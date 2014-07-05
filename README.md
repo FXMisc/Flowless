@@ -46,3 +46,13 @@ As noted before, for the purposes of virtual flow in Flowless the cells are just
   * `computePrefHeight(-1)`
   * `computePrefWidth(height)`
 * Cells are not expected to change their size _spontaneously_, i.e. without changing the item they are holding. Changes to their min/pref/max size will be ignored.
+
+Downloads
+---------
+
+Download the [0.1 binaries](https://github.com/TomasMikula/Flowless/releases/tag/v0.1). Maven artifacts will be available shortly.
+
+Documentation
+-------------
+
+[Javadoc](http://www.fxmisc.org/flowless/javadoc/org/fxmisc/flowless/package-summary.html)
