@@ -26,7 +26,7 @@ Note, however, that Flowless is a low-level layout component and does not provid
 Conceptual differences from ListView
 ------------------------------------
 
-**Dumb cells.** This is the most important difference. For flowless, cells are just [Node](http://docs.oracle.com/javase/8/javafx/api/javafx/scene/Node.html)s and don't encapsulate any logic regarding virtual flow. A cell does not even necessarily store the index of the item it is displaying.
+**Dumb cells.** This is the most important difference. For flowless, cells are just [Node](http://docs.oracle.com/javase/8/javafx/api/javafx/scene/Node.html)s and don't encapsulate any logic regarding virtual flow. A cell does not even necessarily store the index of the item it is displaying. This allows VirtualFlow to have complete control over when the cells are created and/or updated.
 
 **Cell reuse is opt-in,** not forced. Cells are not reused by default. A new cell is created for each item. This simplifies cell implementation and does not impair performance if reusing a cell is about as expensive as creating a new one (i.e. `updateItem` is expensive).
 
