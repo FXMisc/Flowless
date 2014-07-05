@@ -1,4 +1,4 @@
-version = '0.1-SNAPSHOT'
+version = '0.1'
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
@@ -94,3 +94,11 @@ uploadArchives {
 uploadArchives.onlyIf {
     project.hasProperty('sonatypeUsername') && project.hasProperty('sonatypePassword')
 }
+
+task fatJar(type: Jar, dependsOn: classes) {
+    appendix = 'fat'
+    from sourceSets.main.output
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+}
+
+assemble.dependsOn fatJar
