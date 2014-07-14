@@ -8,7 +8,7 @@ JavaFX has its own VirtualFlow, which is not part of the public API, but is used
 Here is a comparison of JavaFX's ListView vs. Flowless on a list of 80 items, 25 of which fit into the viewport.
 
 |                     | Flowless (# of cell creations) | ListView in JDK8u20-b21 (# of `updateItem` calls) | ListView in JDK8u40<sup>(*)</sup> (# of `updateItem` calls) |
-|---------------------|:------------------------------:|:-------------------------------------------------:|:------------------------------------------------------------|
+|---------------------|:------------------------------:|:-------------------------------------------------:|:-----------------------------------------------------------:|
 | update an item in the viewport |                   1 | 25                                                | 1                                                           |
 | update an item outside the viewport |              0 | 25                                                | 0                                                           |
 | delete an item in the middle of the viewport |     1 | 75                                                | ?                                                           |
@@ -18,7 +18,7 @@ Here is a comparison of JavaFX's ListView vs. Flowless on a list of 80 items, 25
 
 (*) If the patch gets integrated into 8u40.
 
-Here is the [source code](https://gist.github.com/TomasMikula/1dcee2cc4e5dab421913) of this mini-benchmark. The results were obtained with JDK 8u20-b21.
+Here is the [source code](https://gist.github.com/TomasMikula/1dcee2cc4e5dab421913) of this mini-benchmark.
 
 Use case for Flowless
 ---------------------
@@ -26,6 +26,17 @@ Use case for Flowless
 You will benefit from Flowless (compared to ListView) the most if you have many item updates and an expensive [updateItem](http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/Cell.html#updateItem-T-boolean-) method.
 
 Note, however, that Flowless is a low-level layout component and does not provide higher-level features like selection model or inline editing. One can, of course, implement those on top of Flowless.
+
+Additional API
+--------------
+
+VirtualFlow in Flowless provides additional public API compared to ListView or VirtualFlow from JavaFX.
+
+**Direct cell access** with [getCell(itemIndex)](http://www.fxmisc.org/flowless/javadoc/org/fxmisc/flowless/VirtualFlow.html#getCell-int-) and [getCellIfVisible(itemIndex)](http://www.fxmisc.org/flowless/javadoc/org/fxmisc/flowless/VirtualFlow.html#getCellIfVisible-int-) methods. This is useful for measurement purposes.
+
+**Hit test** with the [hit(double offset)](http://www.fxmisc.org/flowless/javadoc/org/fxmisc/flowless/VirtualFlow.html#hit-double-) method that converts an offset in primary axis (x for horizontal flow, y for vertical flow) into a cell index and offset relative to the cell, or indicates that the hit is before or beyond the cells.
+
+**Navigate to a subregion of a cell** using the [show(cell, region)](http://www.fxmisc.org/flowless/javadoc/org/fxmisc/flowless/VirtualFlow.html#show-C-javafx.geometry.Bounds-) method. This is a finer grained navigation than just the [show(itemIndex)](http://www.fxmisc.org/flowless/javadoc/org/fxmisc/flowless/VirtualFlow.html#show-int-) method.
 
 Conceptual differences from ListView
 ------------------------------------
