@@ -3,18 +3,22 @@ Flowless
 
 Efficient VirtualFlow for JavaFX. VirtualFlow is a layout container that lays out _cells_ in a vertical or horizontal _flow_. The main feature of a _virtual_ flow is that only the currently visible cells are rendered in the scene. You may have a list of thousands of items, but only, say, 30 cells are rendered at any given time.
 
-JavaFX has its own VirtualFlow, which is not part of the public API, but is used, for example, in the implementation of [ListView](http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/ListView.html). It is, however, [not very efficient](https://javafx-jira.kenai.com/browse/RT-35395) when updating the viewport on items change or scroll. Here is a comparison of JavaFX's ListView vs. Flowless on a list of 80 items, 25 of which fit into the viewport.
+JavaFX has its own VirtualFlow, which is not part of the public API, but is used, for example, in the implementation of [ListView](http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/ListView.html). It is, however, [not very efficient](https://javafx-jira.kenai.com/browse/RT-35395) when updating the viewport on items change or scroll. **EDIT:** Jonathan Giles created a patch to improve ListView performance in the benchmark below. The patch may be integrated into JDK 8u40.
 
-|                                     | ListView (# of `updateItem` calls) | Flowless (# of cell creations) |
-|-------------------------------------|:----------------------------------:|:------------------------------:|
-| update an item in the viewport      | 25                                 | 1                              |
-| update an item outside the viewport | 25                                 | 0                              |
-| scroll 5 items down                 | 5                                  | 5                              |
-| scroll 50 items down                | 75                                 | 25                             |
+Here is a comparison of JavaFX's ListView vs. Flowless on a list of 80 items, 25 of which fit into the viewport.
+
+|                     | Flowless (# of cell creations) | ListView in JDK8u20-b21 (# of `updateItem` calls) | ListView in JDK8u40<sup>(*)</sup> (# of `updateItem` calls) |
+|---------------------|:------------------------------:|:-------------------------------------------------:|:------------------------------------------------------------|
+| update an item in the viewport |                   1 | 25                                                | 1                                                           |
+| update an item outside the viewport |              0 | 25                                                | 0                                                           |
+| delete an item in the middle of the viewport |     1 | 75                                                | ?                                                           |
+| add an item in the middle of the viewport |        1 | 75                                                | ?                                                           |
+| scroll 5 items down |                              5 | 5                                                 | 5                                                           |
+| scroll 50 items down |                            25 | 75                                                | 25 (with fixed cell size)                                   |
+
+(*) If the patch gets integrated into 8u40.
 
 Here is the [source code](https://gist.github.com/TomasMikula/1dcee2cc4e5dab421913) of this mini-benchmark. The results were obtained with JDK 8u20-b21.
-
-We see that whenever a list item is updated in the ListView, every cell in the viewport is updated. This is regardless whether the updated item is in the viewport or not. Flowless achieves the optimal number of cell updates, i.e. 1, resp. 0. When scrolling 5 items down, both implementations need to update/create 5 cells. When scrolling 50 items down, Flowless creates only the 25 cells that will end up in the viewport. For ListView, there are 75 cell updates. I'm not sure what exactly happens to get this number of updates.
 
 Use case for Flowless
 ---------------------
