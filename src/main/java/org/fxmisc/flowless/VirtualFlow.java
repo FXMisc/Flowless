@@ -799,6 +799,9 @@ class VirtualFlowContent<T, C extends Cell<T, ?>> extends Region {
             if(addedSize > 0) {
                 // creating a hole in rendered cells
                 hole = Optional.of(new IndexRange(pos, pos + addedSize));
+            } else {
+                // move the cells after removed items up
+                paveForwardTo(length(), pos - 1);
             }
         } else if(pos > renderedFrom) {
             dropCellsFrom(pos - renderedFrom);
