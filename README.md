@@ -58,25 +58,25 @@ Include Flowless in your project
 
 | Group ID            | Artifact ID | Version |
 | :---------:         | :---------: | :-----: |
-| org.fxmisc.flowless | flowless    | 0.1     |
+| org.fxmisc.flowless | flowless    | 0.2     |
 
 #### Gradle example
 
 ```groovy
 dependencies {
-    compile group: 'org.fxmisc.flowless', name: 'flowless', version: '0.1'
+    compile group: 'org.fxmisc.flowless', name: 'flowless', version: '0.2'
 }
 ```
 
 #### Sbt example
 
 ```scala
-libraryDependencies += "org.fxmisc.flowless" % "flowless" % "0.1"
+libraryDependencies += "org.fxmisc.flowless" % "flowless" % "0.2"
 ```
 
 #### Manual download
 
-Download the [0.1 jar](https://github.com/TomasMikula/Flowless/releases/tag/v0.1) and place it on your classpath.
+Download the [0.2 jar](https://github.com/TomasMikula/Flowless/releases/tag/v0.2) and place it on your classpath.
 
 Documentation
 -------------
