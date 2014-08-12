@@ -1283,15 +1283,18 @@ class VirtualFlowContent<T, C extends Cell<T, ?>> extends Region {
         cell.setVisible(true);
         metrics.resizeRelocate(cell, breadthOffset, l0, breadth, length);
 
-        // do instant layout
         if(cell instanceof Parent) {
-            ((Parent) cell).layout();
+            ((Parent) cell).requestLayout();
         }
     }
 
     private void shiftVisibleCellsByLength(double shift) {
         visibleNodes().forEach(cell -> {
             metrics.relocate(cell, breadthOffset, metrics.minY(cell) + shift);
+
+            if(cell instanceof Parent) {
+                ((Parent) cell).requestLayout();
+            }
         });
     }
 
@@ -1299,6 +1302,10 @@ class VirtualFlowContent<T, C extends Cell<T, ?>> extends Region {
         breadthOffset += shift;
         visibleNodes().forEach(cell -> {
             metrics.relocate(cell, breadthOffset, metrics.minY(cell));
+
+            if(cell instanceof Parent) {
+                ((Parent) cell).requestLayout();
+            }
         });
     }
 
