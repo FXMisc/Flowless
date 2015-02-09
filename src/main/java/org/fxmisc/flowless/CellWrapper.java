@@ -1,11 +1,11 @@
 package org.fxmisc.flowless;
 
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 
 import javafx.scene.Node;
 
-public abstract class CellWrapper<T, N extends Node, C extends Cell<T, N>>
+abstract class CellWrapper<T, N extends Node, C extends Cell<T, N>>
 implements Cell<T, N> {
 
     public static <T, N extends Node,C extends Cell<T, N>>
@@ -53,23 +53,23 @@ implements Cell<T, N> {
     }
 
     public static <T, N extends Node,C extends Cell<T, N>>
-    CellWrapper<T, N, C> beforeUpdateItem(C cell, BiConsumer<Integer, T> action) {
+    CellWrapper<T, N, C> beforeUpdateItem(C cell, Consumer<? super T> action) {
         return new CellWrapper<T, N, C>(cell) {
             @Override
-            public void updateItem(int index, T item) {
-                action.accept(index, item);
-                super.updateItem(index, item);
+            public void updateItem(T item) {
+                action.accept(item);
+                super.updateItem(item);
             }
         };
     }
 
     public static <T, N extends Node,C extends Cell<T, N>>
-    CellWrapper<T, N, C> afterUpdateItem(C cell, BiConsumer<Integer, T> action) {
+    CellWrapper<T, N, C> afterUpdateItem(C cell, Consumer<? super T> action) {
         return new CellWrapper<T, N, C>(cell) {
             @Override
-            public void updateItem(int index, T item) {
-                super.updateItem(index, item);
-                action.accept(index, item);
+            public void updateItem(T item) {
+                super.updateItem(item);
+                action.accept(item);
             }
         };
     }
@@ -117,8 +117,8 @@ implements Cell<T, N> {
     }
 
     @Override
-    public void updateItem(int index, T item) {
-        delegate.updateItem(index, item);
+    public void updateItem(T item) {
+        delegate.updateItem(item);
     }
 
     @Override
@@ -134,5 +134,10 @@ implements Cell<T, N> {
     @Override
     public void dispose() {
         delegate.dispose();
+    }
+
+    @Override
+    public String toString() {
+        return delegate.toString();
     }
 }

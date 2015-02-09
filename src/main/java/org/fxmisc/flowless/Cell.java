@@ -1,6 +1,6 @@
 package org.fxmisc.flowless;
 
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 
 import javafx.scene.Node;
@@ -8,7 +8,14 @@ import javafx.scene.Node;
 @FunctionalInterface
 public interface Cell<T, N extends Node> {
     static <T, N extends Node> Cell<T, N> wrapNode(N node) {
-        return () -> node;
+        return new Cell<T, N>() {
+
+            @Override
+            public N getNode() { return node; }
+
+            @Override
+            public String toString() { return node.toString(); }
+        };
     }
 
     N getNode();
@@ -23,17 +30,16 @@ public interface Cell<T, N extends Node> {
     }
 
     /**
-     * If this cell is reusable ({@link #isReusable()} returns {@code true}),
+     * If this cell is reusable (as indicated by {@link #isReusable()}),
      * this method is called to display a different item. {@link #reset()}
      * will have been called before a call to this method.
      *
      * <p>The default implementation throws
      * {@link UnsupportedOperationException}.
      *
-     * @param index index of the new item
      * @param item the new item to display
      */
-    default void updateItem(int index, T item) {
+    default void updateItem(T item) {
         throw new UnsupportedOperationException();
     }
 
@@ -49,7 +55,7 @@ public interface Cell<T, N extends Node> {
     /**
      * Called when this cell is no longer used to display its item.
      * If this cell is reusable, it may later be asked to display a different
-     * item by a call to {@link #updateItem(int, Object)}.
+     * item by a call to {@link #updateItem(Object)}.
      *
      * <p>Default implementation does nothing.
      */
@@ -83,11 +89,11 @@ public interface Cell<T, N extends Node> {
         return CellWrapper.afterReset(this, action);
     }
 
-    default Cell<T, N> beforeUpdateItem(BiConsumer<Integer, T> action) {
+    default Cell<T, N> beforeUpdateItem(Consumer<? super T> action) {
         return CellWrapper.beforeUpdateItem(this, action);
     }
 
-    default Cell<T, N> afterUpdateItem(BiConsumer<Integer, T> action) {
+    default Cell<T, N> afterUpdateItem(Consumer<? super T> action) {
         return CellWrapper.afterUpdateItem(this, action);
     }
 

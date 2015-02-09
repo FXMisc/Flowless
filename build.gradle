@@ -1,4 +1,4 @@
-version = '0.4-SNAPSHOT'
+version = '0.4'
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
@@ -15,8 +15,9 @@ targetCompatibility = '1.8'
 group = 'org.fxmisc.flowless'
 
 dependencies {
-    compile group: 'org.fxmisc.easybind', name: 'easybind', version: '[1.0.2,)'
-    testCompile group: 'junit', name: 'junit', version: '[4.0,)'
+    compile 'org.reactfx:reactfx:2.0-M2u1'
+    compile 'org.fxmisc.easybind:easybind:[1.0.3,)'
+    testCompile 'junit:junit:[4.0,)'
 }
 
 javadoc {

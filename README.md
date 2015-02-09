@@ -61,7 +61,6 @@ As noted before, for the purposes of virtual flow in Flowless the cells are just
   * `computeMinHeight(-1)`
   * `computePrefHeight(-1)`
   * `computePrefWidth(height)`
-* Cells are not expected to change their size _spontaneously_, i.e. without changing the item they are holding. Changes to their min/pref/max size will be ignored.
 
 Include Flowless in your project
 --------------------------------
@@ -70,25 +69,25 @@ Include Flowless in your project
 
 | Group ID            | Artifact ID | Version |
 | :---------:         | :---------: | :-----: |
-| org.fxmisc.flowless | flowless    | 0.3     |
+| org.fxmisc.flowless | flowless    | 0.4     |
 
 #### Gradle example
 
 ```groovy
 dependencies {
-    compile group: 'org.fxmisc.flowless', name: 'flowless', version: '0.3'
+    compile group: 'org.fxmisc.flowless', name: 'flowless', version: '0.4'
 }
 ```
 
 #### Sbt example
 
 ```scala
-libraryDependencies += "org.fxmisc.flowless" % "flowless" % "0.3"
+libraryDependencies += "org.fxmisc.flowless" % "flowless" % "0.4"
 ```
 
 #### Manual download
 
-Download the [0.3 jar](https://github.com/TomasMikula/Flowless/releases/tag/v0.3) and place it on your classpath.
+Download the [0.4 jar](https://github.com/TomasMikula/Flowless/releases/tag/v0.4) and place it on your classpath.
 
 Documentation
 -------------
