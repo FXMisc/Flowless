@@ -127,8 +127,9 @@ final class SizeTracker {
         return breadthForCells.getValue();
     }
 
-    public void forgetBreadthOf(int itemIndex) {
+    public void forgetSizeOf(int itemIndex) {
         breadths.forget(itemIndex, itemIndex + 1);
+        lengths.forget(itemIndex, itemIndex + 1);
     }
 
     public double lengthFor(int itemIndex) {

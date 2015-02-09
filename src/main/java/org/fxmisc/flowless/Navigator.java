@@ -54,7 +54,7 @@ extends Region implements TargetPositionVisitor {
             int j = cells.indexOfMemoizedItem(i);
             Node node = cells.get(j).getNode();
             if(node instanceof Parent && ((Parent) node).isNeedsLayout()) {
-                sizeTracker.forgetBreadthOf(j);
+                sizeTracker.forgetSizeOf(j);
             }
         }
 
