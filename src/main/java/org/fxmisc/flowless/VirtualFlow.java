@@ -4,6 +4,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.collections.ObservableList;
@@ -15,6 +16,7 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Region;
 
 import org.reactfx.value.Val;
+import org.reactfx.value.Var;
 
 public class VirtualFlow<T, C extends Cell<T, ?>> extends Region {
 
@@ -61,18 +63,12 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region {
         vbar.blockIncrementProperty().bind(vbar.visibleAmountProperty());
 
         // scrollbar positions
-        hbar.setValue(orientation.getHorizontalPosition(content));
-        vbar.setValue(orientation.getVerticalPosition(content));
-        orientation.horizontalPositionProperty(content).addListener(
-                (obs, old, pos) -> hbar.setValue(pos));
-        orientation.verticalPositionProperty(content).addListener(
-                (obs, old, pos) -> vbar.setValue(pos));
-
-        // scroll content by scrollbars
-        hbar.valueProperty().addListener((obs, old, pos) ->
-                orientation.setHorizontalPosition(content, pos.doubleValue()));
-        vbar.valueProperty().addListener((obs, old, pos) ->
-                orientation.setVerticalPosition(content, pos.doubleValue()));
+        Bindings.bindBidirectional(
+                Var.doubleVar(hbar.valueProperty()),
+                orientation.horizontalPositionProperty(content));
+        Bindings.bindBidirectional(
+                Var.doubleVar(vbar.valueProperty()),
+                orientation.verticalPositionProperty(content));
 
         // scroll content by mouse scroll
         this.addEventHandler(ScrollEvent.SCROLL, se -> {

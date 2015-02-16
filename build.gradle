@@ -1,4 +1,4 @@
-version = '0.4'
+version = '0.4.1-SNAPSHOT'
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
@@ -7,6 +7,9 @@ apply plugin: 'signing'
 
 repositories {
     mavenCentral()
+    maven {
+        url 'https://oss.sonatype.org/content/repositories/snapshots/'
+    }
 }
 
 sourceCompatibility = '1.8'
@@ -15,9 +18,9 @@ targetCompatibility = '1.8'
 group = 'org.fxmisc.flowless'
 
 dependencies {
-    compile 'org.reactfx:reactfx:2.0-M2u1'
-    compile 'org.fxmisc.easybind:easybind:[1.0.3,)'
-    testCompile 'junit:junit:[4.0,)'
+    compile 'org.reactfx:reactfx:2.0-SNAPSHOT'
+    compile 'org.fxmisc.easybind:easybind:[1.0.3,1.1)'
+    testCompile 'junit:junit:[4.0,5)'
 }
 
 javadoc {

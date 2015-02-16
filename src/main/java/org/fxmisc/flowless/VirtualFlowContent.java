@@ -16,6 +16,7 @@ import org.fxmisc.easybind.EasyBind;
 import org.reactfx.collection.MemoizationList;
 import org.reactfx.util.Lists;
 import org.reactfx.value.Val;
+import org.reactfx.value.Var;
 
 class VirtualFlowContent<T, C extends Cell<T, ?>> extends Region {
     private final ObservableList<T> items;
@@ -36,15 +37,15 @@ class VirtualFlowContent<T, C extends Cell<T, ?>> extends Region {
     }
 
     private final Val<Double> breadthPositionEstimate;
-    public Val<Double> breadthPositionEstimateProperty() {
-        return breadthPositionEstimate;
+    public Var<Double> breadthPositionEstimateProperty() {
+        return breadthPositionEstimate.asVar(this::setBreadthPosition);
     }
 
     private final Val<Double> lengthOffsetEstimate;
 
     private final Val<Double> lengthPositionEstimate;
-    public Val<Double> lengthPositionEstimateProperty() {
-        return lengthPositionEstimate;
+    public Var<Double> lengthPositionEstimateProperty() {
+        return lengthPositionEstimate.asVar(this::setLengthPosition);
     }
 
     VirtualFlowContent(
@@ -182,14 +183,6 @@ class VirtualFlowContent<T, C extends Cell<T, ?>> extends Region {
         return orientation.getContentBias();
     }
 
-    protected final void setLengthPosition(double pos) {
-        setLengthOffset(lengthPositionToPixels(pos));
-    }
-
-    protected final void setBreadthPosition(double pos) {
-        setBreadthOffset(breadthPositionToPixels(pos));
-    }
-
     protected final void scrollLength(double deltaLength) {
         setLengthOffset(lengthOffsetEstimate.getValue() - deltaLength);
     }
@@ -266,6 +259,14 @@ class VirtualFlowContent<T, C extends Cell<T, ?>> extends Region {
             double shift = Math.max(spaceAfter, -spaceBefore);
             setBreadthOffset(bOff - shift);
         }
+    }
+
+    private void setLengthPosition(double pos) {
+        setLengthOffset(lengthPositionToPixels(pos));
+    }
+
+    private void setBreadthPosition(double pos) {
+        setBreadthOffset(breadthPositionToPixels(pos));
     }
 
     private void setLengthOffset(double pixels) {

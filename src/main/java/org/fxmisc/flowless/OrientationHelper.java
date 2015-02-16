@@ -7,6 +7,7 @@ import javafx.geometry.Orientation;
 import javafx.scene.Node;
 
 import org.reactfx.value.Val;
+import org.reactfx.value.Var;
 
 interface OrientationHelper {
     Orientation getContentBias();
@@ -51,19 +52,10 @@ interface OrientationHelper {
 
     ObservableValue<Double> widthEstimateProperty(VirtualFlowContent<?, ?> content);
     ObservableValue<Double> heightEstimateProperty(VirtualFlowContent<?, ?> content);
-    Val<Double> horizontalPositionProperty(VirtualFlowContent<?, ?> content);
-    Val<Double> verticalPositionProperty(VirtualFlowContent<?, ?> content);
-    void setHorizontalPosition(VirtualFlowContent<?, ?> content, double pos);
-    void setVerticalPosition(VirtualFlowContent<?, ?> content, double pos);
+    Var<Double> horizontalPositionProperty(VirtualFlowContent<?, ?> content);
+    Var<Double> verticalPositionProperty(VirtualFlowContent<?, ?> content);
     void scrollHorizontally(VirtualFlowContent<?, ?> content, double dx);
     void scrollVertically(VirtualFlowContent<?, ?> content, double dy);
-
-    default double getHorizontalPosition(VirtualFlowContent<?, ?> content) {
-        return horizontalPositionProperty(content).getValue();
-    }
-    default double getVerticalPosition(VirtualFlowContent<?, ?> content) {
-        return verticalPositionProperty(content).getValue();
-    }
 }
 
 final class HorizontalHelper implements OrientationHelper {
@@ -152,26 +144,15 @@ final class HorizontalHelper implements OrientationHelper {
     }
 
     @Override
-    public Val<Double> horizontalPositionProperty(
+    public Var<Double> horizontalPositionProperty(
             VirtualFlowContent<?, ?> content) {
         return content.lengthPositionEstimateProperty();
     }
 
     @Override
-    public Val<Double> verticalPositionProperty(
+    public Var<Double> verticalPositionProperty(
             VirtualFlowContent<?, ?> content) {
         return content.breadthPositionEstimateProperty();
-    }
-
-    @Override
-    public void setHorizontalPosition(VirtualFlowContent<?, ?> content,
-            double pos) {
-        content.setLengthPosition(pos);
-    }
-
-    @Override
-    public void setVerticalPosition(VirtualFlowContent<?, ?> content, double pos) {
-        content.setBreadthPosition(pos);
     }
 
     @Override
@@ -271,26 +252,15 @@ final class VerticalHelper implements OrientationHelper {
     }
 
     @Override
-    public Val<Double> horizontalPositionProperty(
+    public Var<Double> horizontalPositionProperty(
             VirtualFlowContent<?, ?> content) {
         return content.breadthPositionEstimateProperty();
     }
 
     @Override
-    public Val<Double> verticalPositionProperty(
+    public Var<Double> verticalPositionProperty(
             VirtualFlowContent<?, ?> content) {
         return content.lengthPositionEstimateProperty();
-    }
-
-    @Override
-    public void setHorizontalPosition(VirtualFlowContent<?, ?> content,
-            double pos) {
-        content.setBreadthPosition(pos);
-    }
-
-    @Override
-    public void setVerticalPosition(VirtualFlowContent<?, ?> content, double pos) {
-        content.setLengthPosition(pos);
     }
 
     @Override
