@@ -1,7 +1,6 @@
 package org.fxmisc.flowless;
 
 import java.util.Optional;
-import java.util.OptionalInt;
 import java.util.function.Function;
 
 import javafx.beans.property.ReadOnlyDoubleProperty;
@@ -74,29 +73,7 @@ class VirtualFlowContent<T, C extends Cell<T, ?>> extends Region {
                 sizeTracker.maxCellBreadthProperty(),
                 (off, vpBr, totalBr) -> offsetToScrollbarPosition(off.doubleValue(), vpBr, totalBr));
 
-        Val<Integer> firstVisibleIndex = Val.create(
-                () -> {
-                    OptionalInt idx = cellPositioner.getFirstVisibleIndex();
-                    return idx.isPresent() ? idx.getAsInt() : null;
-                },
-                cells, cells.memoizedItems());
-
-        Val<C> firstVisibleCell = firstVisibleIndex.map(cellPositioner::getVisibleCell);
-        Val<Double> firstCellMinY = firstVisibleCell.flatMap(orientation::minYProperty);
-
-        lengthOffsetEstimate = Val.combine(
-                sizeTracker.totalLengthEstimateProperty(),
-                sizeTracker.viewportLengthProperty(),
-                sizeTracker.averageLengthEstimateProperty(),
-                firstVisibleIndex,
-                firstCellMinY,
-                (totalLen, vpLen, avgLen, firstIndex, minY) -> {
-                    if(totalLen <= vpLen) {
-                        return 0.0;
-                    }
-
-                    return firstIndex * avgLen - minY;
-                }).orElseConst(0.0);
+        lengthOffsetEstimate = sizeTracker.lengthOffsetEstimateProperty();
 
         lengthPositionEstimate = Val.combine(
                 lengthOffsetEstimate,

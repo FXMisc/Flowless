@@ -25,6 +25,7 @@ final class SizeTracker {
     private final MemoizationList<Double> lengths;
     private final Val<Double> averageLengthEstimate;
     private final Val<Double> totalLengthEstimate;
+    private final Val<Double> lengthOffsetEstimate;
 
     private final Subscription subscription;
 
@@ -48,8 +49,10 @@ final class SizeTracker {
 
         this.lengths = cells.mapDynamic(lengthFn).memoize();
 
-        Val<Double> sumOfKnownLengths = this.lengths.memoizedItems().reduce((a, b) -> a + b).orElseConst(0.0);
-        Val<Integer> knownLengthCount = this.lengths.memoizedItems().sizeProperty();
+        LiveList<Double> knownLengths = this.lengths.memoizedItems();
+        Val<Double> sumOfKnownLengths = knownLengths.reduce((a, b) -> a + b).orElseConst(0.0);
+        Val<Integer> knownLengthCount = knownLengths.sizeProperty();
+
         this.averageLengthEstimate = Val.create(
                 () -> {
                     // make sure to use pref lengths of all present cells
@@ -67,8 +70,43 @@ final class SizeTracker {
                 averageLengthEstimate, cells.sizeProperty(),
                 (avg, n) -> n * avg);
 
-        // pinning totalLengthEstimate binds it all together and enables memoization
-        this.subscription = totalLengthEstimate.pin();
+        Val<Integer> firstVisibleIndex = Val.create(
+                () -> cells.getMemoizedCount() == 0 ? null : cells.indexOfMemoizedItem(0),
+                cells, cells.memoizedItems()); // need to observe cells.memoizedItems()
+                // as well, because they may change without a change in cells.
+
+        Val<? extends Cell<?, ?>> firstVisibleCell = cells.memoizedItems()
+                .collapse(visCells -> visCells.isEmpty() ? null : visCells.get(0));
+
+        Val<Integer> knownLengthCountBeforeFirstVisibleCell = Val.create(() -> {
+            return firstVisibleIndex.getOpt()
+                    .map(i -> lengths.getMemoizedCountBefore(Math.min(i, lengths.size())))
+                    .orElse(0);
+        }, lengths, firstVisibleIndex);
+
+        Val<Double> totalKnownLengthBeforeFirstVisibleCell = knownLengths.reduceRange(
+                knownLengthCountBeforeFirstVisibleCell.map(n -> new IndexRange(0, n)),
+                (a, b) -> a + b).orElseConst(0.0);
+
+        Val<Double> unknownLengthEstimateBeforeFirstVisibleCell = Val.combine(
+                firstVisibleIndex,
+                knownLengthCountBeforeFirstVisibleCell,
+                averageLengthEstimate,
+                (firstIdx, knownCnt, avgLen) -> (firstIdx - knownCnt) * avgLen);
+
+        Val<Double> firstCellMinY = firstVisibleCell.flatMap(orientation::minYProperty);
+
+        lengthOffsetEstimate = Val.combine(
+                totalKnownLengthBeforeFirstVisibleCell,
+                unknownLengthEstimateBeforeFirstVisibleCell,
+                firstCellMinY,
+                (a, b, minY) -> a + b - minY).orElseConst(0.0);
+
+        // pinning totalLengthEstimate and lengthOffsetEstimate
+        // binds it all together and enables memoization
+        this.subscription = Subscription.multi(
+                totalLengthEstimate.pin(),
+                lengthOffsetEstimate.pin());
     }
 
     private static <T> Val<T> avoidFalseInvalidations(Val<T> src) {
@@ -119,6 +157,10 @@ final class SizeTracker {
 
     public Val<Double> totalLengthEstimateProperty() {
         return totalLengthEstimate;
+    }
+
+    public Val<Double> lengthOffsetEstimateProperty() {
+        return lengthOffsetEstimate;
     }
 
     public double breadthFor(int itemIndex) {
