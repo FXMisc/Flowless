@@ -110,15 +110,17 @@ final class EndOffEnd implements TargetPosition {
 
 final class MinDistanceTo implements TargetPosition {
     final int itemIndex;
-    final double additionalOffset;
+    final Offset minY;
+    final Offset maxY;
 
-    MinDistanceTo(int itemIndex, double additionalOffset) {
+    MinDistanceTo(int itemIndex, Offset minY, Offset maxY) {
         this.itemIndex = itemIndex;
-        this.additionalOffset = additionalOffset;
+        this.minY = minY;
+        this.maxY = maxY;
     }
 
     public MinDistanceTo(int itemIndex) {
-        this(itemIndex, 0.0);
+        this(itemIndex, Offset.fromStart(0.0), Offset.fromEnd(0.0));
     }
 
     @Override
@@ -126,10 +128,10 @@ final class MinDistanceTo implements TargetPosition {
             int pos, int removedSize, int addedSize) {
         if(itemIndex >= pos + removedSize) {
             // change before the target item, just update item index
-            return new MinDistanceTo(itemIndex - removedSize + addedSize, additionalOffset);
+            return new MinDistanceTo(itemIndex - removedSize + addedSize, minY, maxY);
         } else if(itemIndex >= pos) {
             // target item deleted, show the first inserted
-            return new MinDistanceTo(pos, additionalOffset);
+            return new MinDistanceTo(pos, Offset.fromStart(0.0), Offset.fromEnd(0.0));
         } else {
             // change after the target item, target position not affected
             return this;
@@ -138,7 +140,7 @@ final class MinDistanceTo implements TargetPosition {
 
     @Override
     public TargetPosition scrollBy(double delta) {
-        return new MinDistanceTo(itemIndex, additionalOffset - delta);
+        return new MinDistanceTo(itemIndex, minY.add(delta), maxY.add(delta));
     }
 
     @Override
@@ -148,6 +150,40 @@ final class MinDistanceTo implements TargetPosition {
 
     @Override
     public TargetPosition clamp(int size) {
-        return new MinDistanceTo(StartOffStart.clamp(itemIndex, size), additionalOffset);
+        return new MinDistanceTo(StartOffStart.clamp(itemIndex, size), minY, maxY);
+    }
+}
+
+class Offset {
+    public static Offset fromStart(double offset) {
+        return new Offset(offset, true);
+    }
+
+    public static Offset fromEnd(double offset) {
+        return new Offset(offset, false);
+    }
+
+    private final double offset;
+    private final boolean fromStart;
+
+    private Offset(double offset, boolean fromStart) {
+        this.offset = offset;
+        this.fromStart = fromStart;
+    }
+
+    public double getValue() {
+        return offset;
+    }
+
+    public boolean isFromStart() {
+        return fromStart;
+    }
+
+    public boolean isFromEnd() {
+        return !fromStart;
+    }
+
+    public Offset add(double delta) {
+        return new Offset(offset + delta, fromStart);
     }
 }

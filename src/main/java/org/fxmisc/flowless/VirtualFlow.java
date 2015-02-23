@@ -167,8 +167,8 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region {
         content.showAtOffset(itemIndex, offset);
     }
 
-    public void show(C cell, Bounds region) {
-        content.showRegion(cell, region);
+    public void show(int itemIndex, Bounds region) {
+        content.showRegion(itemIndex, region);
     }
 
     /**

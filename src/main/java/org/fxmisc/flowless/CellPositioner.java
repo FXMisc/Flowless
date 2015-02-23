@@ -46,8 +46,13 @@ final class CellPositioner<T, C extends Cell<T, ?>> {
     }
 
     public double shortestDeltaToViewport(C cell) {
-        double gapBefore = orientation.minY(cell);
-        double gapAfter = sizeTracker.getViewportLength() - orientation.maxY(cell);
+        return shortestDeltaToViewport(cell, 0.0, orientation.length(cell));
+    }
+
+    public double shortestDeltaToViewport(C cell, double fromY, double toY) {
+        double cellMinY = orientation.minY(cell);
+        double gapBefore = cellMinY + fromY;
+        double gapAfter = sizeTracker.getViewportLength() - (cellMinY + toY);
 
         return (gapBefore < 0 && gapAfter > 0) ? Math.min(-gapBefore, gapAfter) :
                (gapBefore > 0 && gapAfter < 0) ? Math.max(-gapBefore, gapAfter) :
@@ -74,6 +79,13 @@ final class CellPositioner<T, C extends Cell<T, ?>> {
     public C placeEndFromEnd(int itemIndex, double endOffEnd) {
         C cell = getSizedCell(itemIndex);
         double y = sizeTracker.getViewportLength() + endOffEnd - orientation.length(cell);
+        relocate(cell, 0, y);
+        return cell;
+    }
+
+    public C placeStartFromEnd(int itemIndex, double startOffEnd) {
+        C cell = getSizedCell(itemIndex);
+        double y = sizeTracker.getViewportLength() + startOffEnd;
         relocate(cell, 0, y);
         return cell;
     }

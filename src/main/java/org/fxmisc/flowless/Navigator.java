@@ -96,18 +96,10 @@ extends Region implements TargetPositionVisitor {
                          // are affected
     }
 
-  void showLengthRegion(C cell, double fromY, double toY) {
-      double minY = orientation.minY(cell);
-      double spaceBefore = minY + fromY;
-      double spaceAfter = sizeTracker.getViewportLength() - (minY + toY);
-      if(spaceBefore < 0 && spaceAfter > 0) {
-          double shift = Math.min(-spaceBefore, spaceAfter);
-          scrollTargetPositionBy(-shift);
-      } else if(spaceAfter < 0 && spaceBefore > 0) {
-          double shift = Math.max(spaceAfter, -spaceBefore);
-          scrollTargetPositionBy(-shift);
-      }
-  }
+    void showLengthRegion(int itemIndex, double fromY, double toY) {
+        setTargetPosition(new MinDistanceTo(
+                itemIndex, Offset.fromStart(fromY), Offset.fromEnd(toY)));
+    }
 
     @Override
     public void visit(StartOffStart targetPosition) {
@@ -117,7 +109,7 @@ extends Region implements TargetPositionVisitor {
 
     @Override
     public void visit(EndOffEnd targetPosition) {
-        placeEndAtMayCrop(targetPosition.itemIndex, targetPosition.offsetFromEnd);
+        placeEndOffEndMayCrop(targetPosition.itemIndex, targetPosition.offsetFromEnd);
         fillViewportFrom(targetPosition.itemIndex);
     }
 
@@ -125,9 +117,9 @@ extends Region implements TargetPositionVisitor {
     public void visit(MinDistanceTo targetPosition) {
         Optional<C> cell = positioner.getCellIfVisible(targetPosition.itemIndex);
         if(cell.isPresent()) {
-            placeToViewportAndAdjust(targetPosition.itemIndex, targetPosition.additionalOffset);
+            placeToViewport(targetPosition.itemIndex, targetPosition.minY, targetPosition.maxY);
         } else {
-            OptionalInt prevVisible = positioner.lastVisibleBefore(targetPosition.itemIndex);
+            OptionalInt prevVisible;
             OptionalInt nextVisible;
             if((prevVisible = positioner.lastVisibleBefore(targetPosition.itemIndex)).isPresent()) {
                 // Try keeping prevVisible in place:
@@ -135,9 +127,11 @@ extends Region implements TargetPositionVisitor {
                 fillForwardFrom(prevVisible.getAsInt());
                 cell = positioner.getCellIfVisible(targetPosition.itemIndex);
                 if(cell.isPresent()) {
-                    placeToViewportAndAdjust(targetPosition.itemIndex, targetPosition.additionalOffset);
+                    placeToViewport(targetPosition.itemIndex, targetPosition.minY, targetPosition.maxY);
+                } else if(targetPosition.maxY.isFromStart()) {
+                    placeStartOffEndMayCrop(targetPosition.itemIndex, -targetPosition.maxY.getValue());
                 } else {
-                    placeEndAtMayCrop(targetPosition.itemIndex, targetPosition.additionalOffset);
+                    placeEndOffEndMayCrop(targetPosition.itemIndex, -targetPosition.maxY.getValue());
                 }
             } else if((nextVisible = positioner.firstVisibleAfter(targetPosition.itemIndex + 1)).isPresent()) {
                 // Try keeping nextVisible in place:
@@ -145,21 +139,38 @@ extends Region implements TargetPositionVisitor {
                 fillBackwardFrom(nextVisible.getAsInt());
                 cell = positioner.getCellIfVisible(targetPosition.itemIndex);
                 if(cell.isPresent()) {
-                    placeToViewportAndAdjust(targetPosition.itemIndex, targetPosition.additionalOffset);
+                    placeToViewport(targetPosition.itemIndex, targetPosition.minY, targetPosition.maxY);
+                } else if(targetPosition.minY.isFromStart()) {
+                    placeStartAtMayCrop(targetPosition.itemIndex, -targetPosition.minY.getValue());
                 } else {
-                    placeStartAtMayCrop(targetPosition.itemIndex, targetPosition.additionalOffset);
+                    placeEndOffStartMayCrop(targetPosition.itemIndex, -targetPosition.minY.getValue());
                 }
             } else {
-                placeStartAtMayCrop(targetPosition.itemIndex, targetPosition.additionalOffset);
+                if(targetPosition.minY.isFromStart()) {
+                    placeStartAtMayCrop(targetPosition.itemIndex, -targetPosition.minY.getValue());
+                } else {
+                    placeEndOffStartMayCrop(targetPosition.itemIndex, -targetPosition.minY.getValue());
+                }
             }
         }
         fillViewportFrom(targetPosition.itemIndex);
     }
 
-    private void placeToViewportAndAdjust(int itemIndex, double adjustment) {
+    private void placeToViewport(int itemIndex, Offset from, Offset to) {
         C cell = positioner.getVisibleCell(itemIndex);
-        double d = positioner.shortestDeltaToViewport(cell);
-        positioner.placeStartAt(itemIndex, orientation.minY(cell) + d + adjustment);
+        double fromY = from.isFromStart()
+                ? from.getValue()
+                : orientation.length(cell) + to.getValue();
+        double toY = to.isFromStart()
+                ? to.getValue()
+                : orientation.length(cell) + to.getValue();
+        placeToViewport(itemIndex, fromY, toY);
+    }
+
+    private void placeToViewport(int itemIndex, double fromY, double toY) {
+        C cell = positioner.getVisibleCell(itemIndex);
+        double d = positioner.shortestDeltaToViewport(cell, fromY, toY);
+        positioner.placeStartAt(itemIndex, orientation.minY(cell) + d);
     }
 
     private void placeStartAtMayCrop(int itemIndex, double startOffStart) {
@@ -167,7 +178,17 @@ extends Region implements TargetPositionVisitor {
         positioner.placeStartAt(itemIndex, startOffStart);
     }
 
-    private void placeEndAtMayCrop(int itemIndex, double endOffEnd) {
+    private void placeStartOffEndMayCrop(int itemIndex, double startOffEnd) {
+        cropToNeighborhoodOf(itemIndex, startOffEnd);
+        positioner.placeStartFromEnd(itemIndex, startOffEnd);
+    }
+
+    private void placeEndOffStartMayCrop(int itemIndex, double endOffStart) {
+        cropToNeighborhoodOf(itemIndex, endOffStart);
+        positioner.placeEndFromStart(itemIndex, endOffStart);
+    }
+
+    private void placeEndOffEndMayCrop(int itemIndex, double endOffEnd) {
         cropToNeighborhoodOf(itemIndex, endOffEnd);
         positioner.placeEndFromEnd(itemIndex, endOffEnd);
     }

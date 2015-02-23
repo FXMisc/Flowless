@@ -223,12 +223,12 @@ class VirtualFlowContent<T, C extends Cell<T, ?>> extends Region {
         navigator.setTargetPosition(new StartOffStart(itemIdx, offset));
     }
 
-    void showRegion(C cell, Bounds region) {
-      navigator.showLengthRegion(cell, orientation.minY(region), orientation.maxY(region));
-      showBreadthRegion(cell, orientation.minX(region), orientation.maxX(region));
+    void showRegion(int itemIndex, Bounds region) {
+      navigator.showLengthRegion(itemIndex, orientation.minY(region), orientation.maxY(region));
+      showBreadthRegion(orientation.minX(region), orientation.maxX(region));
     }
 
-    private void showBreadthRegion(C cell, double fromX, double toX) {
+    private void showBreadthRegion(double fromX, double toX) {
         double bOff = breadthOffset.get();
         double spaceBefore = fromX - bOff;
         double spaceAfter = sizeTracker.getViewportBreadth() - toX + bOff;
