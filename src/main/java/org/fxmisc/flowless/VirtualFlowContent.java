@@ -91,8 +91,7 @@ class VirtualFlowContent<T, C extends Cell<T, ?>> extends Region {
 
     public C getCellFor(int itemIndex) {
         Lists.checkIndex(itemIndex, items.size());
-        navigator.paveTo(itemIndex);
-        return cellPositioner.getVisibleCell(itemIndex);
+        return cellPositioner.getSizedCell(itemIndex);
     }
 
     public Optional<C> getCellIfVisible(int itemIndex) {

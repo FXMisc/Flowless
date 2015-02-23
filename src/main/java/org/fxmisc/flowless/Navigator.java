@@ -212,14 +212,6 @@ extends Region implements TargetPositionVisitor {
         return i;
     }
 
-    private void paveForwardFrom0(int fromIdx, int targetIdx) {
-        C cell = positioner.getVisibleCell(fromIdx);
-        for(int i = fromIdx + 1; i <= targetIdx; ++i) {
-            double max = orientation.maxY(cell);
-            cell = positioner.placeStartAt(i, max);
-        }
-    }
-
     private int fillBackwardFrom(int itemIndex) {
         return fillBackwardFrom(itemIndex, 0.0);
     }
@@ -248,28 +240,6 @@ extends Region implements TargetPositionVisitor {
             min = orientation.minY(c);
         }
         return i;
-    }
-
-    private void paveBackwardFrom0(int fromIdx, int targetIdx) {
-        C cell = positioner.getVisibleCell(fromIdx);
-        for(int i = fromIdx - 1; i >= targetIdx; --i) {
-            double min = orientation.minY(cell);
-            cell = positioner.placeEndFromStart(i, min);
-        }
-    }
-
-    void paveTo(int itemIdx) {
-        layout();
-        if(!cellListManager.isCellPresent(itemIdx)) {
-            int firstVisible = positioner.getFirstVisibleIndex().getAsInt();
-            if(itemIdx < firstVisible) {
-                paveBackwardFrom0(firstVisible, itemIdx);
-            } else {
-                int lastVisible = positioner.getLastVisibleIndex().getAsInt();
-                assert itemIdx > lastVisible;
-                paveForwardFrom0(lastVisible, itemIdx);
-            }
-        }
     }
 
     private void fillViewportFrom(int itemIndex) {

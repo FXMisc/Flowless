@@ -168,9 +168,14 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region {
     }
 
     /**
-     * If the item is out of view, all cells between the current view and
-     * {@code itemIndex} will be laid out, which may be a significant
-     * performance hit if the target cell is too distant from the current view.
+     * If the item is out of view, instantiates a new cell for the item.
+     * The returned cell will be properly sized, but not properly positioned
+     * relative to the cells in the viewport, unless it is itself in the
+     * viewport.
+     *
+     * @return Cell for the given item. The cell will be valid only until the
+     * next layout pass. It should therefore not be stored. It is intended to
+     * be used for measurement purposes only.
      */
     public C getCell(int itemIndex) {
         return content.getCellFor(itemIndex);

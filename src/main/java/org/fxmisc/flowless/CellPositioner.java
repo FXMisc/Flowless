@@ -78,7 +78,11 @@ final class CellPositioner<T, C extends Cell<T, ?>> {
         return cell;
     }
 
-    private C getSizedCell(int itemIndex) {
+    /**
+     * Returns properly sized, but not properly positioned cell for the given
+     * index.
+     */
+    C getSizedCell(int itemIndex) {
         C cell = cellManager.getCell(itemIndex);
         double breadth = sizeTracker.breadthFor(itemIndex);
         double length = sizeTracker.lengthFor(itemIndex);
