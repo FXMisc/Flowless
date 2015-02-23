@@ -219,6 +219,10 @@ class VirtualFlowContent<T, C extends Cell<T, ?>> extends Region {
         navigator.setTargetPosition(new EndOffEnd(itemIdx, 0.0));
     }
 
+    void showAtOffset(int itemIdx, double offset) {
+        navigator.setTargetPosition(new StartOffStart(itemIdx, offset));
+    }
+
     void showRegion(C cell, Bounds region) {
       navigator.showLengthRegion(cell, orientation.minY(region), orientation.maxY(region));
       showBreadthRegion(cell, orientation.minX(region), orientation.maxX(region));
