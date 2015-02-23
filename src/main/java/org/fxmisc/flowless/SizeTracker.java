@@ -37,8 +37,9 @@ final class SizeTracker {
         this.viewportBounds = viewportBounds;
         this.cells = lazyCells;
         this.breadths = lazyCells.map(orientation::minBreadth).memoize();
-        this.maxKnownMinBreadth = LiveList.reduce(
-                breadths.memoizedItems(), Math::max).orElseConst(0.0);
+        this.maxKnownMinBreadth = breadths.memoizedItems()
+                .reduce(Math::max)
+                .orElseConst(0.0);
         this.viewportBreadth = Val.map(viewportBounds, orientation::breadth);
         this.viewportLength = Val.map(viewportBounds, orientation::length);
         this.breadthForCells = Val.combine(
@@ -56,8 +57,10 @@ final class SizeTracker {
         this.averageLengthEstimate = Val.create(
                 () -> {
                     // make sure to use pref lengths of all present cells
-                    IndexRange cellRange = cells.getMemoizedItemsRange();
-                    lengths.force(cellRange.getStart(), cellRange.getEnd());
+                    for(int i = 0; i < cells.getMemoizedCount(); ++i) {
+                        int j = cells.indexOfMemoizedItem(i);
+                        lengths.force(j, j + 1);
+                    }
 
                     int count = knownLengthCount.getValue();
                     return count == 0
