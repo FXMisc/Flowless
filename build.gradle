@@ -1,4 +1,4 @@
-version = '0.4.1-SNAPSHOT'
+version = '0.4.2-SNAPSHOT'
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
@@ -18,7 +18,7 @@ targetCompatibility = '1.8'
 group = 'org.fxmisc.flowless'
 
 dependencies {
-    compile 'org.reactfx:reactfx:2.0-SNAPSHOT'
+    compile 'org.reactfx:reactfx:2.0-M4'
     compile 'org.fxmisc.easybind:easybind:[1.0.3,1.1)'
     testCompile 'junit:junit:[4.0,5)'
 }
