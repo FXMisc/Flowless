@@ -98,7 +98,7 @@ extends Region implements TargetPositionVisitor {
 
     void showLengthRegion(int itemIndex, double fromY, double toY) {
         setTargetPosition(new MinDistanceTo(
-                itemIndex, Offset.fromStart(fromY), Offset.fromEnd(toY)));
+                itemIndex, Offset.fromStart(fromY), Offset.fromStart(toY)));
     }
 
     @Override
