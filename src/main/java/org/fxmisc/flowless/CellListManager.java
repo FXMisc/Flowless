@@ -7,6 +7,7 @@ import java.util.function.Function;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 
+import org.reactfx.EventStreams;
 import org.reactfx.Subscription;
 import org.reactfx.collection.LiveList;
 import org.reactfx.collection.MemoizationList;
@@ -89,49 +90,16 @@ final class CellListManager<T, C extends Cell<T, ?>> {
 
     private C cellForItem(T item) {
         C cell = cellPool.getCell(item);
-//        Node node = cell.getNode();
-//
-//        // apply CSS when the node is added to the scene
-//        EventStreams.nonNullValuesOf(node.sceneProperty())
-//                .subscribeForOne(scene -> {
-////                    applySkins(node);
-//                    node.applyCss();
-//                });
+
+        // apply CSS when the cell is first added to the scene
+        Node node = cell.getNode();
+        EventStreams.nonNullValuesOf(node.sceneProperty())
+                .subscribeForOne(scene -> {
+                    node.applyCss();
+                });
 
         return cell;
     }
-
-//    private static final Method createDefaultSkin;
-//    static {
-//        try {
-//            createDefaultSkin = Control.class.getDeclaredMethod("createDefaultSkin");
-//        } catch (NoSuchMethodException | SecurityException e) {
-//            throw new RuntimeException("This is too bad", e);
-//        }
-//        createDefaultSkin.setAccessible(true);
-//    }
-//    private static void applySkins(Node node) {
-//        if(node instanceof Parent) {
-//            Parent parent = (Parent) node;
-//            if(parent instanceof Control) {
-//                Control control = (Control) parent;
-//                Skin<?> skin = control.getSkin();
-//                System.out.println("skin for " + control + " is " + skin);
-//                if(skin == null) {
-//                    try {
-//                        skin = (Skin<?>) createDefaultSkin.invoke(control);
-//                    } catch (IllegalAccessException | IllegalArgumentException
-//                            | InvocationTargetException e) {
-//                        throw new RuntimeException("Oops!", e);
-//                    }
-//                    control.setSkin(skin);
-//                }
-//            }
-//            for(Node child: parent.getChildrenUnmodifiable()) {
-//                applySkins(child);
-//            }
-//        }
-//    }
 
     private void presentCellsChanged(QuasiListModification<? extends C> mod) {
         // add removed cells back to the pool
