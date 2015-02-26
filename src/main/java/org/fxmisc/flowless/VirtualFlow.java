@@ -72,10 +72,8 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region {
 
         // scroll content by mouse scroll
         this.addEventHandler(ScrollEvent.SCROLL, se -> {
-            double dx = se.getDeltaX();
-            double dy = se.getDeltaY();
-            orientation.scrollVertically(content, dy);
-            orientation.scrollHorizontally(content, dx);
+            scrollX(se.getDeltaX());
+            scrollY(se.getDeltaY());
             se.consume();
         });
 
@@ -169,6 +167,22 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region {
 
     public void show(int itemIndex, Bounds region) {
         content.showRegion(itemIndex, region);
+    }
+
+    /**
+     * Scroll the content horizontally by the given amount.
+     * @param deltaX positive value scrolls right, negative value scrolls left
+     */
+    public void scrollX(double deltaX) {
+        content.scrollX(deltaX);
+    }
+
+    /**
+     * Scroll the content vertically by the given amount.
+     * @param deltaY positive value scrolls down, negative value scrolls up
+     */
+    public void scrollY(double deltaY) {
+        content.scrollY(deltaY);
     }
 
     /**

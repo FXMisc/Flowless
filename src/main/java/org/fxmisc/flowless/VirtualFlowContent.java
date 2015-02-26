@@ -159,12 +159,20 @@ class VirtualFlowContent<T, C extends Cell<T, ?>> extends Region {
         return orientation.getContentBias();
     }
 
-    protected final void scrollLength(double deltaLength) {
+    void scrollLength(double deltaLength) {
         setLengthOffset(lengthOffsetEstimate.getValue() - deltaLength);
     }
 
-    protected final void scrollBreadth(double deltaBreadth) {
+    void scrollBreadth(double deltaBreadth) {
         setBreadthOffset(breadthOffset.get() + deltaBreadth);
+    }
+
+    void scrollX(double deltaX) {
+        orientation.scrollHorizontally(this, deltaX);
+    }
+
+    void scrollY(double deltaY) {
+        orientation.scrollVertically(this, deltaY);
     }
 
     VirtualFlowHit<C> hit(double offset) {
