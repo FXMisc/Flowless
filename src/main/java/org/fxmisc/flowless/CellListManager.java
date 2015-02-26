@@ -1,7 +1,6 @@
 package org.fxmisc.flowless;
 
 import java.util.Optional;
-import java.util.OptionalInt;
 import java.util.function.Function;
 
 import javafx.collections.ObservableList;
@@ -65,22 +64,6 @@ final class CellListManager<T, C extends Cell<T, ?>> {
         return cells.get(itemIndex);
     }
 
-    public OptionalInt lastPresentBefore(int position) {
-        int presentBefore = cells.getMemoizedCountBefore(position);
-        return presentBefore > 0
-                ? OptionalInt.of(cells.indexOfMemoizedItem(presentBefore - 1))
-                : OptionalInt.empty();
-    }
-
-    public OptionalInt firstPresentAfter(int position) {
-        int presentBefore = cells.getMemoizedCountBefore(position);
-        int presentAfter = cells.getMemoizedCountAfter(position);
-
-        return presentAfter > 0
-                ? OptionalInt.of(cells.indexOfMemoizedItem(presentBefore))
-                : OptionalInt.empty();
-    }
-
     public void cropTo(int fromItem, int toItem) {
         fromItem = Math.max(fromItem, 0);
         toItem = Math.min(toItem, cells.size());
@@ -97,6 +80,10 @@ final class CellListManager<T, C extends Cell<T, ?>> {
                 .subscribeForOne(scene -> {
                     node.applyCss();
                 });
+
+        // Make cell initially invisible.
+        // It will be made visible when it is positioned.
+        node.setVisible(false);
 
         return cell;
     }

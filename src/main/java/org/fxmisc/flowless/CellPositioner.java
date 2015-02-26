@@ -1,7 +1,10 @@
 package org.fxmisc.flowless;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.OptionalInt;
+
+import org.reactfx.collection.MemoizationList;
 
 final class CellPositioner<T, C extends Cell<T, ?>> {
     private final CellListManager<T, C> cellManager;
@@ -22,19 +25,43 @@ final class CellPositioner<T, C extends Cell<T, ?>> {
     }
 
     public C getVisibleCell(int itemIndex) {
-        return cellManager.getPresentCell(itemIndex);
+        C cell = cellManager.getPresentCell(itemIndex);
+        if(cell.getNode().isVisible()) {
+            return cell;
+        } else {
+            throw new NoSuchElementException(
+                    "Cell " + itemIndex + " is not visible");
+        }
     }
 
     public Optional<C> getCellIfVisible(int itemIndex) {
-        return cellManager.getCellIfPresent(itemIndex);
+        return cellManager.getCellIfPresent(itemIndex)
+                .filter(c -> c.getNode().isVisible());
     }
 
     public OptionalInt lastVisibleBefore(int position) {
-        return cellManager.lastPresentBefore(position);
+        MemoizationList<C> cells = cellManager.getLazyCellList();
+        int presentBefore = cells.getMemoizedCountBefore(position);
+        for(int i = presentBefore - 1; i >= 0; --i) {
+            C cell = cells.memoizedItems().get(i);
+            if(cell.getNode().isVisible()) {
+                return OptionalInt.of(cells.indexOfMemoizedItem(i));
+            }
+        }
+        return OptionalInt.empty();
     }
 
     public OptionalInt firstVisibleAfter(int position) {
-        return cellManager.firstPresentAfter(position);
+        MemoizationList<C> cells = cellManager.getLazyCellList();
+        int presentBefore = cells.getMemoizedCountBefore(position);
+        int present = cells.getMemoizedCount();
+        for(int i = presentBefore; i < present; ++i) {
+            C cell = cells.memoizedItems().get(i);
+            if(cell.getNode().isVisible()) {
+                return OptionalInt.of(cells.indexOfMemoizedItem(i));
+            }
+        }
+        return OptionalInt.empty();
     }
 
     public OptionalInt getLastVisibleIndex() {
@@ -67,12 +94,14 @@ final class CellPositioner<T, C extends Cell<T, ?>> {
     public C placeStartAt(int itemIndex, double startOffStart) {
         C cell = getSizedCell(itemIndex);
         relocate(cell, 0, startOffStart);
+        cell.getNode().setVisible(true);
         return cell;
     }
 
     public C placeEndFromStart(int itemIndex, double endOffStart) {
         C cell = getSizedCell(itemIndex);
         relocate(cell, 0, endOffStart - orientation.length(cell));
+        cell.getNode().setVisible(true);
         return cell;
     }
 
@@ -80,6 +109,7 @@ final class CellPositioner<T, C extends Cell<T, ?>> {
         C cell = getSizedCell(itemIndex);
         double y = sizeTracker.getViewportLength() + endOffEnd - orientation.length(cell);
         relocate(cell, 0, y);
+        cell.getNode().setVisible(true);
         return cell;
     }
 
@@ -87,6 +117,7 @@ final class CellPositioner<T, C extends Cell<T, ?>> {
         C cell = getSizedCell(itemIndex);
         double y = sizeTracker.getViewportLength() + startOffEnd;
         relocate(cell, 0, y);
+        cell.getNode().setVisible(true);
         return cell;
     }
 
