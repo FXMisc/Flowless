@@ -11,7 +11,6 @@ import javafx.geometry.Orientation;
 import javafx.scene.layout.Region;
 import javafx.scene.shape.Rectangle;
 
-import org.fxmisc.easybind.EasyBind;
 import org.reactfx.collection.MemoizationList;
 import org.reactfx.util.Lists;
 import org.reactfx.value.Val;
@@ -61,8 +60,9 @@ class VirtualFlowContent<T, C extends Cell<T, ?>> extends Region {
         this.navigator = new Navigator<>(cellListManager, cellPositioner, orientation, sizeTracker);
 
         getChildren().add(navigator);
-        clipProperty().bind(EasyBind.monadic(layoutBoundsProperty())
-                .map(b -> new Rectangle(b.getWidth(), b.getHeight())));
+        clipProperty().bind(Val.map(
+                layoutBoundsProperty(),
+                b -> new Rectangle(b.getWidth(), b.getHeight())));
 
 
         // set up bindings

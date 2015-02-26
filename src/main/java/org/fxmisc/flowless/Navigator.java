@@ -3,11 +3,11 @@ package org.fxmisc.flowless;
 import java.util.Optional;
 import java.util.OptionalInt;
 
+import javafx.beans.binding.Bindings;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.layout.Region;
 
-import org.fxmisc.easybind.EasyBind;
 import org.reactfx.Subscription;
 import org.reactfx.collection.LiveList;
 import org.reactfx.collection.MemoizationList;
@@ -22,7 +22,6 @@ extends Region implements TargetPositionVisitor {
     private final OrientationHelper orientation;
     private final SizeTracker sizeTracker;
     private final Subscription itemsSubscription;
-    private final org.fxmisc.easybind.Subscription childrenBinding;
 
     private TargetPosition targetPosition = TargetPosition.BEGINNING;
 
@@ -38,12 +37,12 @@ extends Region implements TargetPositionVisitor {
         this.sizeTracker = sizeTracker;
 
         this.itemsSubscription = LiveList.observeQuasiChanges(cellListManager.getLazyCellList(), this::itemsChanged);
-        this.childrenBinding = EasyBind.listBind(getChildren(), cellListManager.getNodes());
+        Bindings.bindContent(getChildren(), cellListManager.getNodes());
     }
 
     public void dispose() {
         itemsSubscription.unsubscribe();
-        childrenBinding.unsubscribe();
+        Bindings.unbindContent(getChildren(), cellListManager.getNodes());
     }
 
     @Override

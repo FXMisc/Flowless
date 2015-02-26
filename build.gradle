@@ -19,7 +19,6 @@ group = 'org.fxmisc.flowless'
 
 dependencies {
     compile 'org.reactfx:reactfx:2.0-M4'
-    compile 'org.fxmisc.easybind:easybind:[1.0.3,1.1)'
     testCompile 'junit:junit:[4.0,5)'
 }
 
