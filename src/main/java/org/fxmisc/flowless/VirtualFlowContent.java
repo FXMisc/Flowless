@@ -175,30 +175,35 @@ class VirtualFlowContent<T, C extends Cell<T, ?>> extends Region {
         orientation.scrollVertically(this, deltaY);
     }
 
-    VirtualFlowHit<C> hit(double offset) {
+    VirtualFlowHit<C> hit(double x, double y) {
+        double bOff = orientation.getX(x, y);
+        double lOff = orientation.getY(x, y);
+
+        bOff += breadthOffset.get();
+
         if(items.isEmpty()) {
-            return VirtualFlowHit.hitAfterCells(offset);
+            return orientation.hitAfterCells(bOff, lOff);
         }
 
         layout();
 
         int firstVisible = cellPositioner.getFirstVisibleIndex().getAsInt();
-        firstVisible = navigator.fillBackwardFrom0(firstVisible, offset);
+        firstVisible = navigator.fillBackwardFrom0(firstVisible, lOff);
         C firstCell = cellPositioner.getVisibleCell(firstVisible);
 
         int lastVisible = cellPositioner.getLastVisibleIndex().getAsInt();
-        lastVisible = navigator.fillForwardFrom0(lastVisible, offset);
+        lastVisible = navigator.fillForwardFrom0(lastVisible, lOff);
         C lastCell = cellPositioner.getVisibleCell(lastVisible);
 
-        if(offset < orientation.minY(firstCell)) {
-            return VirtualFlowHit.hitBeforeCells(offset - orientation.minY(firstCell));
-        } else if(offset >= orientation.maxY(lastCell)) {
-            return VirtualFlowHit.hitAfterCells(offset - orientation.maxY(lastCell));
+        if(lOff < orientation.minY(firstCell)) {
+            return orientation.hitBeforeCells(bOff, lOff - orientation.minY(firstCell));
+        } else if(lOff >= orientation.maxY(lastCell)) {
+            return orientation.hitAfterCells(bOff, lOff - orientation.maxY(lastCell));
         } else {
             for(int i = firstVisible; i <= lastVisible; ++i) {
                 C cell = cellPositioner.getVisibleCell(i);
-                if(offset < orientation.maxY(cell)) {
-                    return VirtualFlowHit.cellHit(i, cell, offset - orientation.minY(cell));
+                if(lOff < orientation.maxY(cell)) {
+                    return orientation.cellHit(i, cell, bOff, lOff - orientation.minY(cell));
                 }
             }
             throw new AssertionError("unreachable code");

@@ -11,6 +11,8 @@ import org.reactfx.value.Var;
 
 interface OrientationHelper {
     Orientation getContentBias();
+    double getX(double x, double y);
+    double getY(double x, double y);
     double length(Bounds bounds);
     double breadth(Bounds bounds);
     double minX(Bounds bounds);
@@ -56,6 +58,10 @@ interface OrientationHelper {
     Var<Double> verticalPositionProperty(VirtualFlowContent<?, ?> content);
     void scrollHorizontally(VirtualFlowContent<?, ?> content, double dx);
     void scrollVertically(VirtualFlowContent<?, ?> content, double dy);
+
+    <C extends Cell<?, ?>> VirtualFlowHit<C> hitBeforeCells(double bOff, double lOff);
+    <C extends Cell<?, ?>> VirtualFlowHit<C> hitAfterCells(double bOff, double lOff);
+    <C extends Cell<?, ?>> VirtualFlowHit<C> cellHit(int itemIndex, C cell, double bOff, double lOff);
 }
 
 final class HorizontalHelper implements OrientationHelper {
@@ -63,6 +69,16 @@ final class HorizontalHelper implements OrientationHelper {
     @Override
     public Orientation getContentBias() {
         return Orientation.VERTICAL;
+    }
+
+    @Override
+    public double getX(double x, double y) {
+        return y;
+    }
+
+    @Override
+    public double getY(double x, double y) {
+        return x;
     }
 
     @Override
@@ -164,6 +180,24 @@ final class HorizontalHelper implements OrientationHelper {
     public void scrollVertically(VirtualFlowContent<?, ?> content, double dy) {
         content.scrollBreadth(dy);
     }
+
+    @Override
+    public <C extends Cell<?, ?>> VirtualFlowHit<C> hitBeforeCells(
+            double bOff, double lOff) {
+        return VirtualFlowHit.hitBeforeCells(lOff, bOff);
+    }
+
+    @Override
+    public <C extends Cell<?, ?>> VirtualFlowHit<C> hitAfterCells(
+            double bOff, double lOff) {
+        return VirtualFlowHit.hitAfterCells(lOff, bOff);
+    }
+
+    @Override
+    public <C extends Cell<?, ?>> VirtualFlowHit<C> cellHit(
+            int itemIndex, C cell, double bOff, double lOff) {
+        return VirtualFlowHit.cellHit(itemIndex, cell, lOff, bOff);
+    }
 }
 
 final class VerticalHelper implements OrientationHelper {
@@ -171,6 +205,16 @@ final class VerticalHelper implements OrientationHelper {
     @Override
     public Orientation getContentBias() {
         return Orientation.HORIZONTAL;
+    }
+
+    @Override
+    public double getX(double x, double y) {
+        return x;
+    }
+
+    @Override
+    public double getY(double x, double y) {
+        return y;
     }
 
     @Override
@@ -271,5 +315,23 @@ final class VerticalHelper implements OrientationHelper {
     @Override
     public void scrollVertically(VirtualFlowContent<?, ?> content, double dy) {
         content.scrollLength(dy);
+    }
+
+    @Override
+    public <C extends Cell<?, ?>> VirtualFlowHit<C> hitBeforeCells(
+            double bOff, double lOff) {
+        return VirtualFlowHit.hitBeforeCells(bOff, lOff);
+    }
+
+    @Override
+    public <C extends Cell<?, ?>> VirtualFlowHit<C> hitAfterCells(
+            double bOff, double lOff) {
+        return VirtualFlowHit.hitAfterCells(bOff, lOff);
+    }
+
+    @Override
+    public <C extends Cell<?, ?>> VirtualFlowHit<C> cellHit(
+            int itemIndex, C cell, double bOff, double lOff) {
+        return VirtualFlowHit.cellHit(itemIndex, cell, bOff, lOff);
     }
 }

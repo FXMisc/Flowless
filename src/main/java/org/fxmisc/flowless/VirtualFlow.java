@@ -207,8 +207,22 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region {
         return content.visibleCells();
     }
 
-    public VirtualFlowHit<C> hit(double offset) {
-        return content.hit(offset);
+    /**
+     * Hits this virtual flow at the given coordinates.
+     * @param x x offset from the left edge of the viewport
+     * @param y y offset from the top edge of the viewport
+     * @return hit info containing the cell that was hit and coordinates
+     * relative to the cell. If the hit was before the cells (i.e. above a
+     * vertical flow content or left of a horizontal flow content), returns
+     * a <em>hit before cells</em> containing offset from the top left corner
+     * of the content. If the hit was after the cells (i.e. below a vertical
+     * flow content or right of a horizontal flow content), returns a
+     * <em>hit after cells</em> containing offset from the top right corner of
+     * the content of a horizontal flow or bottom left corner of the content of
+     * a vertical flow.
+     */
+    public VirtualFlowHit<C> hit(double x, double y) {
+        return content.hit(x, y);
     }
 
     @Override

@@ -1,19 +1,21 @@
 package org.fxmisc.flowless;
 
+import javafx.geometry.Point2D;
+
 
 public abstract class VirtualFlowHit<C extends Cell<?, ?>> {
 
     static <C extends Cell<?, ?>> VirtualFlowHit<C> cellHit(
-            int cellIndex, C cell, double cellOffset) {
-        return new VirtualFlowHit.CellHit<>(cellIndex, cell, cellOffset);
+            int cellIndex, C cell, double x, double y) {
+        return new VirtualFlowHit.CellHit<>(cellIndex, cell, new Point2D(x, y));
     }
 
-    static <C extends Cell<?, ?>> VirtualFlowHit<C> hitBeforeCells(double offset) {
-        return new VirtualFlowHit.HitBeforeCells<>(offset);
+    static <C extends Cell<?, ?>> VirtualFlowHit<C> hitBeforeCells(double x, double y) {
+        return new VirtualFlowHit.HitBeforeCells<>(new Point2D(x, y));
     }
 
-    static <C extends Cell<?, ?>> VirtualFlowHit<C> hitAfterCells(double offset) {
-        return new VirtualFlowHit.HitAfterCells<>(offset);
+    static <C extends Cell<?, ?>> VirtualFlowHit<C> hitAfterCells(double x, double y) {
+        return new VirtualFlowHit.HitAfterCells<>(new Point2D(x, y));
     }
 
     // private constructor to prevent subclassing
@@ -25,17 +27,17 @@ public abstract class VirtualFlowHit<C extends Cell<?, ?>> {
 
     public abstract int getCellIndex();
     public abstract C getCell();
-    public abstract double getCellOffset();
+    public abstract Point2D getCellOffset();
 
-    public abstract double getOffsetBeforeCells();
-    public abstract double getOffsetAfterCells();
+    public abstract Point2D getOffsetBeforeCells();
+    public abstract Point2D getOffsetAfterCells();
 
     private static class CellHit<C extends Cell<?, ?>> extends VirtualFlowHit<C> {
         private final int cellIdx;
         private final C cell;
-        private final double cellOffset;
+        private final Point2D cellOffset;
 
-        CellHit(int cellIdx, C cell, double cellOffset) {
+        CellHit(int cellIdx, C cell, Point2D cellOffset) {
             this.cellIdx = cellIdx;
             this.cell = cell;
             this.cellOffset = cellOffset;
@@ -46,23 +48,23 @@ public abstract class VirtualFlowHit<C extends Cell<?, ?>> {
         @Override public boolean isAfterCells() { return false; }
         @Override public int getCellIndex() { return cellIdx; }
         @Override public C getCell() { return cell; }
-        @Override public double getCellOffset() { return cellOffset; }
+        @Override public Point2D getCellOffset() { return cellOffset; }
 
         @Override
-        public double getOffsetBeforeCells() {
+        public Point2D getOffsetBeforeCells() {
             throw new UnsupportedOperationException();
         }
 
         @Override
-        public double getOffsetAfterCells() {
+        public Point2D getOffsetAfterCells() {
             throw new UnsupportedOperationException();
         }
     }
 
     private static class HitBeforeCells<C extends Cell<?, ?>> extends VirtualFlowHit<C> {
-        private final double offset;
+        private final Point2D offset;
 
-        HitBeforeCells(double offset) {
+        HitBeforeCells(Point2D offset) {
             this.offset = offset;
         }
 
@@ -78,23 +80,23 @@ public abstract class VirtualFlowHit<C extends Cell<?, ?>> {
             throw new UnsupportedOperationException();
         }
 
-        @Override public double getCellOffset() {
+        @Override public Point2D getCellOffset() {
             throw new UnsupportedOperationException();
         }
 
-        @Override public double getOffsetBeforeCells() {
+        @Override public Point2D getOffsetBeforeCells() {
             return offset;
         }
 
-        @Override public double getOffsetAfterCells() {
+        @Override public Point2D getOffsetAfterCells() {
             throw new UnsupportedOperationException();
         }
     }
 
     private static class HitAfterCells<C extends Cell<?, ?>> extends VirtualFlowHit<C> {
-        private final double offset;
+        private final Point2D offset;
 
-        HitAfterCells(double offset) {
+        HitAfterCells(Point2D offset) {
             this.offset = offset;
         }
 
@@ -110,15 +112,15 @@ public abstract class VirtualFlowHit<C extends Cell<?, ?>> {
             throw new UnsupportedOperationException();
         }
 
-        @Override public double getCellOffset() {
+        @Override public Point2D getCellOffset() {
             throw new UnsupportedOperationException();
         }
 
-        @Override public double getOffsetBeforeCells() {
+        @Override public Point2D getOffsetBeforeCells() {
             throw new UnsupportedOperationException();
         }
 
-        @Override public double getOffsetAfterCells() {
+        @Override public Point2D getOffsetAfterCells() {
             return offset;
         }
     }
