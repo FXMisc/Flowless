@@ -35,9 +35,11 @@ VirtualFlow in Flowless provides additional public API compared to ListView or V
 
 **Direct cell access** with [getCell(itemIndex)](http://www.fxmisc.org/flowless/javadoc/org/fxmisc/flowless/VirtualFlow.html#getCell-int-) and [getCellIfVisible(itemIndex)](http://www.fxmisc.org/flowless/javadoc/org/fxmisc/flowless/VirtualFlow.html#getCellIfVisible-int-) methods. This is useful for measurement purposes.
 
-**Hit test** with the [hit(double offset)](http://www.fxmisc.org/flowless/javadoc/org/fxmisc/flowless/VirtualFlow.html#hit-double-) method that converts an offset in primary axis (x for horizontal flow, y for vertical flow) into a cell index and offset relative to the cell, or indicates that the hit is before or beyond the cells.
+**Hit test** with the [hit(double x, double y)](http://www.fxmisc.org/flowless/javadoc/org/fxmisc/flowless/VirtualFlow.html#hit-double-double-) method that converts viewport coordinates into a cell index and coordinates relative to the cell, or indicates that the hit is before or beyond the cells.
 
-**Navigate to a subregion of a cell** using the [show(cell, region)](http://www.fxmisc.org/flowless/javadoc/org/fxmisc/flowless/VirtualFlow.html#show-C-javafx.geometry.Bounds-) method. This is a finer grained navigation than just the [show(itemIndex)](http://www.fxmisc.org/flowless/javadoc/org/fxmisc/flowless/VirtualFlow.html#show-int-) method.
+**Navigate to a subregion of a cell** using the [show(itemIndex, region)](http://www.fxmisc.org/flowless/javadoc/org/fxmisc/flowless/VirtualFlow.html#show-int-javafx.geometry.Bounds-) method. This is a finer grained navigation than just the [show(itemIndex)](http://www.fxmisc.org/flowless/javadoc/org/fxmisc/flowless/VirtualFlow.html#show-int-) method.
+
+**Scroll:** [scrollX(deltaX)](http://www.fxmisc.org/flowless/javadoc/org/fxmisc/flowless/VirtualFlow.html#scrollX-double-) and [scrollY(deltaY)](http://www.fxmisc.org/flowless/javadoc/org/fxmisc/flowless/VirtualFlow.html#scrollY-double-) methods.
 
 Conceptual differences from ListView
 ------------------------------------
