@@ -72,8 +72,8 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region {
 
         // scroll content by mouse scroll
         this.addEventHandler(ScrollEvent.SCROLL, se -> {
-            scrollX(se.getDeltaX());
-            scrollY(se.getDeltaY());
+            scrollX(-se.getDeltaX());
+            scrollY(-se.getDeltaY());
             se.consume();
         });
 
