@@ -35,6 +35,8 @@ VirtualFlow in Flowless provides additional public API compared to ListView or V
 
 **Direct cell access** with [getCell(itemIndex)](http://www.fxmisc.org/flowless/javadoc/org/fxmisc/flowless/VirtualFlow.html#getCell-int-) and [getCellIfVisible(itemIndex)](http://www.fxmisc.org/flowless/javadoc/org/fxmisc/flowless/VirtualFlow.html#getCellIfVisible-int-) methods. This is useful for measurement purposes.
 
+**List of currently visible cells** via [visibleCells()](http://www.fxmisc.org/flowless/javadoc/org/fxmisc/flowless/VirtualFlow.html#visibleCells--).
+
 **Hit test** with the [hit(double x, double y)](http://www.fxmisc.org/flowless/javadoc/org/fxmisc/flowless/VirtualFlow.html#hit-double-double-) method that converts viewport coordinates into a cell index and coordinates relative to the cell, or indicates that the hit is before or beyond the cells.
 
 **Navigate to a subregion of a cell** using the [show(itemIndex, region)](http://www.fxmisc.org/flowless/javadoc/org/fxmisc/flowless/VirtualFlow.html#show-int-javafx.geometry.Bounds-) method. This is a finer grained navigation than just the [show(itemIndex)](http://www.fxmisc.org/flowless/javadoc/org/fxmisc/flowless/VirtualFlow.html#show-int-) method.
