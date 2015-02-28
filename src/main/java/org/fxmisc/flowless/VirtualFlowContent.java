@@ -160,7 +160,7 @@ class VirtualFlowContent<T, C extends Cell<T, ?>> extends Region {
     }
 
     void scrollLength(double deltaLength) {
-        setLengthOffset(lengthOffsetEstimate.getValue() - deltaLength);
+        setLengthOffset(lengthOffsetEstimate.getValue() + deltaLength);
     }
 
     void scrollBreadth(double deltaBreadth) {
