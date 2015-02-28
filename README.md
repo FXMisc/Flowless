@@ -87,7 +87,7 @@ libraryDependencies += "org.fxmisc.flowless" % "flowless" % "0.4.3"
 
 #### Manual download
 
-Download the [0.4.3 jar](https://github.com/TomasMikula/Flowless/releases/tag/v0.4.3) and place it on your classpath.
+Download the [0.4.3 jar](https://github.com/TomasMikula/Flowless/releases/tag/v0.4.3u1) and place it on your classpath.
 
 Documentation
 -------------
