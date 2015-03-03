@@ -43,6 +43,8 @@ VirtualFlow in Flowless provides additional public API compared to ListView or V
 
 **Scroll:** [scrollX(deltaX)](http://www.fxmisc.org/flowless/javadoc/org/fxmisc/flowless/VirtualFlow.html#scrollX-double-) and [scrollY(deltaY)](http://www.fxmisc.org/flowless/javadoc/org/fxmisc/flowless/VirtualFlow.html#scrollY-double-) methods.
 
+**Gravity:** You can create VirtualFlow where cells stick to the bottom (vertical flow) or right (horizontal flow) when there are not enough items to fill the viewport.
+
 Conceptual differences from ListView
 ------------------------------------
 
