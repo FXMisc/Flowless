@@ -11,6 +11,7 @@ import javafx.geometry.Orientation;
 import javafx.scene.layout.Region;
 import javafx.scene.shape.Rectangle;
 
+import org.fxmisc.flowless.VirtualFlow.Gravity;
 import org.reactfx.collection.MemoizationList;
 import org.reactfx.util.Lists;
 import org.reactfx.value.Val;
@@ -49,7 +50,8 @@ class VirtualFlowContent<T, C extends Cell<T, ?>> extends Region {
     VirtualFlowContent(
             ObservableList<T> items,
             Function<? super T, ? extends C> cellFactory,
-            OrientationHelper orientation) {
+            OrientationHelper orientation,
+            Gravity gravity) {
         this.getStyleClass().add("virtual-flow-content");
         this.items = items;
         this.orientation = orientation;
@@ -57,7 +59,7 @@ class VirtualFlowContent<T, C extends Cell<T, ?>> extends Region {
         MemoizationList<C> cells = cellListManager.getLazyCellList();
         this.sizeTracker = new SizeTracker(orientation, layoutBoundsProperty(), cells);
         this.cellPositioner = new CellPositioner<>(cellListManager, orientation, sizeTracker);
-        this.navigator = new Navigator<>(cellListManager, cellPositioner, orientation, sizeTracker);
+        this.navigator = new Navigator<>(cellListManager, cellPositioner, orientation, gravity, sizeTracker);
 
         getChildren().add(navigator);
         clipProperty().bind(Val.map(

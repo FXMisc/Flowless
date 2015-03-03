@@ -8,6 +8,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.layout.Region;
 
+import org.fxmisc.flowless.VirtualFlow.Gravity;
 import org.reactfx.Subscription;
 import org.reactfx.collection.LiveList;
 import org.reactfx.collection.MemoizationList;
@@ -20,6 +21,7 @@ extends Region implements TargetPositionVisitor {
     private final MemoizationList<C> cells;
     private final CellPositioner<T, C> positioner;
     private final OrientationHelper orientation;
+    private final Gravity gravity;
     private final SizeTracker sizeTracker;
     private final Subscription itemsSubscription;
 
@@ -29,11 +31,13 @@ extends Region implements TargetPositionVisitor {
             CellListManager<T, C> cellListManager,
             CellPositioner<T, C> positioner,
             OrientationHelper orientation,
+            Gravity gravity,
             SizeTracker sizeTracker) {
         this.cellListManager = cellListManager;
         this.cells = cellListManager.getLazyCellList();
         this.positioner = positioner;
         this.orientation = orientation;
+        this.gravity = gravity;
         this.sizeTracker = sizeTracker;
 
         this.itemsSubscription = LiveList.observeQuasiChanges(cellListManager.getLazyCellList(), this::itemsChanged);
@@ -265,35 +269,30 @@ extends Region implements TargetPositionVisitor {
     private void fillViewportFrom(int itemIndex) {
         // cell for itemIndex is assumed to be placed correctly
 
-        // fill up to viewport start
-        int first = fillBackwardFrom0(itemIndex);
+        // fill up to the ground
+        int ground = fillTowardsGroundFrom0(itemIndex);
 
-        // if viewport start not reached, shift cells to the start
-        C firstCell = positioner.getVisibleCell(first);
-        double gapBefore = orientation.minY(firstCell);
+        // if ground not reached, shift cells to the ground
+        double gapBefore = distanceFromGround(ground);
         if(gapBefore > 0) {
-            for(int i = first; i <= itemIndex; ++i) {
-                positioner.shiftCellBy(positioner.getVisibleCell(i), -gapBefore);
-            }
+            shiftCellsTowardsGround(ground, itemIndex, gapBefore);
         }
 
-        // fill up to viewport end
-        int last = fillForwardFrom0(itemIndex);
+        // fill up to the sky
+        int sky = fillTowardsSkyFrom0(itemIndex);
 
-        // if viewport end not reached, add more cells to the front and then shift
-        C lastCell = positioner.getVisibleCell(last);
-        double gapAfter = sizeTracker.getViewportLength() - orientation.maxY(lastCell);
+        // if sky not reached, add more cells under the ground and then shift
+        double gapAfter = distanceFromSky(sky);
         if(gapAfter > 0) {
-            first = fillBackwardFrom0(first, -gapAfter);
-            firstCell = positioner.getVisibleCell(first);
-            double extraBefore = -orientation.minY(firstCell);
+            ground = fillTowardsGroundFrom0(ground, -gapAfter);
+            double extraBefore = -distanceFromGround(ground);
             double shift = Math.min(gapAfter, extraBefore);
-            for(int i = first; i <= last; ++i) {
-                positioner.shiftCellBy(positioner.getVisibleCell(i), shift);
-            }
+            shiftCellsTowardsGround(ground, sky, -shift);
         }
 
         // crop to the visible cells
+        int first = Math.min(ground, sky);
+        int last = Math.max(ground, sky);
         while(first < last &&
                 orientation.maxY(positioner.getVisibleCell(first)) <= 0.0) {
             ++first;
@@ -303,5 +302,52 @@ extends Region implements TargetPositionVisitor {
             --last;
         }
         positioner.cropTo(first, last + 1);
+    }
+
+    private int fillTowardsGroundFrom0(int itemIndex) {
+        return gravity == Gravity.FRONT
+                ? fillBackwardFrom0(itemIndex)
+                : fillForwardFrom0(itemIndex);
+    }
+
+    private int fillTowardsGroundFrom0(int itemIndex, double upTo) {
+        return gravity == Gravity.FRONT
+                ? fillBackwardFrom0(itemIndex, upTo)
+                : fillForwardFrom0(itemIndex, sizeTracker.getViewportLength() - upTo);
+    }
+
+    private int fillTowardsSkyFrom0(int itemIndex) {
+        return gravity == Gravity.FRONT
+                ? fillForwardFrom0(itemIndex)
+                : fillBackwardFrom0(itemIndex);
+    }
+
+    private double distanceFromGround(int itemIndex) {
+        C cell = positioner.getVisibleCell(itemIndex);
+        return gravity == Gravity.FRONT
+                ? orientation.minY(cell)
+                : sizeTracker.getViewportLength() - orientation.maxY(cell);
+    }
+
+    private double distanceFromSky(int itemIndex) {
+        C cell = positioner.getVisibleCell(itemIndex);
+        return gravity == Gravity.FRONT
+                ? sizeTracker.getViewportLength() - orientation.maxY(cell)
+                : orientation.minY(cell);
+    }
+
+    private void shiftCellsTowardsGround(
+            int groundCellIndex, int lastCellIndex, double amount) {
+        if(gravity == Gravity.FRONT) {
+            assert groundCellIndex <= lastCellIndex;
+            for(int i = groundCellIndex; i <= lastCellIndex; ++i) {
+                positioner.shiftCellBy(positioner.getVisibleCell(i), -amount);
+            }
+        } else {
+            assert groundCellIndex >= lastCellIndex;
+            for(int i = groundCellIndex; i >= lastCellIndex; --i) {
+                positioner.shiftCellBy(positioner.getVisibleCell(i), amount);
+            }
+        }
     }
 }

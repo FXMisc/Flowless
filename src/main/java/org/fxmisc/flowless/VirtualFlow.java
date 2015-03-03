@@ -20,16 +20,32 @@ import org.reactfx.value.Var;
 
 public class VirtualFlow<T, C extends Cell<T, ?>> extends Region {
 
+    public static enum Gravity { FRONT, REAR }
+
     public static <T, C extends Cell<T, ?>> VirtualFlow<T, C> createHorizontal(
             ObservableList<T> items,
             Function<? super T, ? extends C> cellFactory) {
-        return new VirtualFlow<>(items, cellFactory, new HorizontalHelper());
+        return createHorizontal(items, cellFactory, Gravity.FRONT);
+    }
+
+    public static <T, C extends Cell<T, ?>> VirtualFlow<T, C> createHorizontal(
+            ObservableList<T> items,
+            Function<? super T, ? extends C> cellFactory,
+            Gravity gravity) {
+        return new VirtualFlow<>(items, cellFactory, new HorizontalHelper(), gravity);
     }
 
     public static <T, C extends Cell<T, ?>> VirtualFlow<T, C> createVertical(
             ObservableList<T> items,
             Function<? super T, ? extends C> cellFactory) {
-        return new VirtualFlow<>(items, cellFactory, new VerticalHelper());
+        return createVertical(items, cellFactory, Gravity.FRONT);
+    }
+
+    public static <T, C extends Cell<T, ?>> VirtualFlow<T, C> createVertical(
+            ObservableList<T> items,
+            Function<? super T, ? extends C> cellFactory,
+            Gravity gravity) {
+        return new VirtualFlow<>(items, cellFactory, new VerticalHelper(), gravity);
     }
 
     private final ScrollBar hbar;
@@ -40,9 +56,11 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region {
     private VirtualFlow(
             ObservableList<T> items,
             Function<? super T, ? extends C> cellFactory,
-            OrientationHelper orientation) {
+            OrientationHelper orientation,
+            Gravity gravity) {
         this.getStyleClass().add("virtual-flow");
-        this.content = new VirtualFlowContent<>(items, cellFactory, orientation);
+        this.content = new VirtualFlowContent<>(
+                items, cellFactory, orientation, gravity);
 
         // create scrollbars
         hbar = new ScrollBar();
