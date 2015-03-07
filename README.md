@@ -3,21 +3,18 @@ Flowless
 
 Efficient VirtualFlow for JavaFX. VirtualFlow is a layout container that lays out _cells_ in a vertical or horizontal _flow_. The main feature of a _virtual_ flow is that only the currently visible cells are rendered in the scene. You may have a list of thousands of items, but only, say, 30 cells are rendered at any given time.
 
-JavaFX has its own VirtualFlow, which is not part of the public API, but is used, for example, in the implementation of [ListView](http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/ListView.html). It is, however, [not very efficient](https://javafx-jira.kenai.com/browse/RT-35395) when updating the viewport on items change or scroll. **EDIT:** Jonathan Giles created a patch to improve ListView performance in the benchmark below. The patch may be integrated into JDK 8u40.
+JavaFX has its own VirtualFlow, which is not part of the public API, but is used, for example, in the implementation of [ListView](http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/ListView.html). It is, however, [not very efficient](https://javafx-jira.kenai.com/browse/RT-35395) when updating the viewport on items change or scroll.
 
 Here is a comparison of JavaFX's ListView vs. Flowless on a list of 80 items, 25 of which fit into the viewport.
 
-|                     | Flowless (# of cell creations) | ListView in JDK8u20-b21 (# of `updateItem` calls) | ListView in JDK8u40<sup>(</sup>\*<sup>), (</sup>\*\*<sup>)</sup> (# of `updateItem` calls) |
-|---------------------|:------------------------------:|:-------------------------------------------------:|:------------------------------------------------------------------------------------------:|
-| update an item in the viewport |                   1 | 25                                                | 1                                                                                          |
-| update an item outside the viewport |              0 | 25                                                | 0                                                                                          |
-| delete an item in the middle of the viewport |     1 | 75                                                | 12                                                                                         |
-| add an item in the middle of the viewport |        1 | 75                                                | 12                                                                                         |
-| scroll 5 items down |                              5 | 5                                                 | 5                                                                                          |
-| scroll 50 items down |                            25 | 75                                                | 25                                                                                         |
-
-<sup>(</sup>\*<sup>)</sup> If the patch gets integrated into 8u40.  
-<sup>(</sup>\*\*<sup>)</sup> With fixed cell size.  
+|                     | Flowless (# of cell creations) | JDK 8u40 ListView (# of `updateItem` calls) |
+|---------------------|:------------------------------:|:-------------------------------------------:|
+| update an item in the viewport |                   1 | 1                                           |
+| update an item outside the viewport |              0 | 0                                           |
+| delete an item in the middle of the viewport |     1 | 63                                          |
+| add an item in the middle of the viewport |        1 | 63                                          |
+| scroll 5 items down |                              5 | 5                                           |
+| scroll 50 items down |                            25 | 75                                          |
 
 Here is the [source code](https://gist.github.com/TomasMikula/1dcee2cc4e5dab421913) of this mini-benchmark.
 
