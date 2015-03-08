@@ -7,9 +7,7 @@ apply plugin: 'signing'
 
 repositories {
     mavenCentral()
-    maven {
-        url 'https://oss.sonatype.org/content/repositories/snapshots/'
-    }
+    jcenter()
 }
 
 sourceCompatibility = '1.8'
@@ -19,7 +17,8 @@ group = 'org.fxmisc.flowless'
 
 dependencies {
     compile 'org.reactfx:reactfx:2.0-M4'
-    testCompile 'junit:junit:[4.0,5)'
+    testCompile "org.testfx:testfx-core:[4.0,4.1)"
+    testCompile "org.testfx:testfx-junit:[4.0,4.1)"
 }
 
 javadoc {
