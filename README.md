@@ -7,14 +7,15 @@ JavaFX has its own VirtualFlow, which is not part of the public API, but is used
 
 Here is a comparison of JavaFX's ListView vs. Flowless on a list of 80 items, 25 of which fit into the viewport.
 
-|                     | Flowless (# of cell creations) | JDK 8u40 ListView (# of `updateItem` calls) |
-|---------------------|:------------------------------:|:-------------------------------------------:|
-| update an item in the viewport |                   1 | 1                                           |
-| update an item outside the viewport |              0 | 0                                           |
-| delete an item in the middle of the viewport |     1 | 63                                          |
-| add an item in the middle of the viewport |        1 | 63                                          |
-| scroll 5 items down |                              5 | 5                                           |
-| scroll 50 items down |                            25 | 75                                          |
+|                                              | Flowless (# of cell creations / # of cell layouts) | JDK 8u40 ListView (# of `updateItem` calls / # of cell layouts) | JDK 8u40 ListView with fixed cell size (# of `updateItem` calls / # of cell layouts) |
+|----------------------------------------------|:-----:|:-----:|:-----:|
+| update an item in the viewport               |   1/1 | 1/1   | 1/1   |
+| update an item outside the viewport          |   0/0 | 0/0   | 0/0   |
+| delete an item in the middle of the viewport |   1/1 | 38/25 | 38/25 |
+| add an item in the middle of the viewport    |   1/1 | 38/25 | 38/25 |
+| scroll 5 items down                          |   5/5 | 5/5   | 5/5   |
+| scroll 50 items down                         | 25/25 | 50/25 | 25/25 |
+
 
 Here is the [source code](https://gist.github.com/TomasMikula/1dcee2cc4e5dab421913) of this mini-benchmark.
 
