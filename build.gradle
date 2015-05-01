@@ -2,18 +2,29 @@ version = '0.4.4-SNAPSHOT'
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
-apply plugin: 'maven'
-apply plugin: 'signing'
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'org.gradle.api.plugins:gradle-nexus-plugin:0.7.1'
+    }
+}
 
 repositories {
     mavenCentral()
     jcenter()
 }
 
+apply from: 'gradle/publish.gradle'
+
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
 group = 'org.fxmisc.flowless'
+project.archivesBaseName = 'flowless'
 
 dependencies {
     compile 'org.reactfx:reactfx:2.0-M4'
@@ -34,78 +45,6 @@ javadoc {
         'http://docs.oracle.com/javase/8/javafx/api/'
     ]
 }
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from 'build/docs/javadoc'
-}
-
-task sourcesJar(type: Jar) {
-    from sourceSets.main.allSource
-    classifier = 'sources'
-}
-
-artifacts {
-    archives jar
-
-    archives javadocJar
-    archives sourcesJar
-}
-
-signing {
-    sign configurations.archives
-}
-
-signArchives.onlyIf {
-    project.hasProperty('signing.keyId') && project.hasProperty('signing.password') && project.hasProperty('signing.secretKeyRingFile')
-}
-
-def doUploadArchives = project.hasProperty('sonatypeUsername') && project.hasProperty('sonatypePassword')
-
-if(doUploadArchives) {
-    uploadArchives {
-        repositories.mavenDeployer {
-            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-              authentication(userName: sonatypeUsername, password: sonatypePassword)
-            }
-
-            snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots') {
-                authentication(userName: sonatypeUsername, password: sonatypePassword)
-            }
-
-            pom.project {
-                name 'Flowless'
-                packaging 'jar'
-                description 'Efficient VirtualFlow for JavaFX.'
-                url 'http://www.fxmisc.org/flowless/'
-             
-                scm {
-                    url 'scm:git@github.com:TomasMikula/Flowless.git'
-                    connection 'scm:git@github.com:TomasMikula/Flowless.git'
-                    developerConnection 'scm:git@github.com:TomasMikula/Flowless.git'
-                }
-             
-                licenses {
-                    license {
-                        name 'The BSD 2-Clause License'
-                        url 'http://opensource.org/licenses/BSD-2-Clause'
-                        distribution 'repo'
-                    }
-                }
-             
-                developers {
-                    developer {
-                        name 'Tomas Mikula'
-                    }
-                }
-            }
-        }
-    }
-}
-
-uploadArchives.onlyIf { doUploadArchives }
 
 task fatJar(type: Jar, dependsOn: classes) {
     appendix = 'fat'

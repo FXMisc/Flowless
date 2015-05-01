@@ -1,0 +1,32 @@
+apply plugin: 'nexus'
+
+modifyPom {
+  project {
+    name 'Flowless'
+    description 'Efficient VirtualFlow for JavaFX.'
+    url 'http://www.fxmisc.org/flowless/'
+    packaging 'jar'
+    licenses {
+      license {
+        name 'The BSD 2-Clause License'
+        url 'http://opensource.org/licenses/BSD-2-Clause'
+        distribution 'repo'
+      }
+    }
+    scm {
+      url 'scm:git@github.com:TomasMikula/Flowless.git'
+      connection 'scm:git@github.com:TomasMikula/Flowless.git'
+      developerConnection 'scm:git@github.com:TomasMikula/Flowless.git'
+    }
+    developers {
+      developer {
+        name 'Tomas Mikula'
+      }
+    }
+  }
+}
+
+nexus {
+  repositoryUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2'
+  snapshotRepositoryUrl = 'https://oss.sonatype.org/content/repositories/snapshots'
+}
