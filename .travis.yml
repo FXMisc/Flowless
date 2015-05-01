@@ -1,0 +1,43 @@
+language: java
+jdk:
+  - oraclejdk8
+
+os:
+  - linux
+
+# run in container
+sudo: false
+
+# use framebuffer for UI
+before_install:
+  - export DISPLAY=:99.0
+  - sh -e /etc/init.d/xvfb start
+
+env:
+  global:
+    # ENC_PWD
+    - secure: "gKAzrngDxttmaZ5PM7zhlYmZOC9OGDc5vFhV3LZ3t+QRebQd+rZMrYqu71+BjlSbHM9Lp5Fj59yEjv5dkRPMbVdAVvQBK4pfBuOmrY5XJqqADDR63EI7QSiC7wzWP776mW7rb22DJKcyGf4FjnfDdXU9LENcmM2xMAjx0aNxL+A="
+    # GH_TOKEN
+    - secure: "aMKCaSTnelmitm7ubPFPNzEsXMLsB/aa6ttycyHn3vNUtrfEdrvgK3rgTs6KPdwvvlCsh845GqHZjtcNh+q74Bn+R73JQRe2m+IHk61DFhEj1U78kB14rtALkN4pX32HgLonPpKwVxfnAUc1jGWsXsNlSV8rtGMto5gTcqVK9yM="
+
+# publish artifacts and Javadoc after a successful build
+after_success:
+  - travis/publish.sh
+
+before_deploy:
+  - export VERSION=$(gradle -q getVersion)
+deploy:
+  provider: releases
+  api_key:
+    secure: "bpAttvhKOyYLTWJzQqBIGcCDZXC7ZV42D/OhztSDC1DDye5B2s1yNwwAvBvzftuiQUyHWG4Rr6o+Y0ZXdEuKPm8ABYqnaUDfEXuaP8mtKrVRB1np1NDY3MBCJalzBQe1/RHh7sm4zzvLWRndxaY76kmJA5gC5PMOtk3GDubIKmU="
+  file_glob: true
+  file:
+    - "build/libs/flowless-${VERSION}.jar"
+    - "build/libs/flowless-${VERSION}-javadoc.jar"
+    - "build/libs/flowless-${VERSION}-sources.jar"
+    - "build/libs/flowless-fat-${VERSION}.jar"
+  skip_cleanup: true
+  on:
+    tags: true
+    branch: master
+    repo: TomasMikula/Flowless

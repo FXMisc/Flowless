@@ -53,3 +53,7 @@ task fatJar(type: Jar, dependsOn: classes) {
 }
 
 assemble.dependsOn fatJar
+
+task getVersion << {
+  println version
+}
