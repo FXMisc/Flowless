@@ -5,6 +5,12 @@ jdk:
 os:
   - linux
 
+# enable Java 8u45+, see https://github.com/travis-ci/travis-ci/issues/4042
+addons:
+  apt:
+    packages:
+      - oracle-java8-installer
+
 # run in container
 sudo: false
 
