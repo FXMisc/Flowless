@@ -58,6 +58,8 @@ interface OrientationHelper {
     Var<Double> verticalPositionProperty(VirtualFlowContent<?, ?> content);
     void scrollHorizontally(VirtualFlowContent<?, ?> content, double dx);
     void scrollVertically(VirtualFlowContent<?, ?> content, double dy);
+    void scrollHorizontallyToPixel(VirtualFlowContent<?, ?> content, double pixel);
+    void scrollVerticallyToPixel(VirtualFlowContent<?, ?> content, double pixel);
 
     <C extends Cell<?, ?>> VirtualFlowHit<C> hitBeforeCells(double bOff, double lOff);
     <C extends Cell<?, ?>> VirtualFlowHit<C> hitAfterCells(double bOff, double lOff);
@@ -179,6 +181,16 @@ final class HorizontalHelper implements OrientationHelper {
     @Override
     public void scrollVertically(VirtualFlowContent<?, ?> content, double dy) {
         content.scrollBreadth(dy);
+    }
+
+    @Override
+    public void scrollHorizontallyToPixel(VirtualFlowContent<?, ?> content, double pixel) {
+        content.scrollLengthToPixel(pixel);
+    }
+
+    @Override
+    public void scrollVerticallyToPixel(VirtualFlowContent<?, ?> content, double pixel) { // breadth
+        content.scrollBreadthToPixel(pixel);
     }
 
     @Override
@@ -315,6 +327,16 @@ final class VerticalHelper implements OrientationHelper {
     @Override
     public void scrollVertically(VirtualFlowContent<?, ?> content, double dy) {
         content.scrollLength(dy);
+    }
+
+    @Override
+    public void scrollHorizontallyToPixel(VirtualFlowContent<?, ?> content, double pixel) {
+        content.scrollBreadthToPixel(pixel);
+    }
+
+    @Override
+    public void scrollVerticallyToPixel(VirtualFlowContent<?, ?> content, double pixel) { // length
+        content.scrollLengthToPixel(pixel);
     }
 
     @Override

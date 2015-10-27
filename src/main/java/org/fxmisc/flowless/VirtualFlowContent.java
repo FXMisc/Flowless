@@ -169,12 +169,28 @@ class VirtualFlowContent<T, C extends Cell<T, ?>> extends Region {
         setBreadthOffset(breadthOffset.get() + deltaBreadth);
     }
 
+    void scrollLengthToPixel(double pixel) {
+        setLengthOffset(pixel);
+    }
+
+    void scrollBreadthToPixel(double pixel) {
+        setBreadthOffset(pixel);
+    }
+
     void scrollX(double deltaX) {
         orientation.scrollHorizontally(this, deltaX);
     }
 
     void scrollY(double deltaY) {
         orientation.scrollVertically(this, deltaY);
+    }
+
+    void scrollXToPixel(double pixel) {
+        orientation.scrollHorizontallyToPixel(this, pixel);
+    }
+
+    void scrollYToPixel(double pixel) {
+        orientation.scrollVerticallyToPixel(this, pixel);
     }
 
     Val<Double> totalWidthEstimateProperty() {

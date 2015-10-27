@@ -202,6 +202,23 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region {
     public void scrollY(double deltaY) {
         content.scrollY(deltaY);
     }
+
+    /**
+     * Scroll the content horizontally to the pixel
+     * @param pixel
+     */
+    public void scrollXToPixel(double pixel) {
+        content.scrollXToPixel(pixel);
+    }
+
+    /**
+     * Scroll the content vertically to the pixel
+     * @param pixel
+     */
+    public void scrollYToPixel(double pixel) {
+        content.scrollYToPixel(pixel);
+    }
+
     public Val<Double> totalWidthEstimateProperty() {
         return content.totalBreadthEstimateProperty();
     }
