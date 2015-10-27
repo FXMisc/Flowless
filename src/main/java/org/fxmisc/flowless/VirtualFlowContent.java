@@ -177,6 +177,14 @@ class VirtualFlowContent<T, C extends Cell<T, ?>> extends Region {
         orientation.scrollVertically(this, deltaY);
     }
 
+    Val<Double> totalWidthEstimateProperty() {
+        return Val.wrap(orientation.widthEstimateProperty(this));
+    }
+
+    Val<Double> totalHeightEstimateProperty() {
+        return Val.wrap(orientation.heightEstimateProperty(this));
+    }
+
     VirtualFlowHit<C> hit(double x, double y) {
         double bOff = orientation.getX(x, y);
         double lOff = orientation.getY(x, y);

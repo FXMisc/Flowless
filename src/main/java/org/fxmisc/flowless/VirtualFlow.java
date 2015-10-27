@@ -202,12 +202,11 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region {
     public void scrollY(double deltaY) {
         content.scrollY(deltaY);
     }
-
-    public Val<Double> totalBreadthEstimateProperty() {
+    public Val<Double> totalWidthEstimateProperty() {
         return content.totalBreadthEstimateProperty();
     }
 
-    public Val<Double> totalLengthEstimateProperty() {
+    public Val<Double> totalHeightEstimateProperty() {
         return content.totalLengthEstimateProperty();
     }
 
