@@ -185,12 +185,12 @@ final class HorizontalHelper implements OrientationHelper {
 
     @Override
     public void scrollHorizontallyToPixel(VirtualFlowContent<?, ?> content, double pixel) {
-        content.scrollLengthToPixel(pixel);
+        content.setLengthOffset(pixel);
     }
 
     @Override
-    public void scrollVerticallyToPixel(VirtualFlowContent<?, ?> content, double pixel) { // breadth
-        content.scrollBreadthToPixel(pixel);
+    public void scrollVerticallyToPixel(VirtualFlowContent<?, ?> content, double pixel) {
+        content.setBreadthOffset(pixel);
     }
 
     @Override
@@ -331,12 +331,12 @@ final class VerticalHelper implements OrientationHelper {
 
     @Override
     public void scrollHorizontallyToPixel(VirtualFlowContent<?, ?> content, double pixel) {
-        content.scrollBreadthToPixel(pixel);
+        content.setBreadthOffset(pixel);
     }
 
     @Override
     public void scrollVerticallyToPixel(VirtualFlowContent<?, ?> content, double pixel) { // length
-        content.scrollLengthToPixel(pixel);
+        content.setLengthOffset(pixel);
     }
 
     @Override

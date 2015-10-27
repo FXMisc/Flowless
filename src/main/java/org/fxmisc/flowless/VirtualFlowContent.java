@@ -169,14 +169,6 @@ class VirtualFlowContent<T, C extends Cell<T, ?>> extends Region {
         setBreadthOffset(breadthOffset.get() + deltaBreadth);
     }
 
-    void scrollLengthToPixel(double pixel) {
-        setLengthOffset(pixel);
-    }
-
-    void scrollBreadthToPixel(double pixel) {
-        setBreadthOffset(pixel);
-    }
-
     void scrollX(double deltaX) {
         orientation.scrollHorizontally(this, deltaX);
     }
@@ -310,7 +302,7 @@ class VirtualFlowContent<T, C extends Cell<T, ?>> extends Region {
         setBreadthOffset(breadthPositionToPixels(pos));
     }
 
-    private void setLengthOffset(double pixels) {
+    void setLengthOffset(double pixels) {
         double total = totalLengthEstimateProperty().getOrElse(0.0);
         double length = sizeTracker.getViewportLength();
         double max = Math.max(total - length, 0);
@@ -329,7 +321,7 @@ class VirtualFlowContent<T, C extends Cell<T, ?>> extends Region {
         }
     }
 
-    private void setBreadthOffset(double pixels) {
+    void setBreadthOffset(double pixels) {
         double total = totalBreadthEstimateProperty().getValue();
         double breadth = sizeTracker.getViewportBreadth();
         double max = Math.max(total - breadth, 0);
