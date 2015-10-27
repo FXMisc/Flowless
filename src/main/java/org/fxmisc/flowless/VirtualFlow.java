@@ -204,6 +204,38 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region {
     }
 
     /**
+     * Scroll the content horizontally to the pixel
+     * @param pixel
+     */
+    public void scrollXToPixel(double pixel) {
+        content.scrollXToPixel(pixel);
+    }
+
+    /**
+     * Scroll the content vertically to the pixel
+     * @param pixel
+     */
+    public void scrollYToPixel(double pixel) {
+        content.scrollYToPixel(pixel);
+    }
+
+    public Val<Double> totalWidthEstimateProperty() {
+        return content.totalBreadthEstimateProperty();
+    }
+
+    public Val<Double> totalHeightEstimateProperty() {
+        return content.totalLengthEstimateProperty();
+    }
+
+    public Val<Double> estimatedScrollXProperty() {
+        return content.estimatedWidthPositionProperty();
+    }
+
+    public Val<Double> estimatedScrollYProperty() {
+        return content.estimatedHeightPositionProperty();
+    }
+
+    /**
      * If the item is out of view, instantiates a new cell for the item.
      * The returned cell will be properly sized, but not properly positioned
      * relative to the cells in the viewport, unless it is itself in the

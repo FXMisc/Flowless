@@ -5,6 +5,7 @@ import java.util.function.Function;
 
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.ReadOnlyDoubleWrapper;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
 import javafx.geometry.Orientation;
@@ -169,12 +170,58 @@ class VirtualFlowContent<T, C extends Cell<T, ?>> extends Region {
         setBreadthOffset(breadthOffset.get() + deltaBreadth);
     }
 
+    void scrollLengthToPixel(double pixel) {
+        setLengthOffset(pixel);
+    }
+
+    void scrollBreadthToPixel(double pixel) {
+        setBreadthOffset(pixel);
+    }
+
     void scrollX(double deltaX) {
         orientation.scrollHorizontally(this, deltaX);
     }
 
     void scrollY(double deltaY) {
         orientation.scrollVertically(this, deltaY);
+    }
+
+    void scrollXToPixel(double pixel) {
+        orientation.scrollHorizontallyToPixel(this, pixel);
+    }
+
+    void scrollYToPixel(double pixel) {
+        orientation.scrollVerticallyToPixel(this, pixel);
+    }
+
+    Val<Double> totalWidthEstimateProperty() {
+        return Val.wrap(orientation.widthEstimateProperty(this));
+    }
+
+    Val<Double> totalHeightEstimateProperty() {
+        return Val.wrap(orientation.heightEstimateProperty(this));
+    }
+
+    Val<Double> estimatedWidthPositionProperty() {
+        switch (getContentBias()) {
+            case HORIZONTAL: // vertical flow
+                return breadthPositionEstimateProperty();
+            case VERTICAL: // horizontal flow
+                return lengthPositionEstimateProperty();
+            default:
+                throw new AssertionError("Unreachable code");
+        }
+    }
+
+    Val<Double> estimatedHeightPositionProperty() {
+        switch (getContentBias()) {
+            case HORIZONTAL: // vertical flow
+                return lengthPositionEstimateProperty();
+            case VERTICAL: // horizontal flow
+                return breadthPositionEstimateProperty();
+            default:
+                throw new AssertionError("Unreachable code");
+        }
     }
 
     VirtualFlowHit<C> hit(double x, double y) {
