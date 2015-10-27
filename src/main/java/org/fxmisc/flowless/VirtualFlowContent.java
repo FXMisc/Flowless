@@ -194,25 +194,11 @@ class VirtualFlowContent<T, C extends Cell<T, ?>> extends Region {
     }
 
     Val<Double> horizontalPositionProperty() {
-        switch (getContentBias()) {
-            case HORIZONTAL: // vertical flow
-                return breadthPositionEstimateProperty();
-            case VERTICAL: // horizontal flow
-                return lengthPositionEstimateProperty();
-            default:
-                throw new AssertionError("Unreachable code");
-        }
+        return orientation.horizontalPositionProperty(this);
     }
 
     Val<Double> verticalPositionProperty() {
-        switch (getContentBias()) {
-            case HORIZONTAL: // vertical flow
-                return lengthPositionEstimateProperty();
-            case VERTICAL: // horizontal flow
-                return breadthPositionEstimateProperty();
-            default:
-                throw new AssertionError("Unreachable code");
-        }
+        return orientation.verticalPositionProperty(this);
     }
 
     VirtualFlowHit<C> hit(double x, double y) {
