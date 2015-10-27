@@ -205,7 +205,7 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region {
 
     /**
      * Scroll the content horizontally to the pixel
-     * @param pixel
+     * @param pixel - the pixel position to which to scroll
      */
     public void scrollXToPixel(double pixel) {
         content.scrollXToPixel(pixel);
@@ -213,7 +213,7 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region {
 
     /**
      * Scroll the content vertically to the pixel
-     * @param pixel
+     * @param pixel - the pixel position to which to scroll
      */
     public void scrollYToPixel(double pixel) {
         content.scrollYToPixel(pixel);

@@ -52,8 +52,8 @@ interface OrientationHelper {
     default void resize(Cell<?, ?> cell, double breadth, double length) { resize(cell.getNode(), breadth, length); }
     default void relocate(Cell<?, ?> cell, double b0, double l0) { relocate(cell.getNode(), b0, l0); }
 
-    ObservableValue<Double> widthEstimateProperty(VirtualFlowContent<?, ?> content);
-    ObservableValue<Double> heightEstimateProperty(VirtualFlowContent<?, ?> content);
+    Val<Double> widthEstimateProperty(VirtualFlowContent<?, ?> content);
+    Val<Double> heightEstimateProperty(VirtualFlowContent<?, ?> content);
     Var<Double> horizontalPositionProperty(VirtualFlowContent<?, ?> content);
     Var<Double> verticalPositionProperty(VirtualFlowContent<?, ?> content);
     void scrollHorizontally(VirtualFlowContent<?, ?> content, double dx);
@@ -150,13 +150,13 @@ final class HorizontalHelper implements OrientationHelper {
     }
 
     @Override
-    public ObservableValue<Double> widthEstimateProperty(
+    public Val<Double> widthEstimateProperty(
             VirtualFlowContent<?, ?> content) {
         return content.totalLengthEstimateProperty();
     }
 
     @Override
-    public ObservableValue<Double> heightEstimateProperty(
+    public Val<Double> heightEstimateProperty(
             VirtualFlowContent<?, ?> content) {
         return content.totalBreadthEstimateProperty();
     }
@@ -296,13 +296,13 @@ final class VerticalHelper implements OrientationHelper {
     }
 
     @Override
-    public ObservableValue<Double> widthEstimateProperty(
+    public Val<Double> widthEstimateProperty(
             VirtualFlowContent<?, ?> content) {
         return content.totalBreadthEstimateProperty();
     }
 
     @Override
-    public ObservableValue<Double> heightEstimateProperty(
+    public Val<Double> heightEstimateProperty(
             VirtualFlowContent<?, ?> content) {
         return content.totalLengthEstimateProperty();
     }

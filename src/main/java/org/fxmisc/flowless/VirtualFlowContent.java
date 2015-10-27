@@ -186,11 +186,11 @@ class VirtualFlowContent<T, C extends Cell<T, ?>> extends Region {
     }
 
     Val<Double> totalWidthEstimateProperty() {
-        return Val.wrap(orientation.widthEstimateProperty(this));
+        return orientation.widthEstimateProperty(this);
     }
 
     Val<Double> totalHeightEstimateProperty() {
-        return Val.wrap(orientation.heightEstimateProperty(this));
+        return orientation.heightEstimateProperty(this);
     }
 
     Val<Double> estimatedWidthPositionProperty() {
