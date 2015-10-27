@@ -185,6 +185,28 @@ class VirtualFlowContent<T, C extends Cell<T, ?>> extends Region {
         return Val.wrap(orientation.heightEstimateProperty(this));
     }
 
+    Val<Double> estimatedWidthPositionProperty() {
+        switch (getContentBias()) {
+            case HORIZONTAL: // vertical flow
+                return breadthPositionEstimateProperty();
+            case VERTICAL: // horizontal flow
+                return lengthPositionEstimateProperty();
+            default:
+                throw new AssertionError("Unreachable code");
+        }
+    }
+
+    Val<Double> estimatedHeightPositionProperty() {
+        switch (getContentBias()) {
+            case HORIZONTAL: // vertical flow
+                return lengthPositionEstimateProperty();
+            case VERTICAL: // horizontal flow
+                return breadthPositionEstimateProperty();
+            default:
+                throw new AssertionError("Unreachable code");
+        }
+    }
+
     VirtualFlowHit<C> hit(double x, double y) {
         double bOff = orientation.getX(x, y);
         double lOff = orientation.getY(x, y);

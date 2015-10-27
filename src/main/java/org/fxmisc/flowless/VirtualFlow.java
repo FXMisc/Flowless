@@ -210,6 +210,14 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region {
         return content.totalLengthEstimateProperty();
     }
 
+    public Val<Double> estimatedScrollXProperty() {
+        return content.estimatedWidthPositionProperty();
+    }
+
+    public Val<Double> estimatedScrollYProperty() {
+        return content.estimatedHeightPositionProperty();
+    }
+
     /**
      * If the item is out of view, instantiates a new cell for the item.
      * The returned cell will be properly sized, but not properly positioned
