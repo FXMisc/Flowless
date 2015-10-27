@@ -151,14 +151,6 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region {
         return content.breadthOffsetProperty();
     }
 
-    public Val<Double> totalBreadthEstimateProperty() {
-        return content.totalBreadthEstimateProperty();
-    }
-
-    public Val<Double> totalLengthEstimateProperty() {
-        return content.totalLengthEstimateProperty();
-    }
-
     public Bounds cellToViewport(C cell, Bounds bounds) {
         return cell.getNode().localToParent(bounds);
     }
@@ -209,6 +201,38 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region {
      */
     public void scrollY(double deltaY) {
         content.scrollY(deltaY);
+    }
+
+    /**
+     * Scroll the content horizontally to the pixel
+     * @param pixel
+     */
+    public void scrollXToPixel(double pixel) {
+        content.scrollXToPixel(pixel);
+    }
+
+    /**
+     * Scroll the content vertically to the pixel
+     * @param pixel
+     */
+    public void scrollYToPixel(double pixel) {
+        content.scrollYToPixel(pixel);
+    }
+
+    public Val<Double> totalWidthEstimateProperty() {
+        return content.totalBreadthEstimateProperty();
+    }
+
+    public Val<Double> totalHeightEstimateProperty() {
+        return content.totalLengthEstimateProperty();
+    }
+
+    public Val<Double> estimatedScrollXProperty() {
+        return content.estimatedWidthPositionProperty();
+    }
+
+    public Val<Double> estimatedScrollYProperty() {
+        return content.estimatedHeightPositionProperty();
     }
 
     /**
