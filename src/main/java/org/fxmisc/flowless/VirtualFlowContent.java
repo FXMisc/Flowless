@@ -193,7 +193,7 @@ class VirtualFlowContent<T, C extends Cell<T, ?>> extends Region {
         return orientation.heightEstimateProperty(this);
     }
 
-    Val<Double> estimatedWidthPositionProperty() {
+    Val<Double> horizontalPositionProperty() {
         switch (getContentBias()) {
             case HORIZONTAL: // vertical flow
                 return breadthPositionEstimateProperty();
@@ -204,7 +204,7 @@ class VirtualFlowContent<T, C extends Cell<T, ?>> extends Region {
         }
     }
 
-    Val<Double> estimatedHeightPositionProperty() {
+    Val<Double> verticalPositionProperty() {
         switch (getContentBias()) {
             case HORIZONTAL: // vertical flow
                 return lengthPositionEstimateProperty();
