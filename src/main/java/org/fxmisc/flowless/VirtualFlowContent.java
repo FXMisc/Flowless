@@ -186,23 +186,23 @@ class VirtualFlowContent<T, C extends Cell<T, ?>> extends Region {
         orientation.scrollVertically(this, deltaY);
     }
 
-    public void scrollXToPixel(double pixel) {
+    void scrollXToPixel(double pixel) {
         orientation.scrollHorizontallyToPixel(this, pixel);
     }
 
-    public void scrollYToPixel(double pixel) {
+    void scrollYToPixel(double pixel) {
         orientation.scrollVerticallyToPixel(this, pixel);
     }
 
-    public Val<Double> totalWidthEstimateProperty() {
+    Val<Double> totalWidthEstimateProperty() {
         return Val.wrap(orientation.widthEstimateProperty(this));
     }
 
-    public Val<Double> totalHeightEstimateProperty() {
+    Val<Double> totalHeightEstimateProperty() {
         return Val.wrap(orientation.heightEstimateProperty(this));
     }
 
-    public Val<Double> estimatedWidthPositionProperty() {
+    Val<Double> estimatedWidthPositionProperty() {
         switch (getContentBias()) {
             case HORIZONTAL: // vertical flow
                 return breadthPositionEstimateProperty();
@@ -213,7 +213,7 @@ class VirtualFlowContent<T, C extends Cell<T, ?>> extends Region {
         }
     }
 
-    public Val<Double> estimatedHeightPositionProperty() {
+    Val<Double> estimatedHeightPositionProperty() {
         switch (getContentBias()) {
             case HORIZONTAL: // vertical flow
                 return lengthPositionEstimateProperty();
