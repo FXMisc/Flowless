@@ -56,8 +56,15 @@ interface OrientationHelper {
     Val<Double> heightEstimateProperty(VirtualFlowContent<?, ?> content);
     Var<Double> horizontalPositionProperty(VirtualFlowContent<?, ?> content);
     Var<Double> verticalPositionProperty(VirtualFlowContent<?, ?> content);
+
+    @Deprecated
     void scrollHorizontally(VirtualFlowContent<?, ?> content, double dx);
+
+    @Deprecated
     void scrollVertically(VirtualFlowContent<?, ?> content, double dy);
+
+    void scrollHorizontallyBy(VirtualFlowContent<?, ?> content, double dx);
+    void scrollVerticallyBy(VirtualFlowContent<?, ?> content, double dy);
     void scrollHorizontallyToPixel(VirtualFlowContent<?, ?> content, double pixel);
     void scrollVerticallyToPixel(VirtualFlowContent<?, ?> content, double pixel);
 
@@ -174,12 +181,24 @@ final class HorizontalHelper implements OrientationHelper {
     }
 
     @Override
+    @Deprecated
     public void scrollHorizontally(VirtualFlowContent<?, ?> content, double dx) {
         content.scrollLength(dx);
     }
 
     @Override
-    public void scrollVertically(VirtualFlowContent<?, ?> content, double dy) {
+    @Deprecated
+    public void scrollVertically(VirtualFlowContent<?, ?> content, double dx) {
+        content.scrollBreadth(dx);
+    }
+
+    @Override
+    public void scrollHorizontallyBy(VirtualFlowContent<?, ?> content, double dx) {
+        content.scrollLength(dx);
+    }
+
+    @Override
+    public void scrollVerticallyBy(VirtualFlowContent<?, ?> content, double dy) {
         content.scrollBreadth(dy);
     }
 
@@ -320,12 +339,24 @@ final class VerticalHelper implements OrientationHelper {
     }
 
     @Override
+    @Deprecated
     public void scrollHorizontally(VirtualFlowContent<?, ?> content, double dx) {
         content.scrollBreadth(dx);
     }
 
     @Override
+    @Deprecated
     public void scrollVertically(VirtualFlowContent<?, ?> content, double dy) {
+        content.scrollLength(dy);
+    }
+
+    @Override
+    public void scrollHorizontallyBy(VirtualFlowContent<?, ?> content, double dx) {
+        content.scrollBreadth(dx);
+    }
+
+    @Override
+    public void scrollVerticallyBy(VirtualFlowContent<?, ?> content, double dy) {
         content.scrollLength(dy);
     }
 

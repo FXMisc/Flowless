@@ -188,19 +188,41 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region {
     }
 
     /**
+     * Deprecated - use scrollXBy(deltaX) instead.
+     *
      * Scroll the content horizontally by the given amount.
      * @param deltaX positive value scrolls right, negative value scrolls left
      */
+    @Deprecated
     public void scrollX(double deltaX) {
         content.scrollX(deltaX);
+    }
+
+    /**
+     * Deprecated - use scrollYBy(deltaY) instead.
+     *
+     * Scroll the content vertically by the given amount.
+     * @param deltaY positive value scrolls down, negative value scrolls up
+     */
+    @Deprecated
+    public void scrollY(double deltaY) {
+        content.scrollY(deltaY);
+    }
+
+    /**
+     * Scroll the content horizontally by the given amount.
+     * @param deltaX positive value scrolls right, negative value scrolls left
+     */
+    public void scrollXBy(double deltaX) {
+        content.scrollXBy(deltaX);
     }
 
     /**
      * Scroll the content vertically by the given amount.
      * @param deltaY positive value scrolls down, negative value scrolls up
      */
-    public void scrollY(double deltaY) {
-        content.scrollY(deltaY);
+    public void scrollYBy(double deltaY) {
+        content.scrollYBy(deltaY);
     }
 
     /**
