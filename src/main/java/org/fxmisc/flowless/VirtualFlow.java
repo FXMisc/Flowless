@@ -90,8 +90,8 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region {
 
         // scroll content by mouse scroll
         this.addEventHandler(ScrollEvent.SCROLL, se -> {
-            scrollX(-se.getDeltaX());
-            scrollY(-se.getDeltaY());
+            scrollXBy(-se.getDeltaX());
+            scrollYBy(-se.getDeltaY());
             se.consume();
         });
 
@@ -190,17 +190,69 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region {
     /**
      * Scroll the content horizontally by the given amount.
      * @param deltaX positive value scrolls right, negative value scrolls left
+     * @deprecated use {@link #scrollXBy(double)} instead
      */
+    @Deprecated
     public void scrollX(double deltaX) {
-        content.scrollX(deltaX);
+        content.scrollXBy(deltaX);
+    }
+
+    /**
+     * Scroll the content vertically by the given amount.
+     * @param deltaY positive value scrolls down, negative value scrolls up
+     * @deprecated use {@link #scrollYBy(double)} instead
+     */
+    @Deprecated
+    public void scrollY(double deltaY) {
+        content.scrollYBy(deltaY);
+    }
+
+    /**
+     * Scroll the content horizontally by the given amount.
+     * @param deltaX positive value scrolls right, negative value scrolls left
+     */
+    public void scrollXBy(double deltaX) {
+        content.scrollXBy(deltaX);
     }
 
     /**
      * Scroll the content vertically by the given amount.
      * @param deltaY positive value scrolls down, negative value scrolls up
      */
-    public void scrollY(double deltaY) {
-        content.scrollY(deltaY);
+    public void scrollYBy(double deltaY) {
+        content.scrollYBy(deltaY);
+    }
+
+    /**
+     * Scroll the content horizontally to the pixel
+     * @param pixel - the pixel position to which to scroll
+     */
+    public void scrollXToPixel(double pixel) {
+        content.scrollXToPixel(pixel);
+    }
+
+    /**
+     * Scroll the content vertically to the pixel
+     * @param pixel - the pixel position to which to scroll
+     */
+    public void scrollYToPixel(double pixel) {
+        content.scrollYToPixel(pixel);
+    }
+
+    public Val<Double> totalWidthEstimateProperty() {
+        return content.totalWidthEstimateProperty();
+    }
+
+    public Val<Double> totalHeightEstimateProperty() {
+        return content.totalHeightEstimateProperty();
+    }
+
+    public Val<Double> estimatedScrollXProperty() {
+        return content.horizontalPositionProperty();
+    }
+
+    public Val<Double> estimatedScrollYProperty() {
+        return content.verticalPositionProperty();
     }
 
     /**

@@ -169,12 +169,36 @@ class VirtualFlowContent<T, C extends Cell<T, ?>> extends Region {
         setBreadthOffset(breadthOffset.get() + deltaBreadth);
     }
 
-    void scrollX(double deltaX) {
-        orientation.scrollHorizontally(this, deltaX);
+    void scrollXBy(double deltaX) {
+        orientation.scrollHorizontallyBy(this, deltaX);
     }
 
-    void scrollY(double deltaY) {
-        orientation.scrollVertically(this, deltaY);
+    void scrollYBy(double deltaY) {
+        orientation.scrollVerticallyBy(this, deltaY);
+    }
+
+    void scrollXToPixel(double pixel) {
+        orientation.scrollHorizontallyToPixel(this, pixel);
+    }
+
+    void scrollYToPixel(double pixel) {
+        orientation.scrollVerticallyToPixel(this, pixel);
+    }
+
+    Val<Double> totalWidthEstimateProperty() {
+        return orientation.widthEstimateProperty(this);
+    }
+
+    Val<Double> totalHeightEstimateProperty() {
+        return orientation.heightEstimateProperty(this);
+    }
+
+    Val<Double> horizontalPositionProperty() {
+        return orientation.horizontalPositionProperty(this);
+    }
+
+    Val<Double> verticalPositionProperty() {
+        return orientation.verticalPositionProperty(this);
     }
 
     VirtualFlowHit<C> hit(double x, double y) {
@@ -264,7 +288,7 @@ class VirtualFlowContent<T, C extends Cell<T, ?>> extends Region {
         setBreadthOffset(breadthPositionToPixels(pos));
     }
 
-    private void setLengthOffset(double pixels) {
+    void setLengthOffset(double pixels) {
         double total = totalLengthEstimateProperty().getOrElse(0.0);
         double length = sizeTracker.getViewportLength();
         double max = Math.max(total - length, 0);
@@ -283,7 +307,7 @@ class VirtualFlowContent<T, C extends Cell<T, ?>> extends Region {
         }
     }
 
-    private void setBreadthOffset(double pixels) {
+    void setBreadthOffset(double pixels) {
         double total = totalBreadthEstimateProperty().getValue();
         double breadth = sizeTracker.getViewportBreadth();
         double max = Math.max(total - breadth, 0);

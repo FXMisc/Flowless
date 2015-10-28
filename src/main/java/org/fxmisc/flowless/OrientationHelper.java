@@ -52,12 +52,15 @@ interface OrientationHelper {
     default void resize(Cell<?, ?> cell, double breadth, double length) { resize(cell.getNode(), breadth, length); }
     default void relocate(Cell<?, ?> cell, double b0, double l0) { relocate(cell.getNode(), b0, l0); }
 
-    ObservableValue<Double> widthEstimateProperty(VirtualFlowContent<?, ?> content);
-    ObservableValue<Double> heightEstimateProperty(VirtualFlowContent<?, ?> content);
+    Val<Double> widthEstimateProperty(VirtualFlowContent<?, ?> content);
+    Val<Double> heightEstimateProperty(VirtualFlowContent<?, ?> content);
     Var<Double> horizontalPositionProperty(VirtualFlowContent<?, ?> content);
     Var<Double> verticalPositionProperty(VirtualFlowContent<?, ?> content);
-    void scrollHorizontally(VirtualFlowContent<?, ?> content, double dx);
-    void scrollVertically(VirtualFlowContent<?, ?> content, double dy);
+
+    void scrollHorizontallyBy(VirtualFlowContent<?, ?> content, double dx);
+    void scrollVerticallyBy(VirtualFlowContent<?, ?> content, double dy);
+    void scrollHorizontallyToPixel(VirtualFlowContent<?, ?> content, double pixel);
+    void scrollVerticallyToPixel(VirtualFlowContent<?, ?> content, double pixel);
 
     <C extends Cell<?, ?>> VirtualFlowHit<C> hitBeforeCells(double bOff, double lOff);
     <C extends Cell<?, ?>> VirtualFlowHit<C> hitAfterCells(double bOff, double lOff);
@@ -148,13 +151,13 @@ final class HorizontalHelper implements OrientationHelper {
     }
 
     @Override
-    public ObservableValue<Double> widthEstimateProperty(
+    public Val<Double> widthEstimateProperty(
             VirtualFlowContent<?, ?> content) {
         return content.totalLengthEstimateProperty();
     }
 
     @Override
-    public ObservableValue<Double> heightEstimateProperty(
+    public Val<Double> heightEstimateProperty(
             VirtualFlowContent<?, ?> content) {
         return content.totalBreadthEstimateProperty();
     }
@@ -172,13 +175,23 @@ final class HorizontalHelper implements OrientationHelper {
     }
 
     @Override
-    public void scrollHorizontally(VirtualFlowContent<?, ?> content, double dx) {
+    public void scrollHorizontallyBy(VirtualFlowContent<?, ?> content, double dx) {
         content.scrollLength(dx);
     }
 
     @Override
-    public void scrollVertically(VirtualFlowContent<?, ?> content, double dy) {
+    public void scrollVerticallyBy(VirtualFlowContent<?, ?> content, double dy) {
         content.scrollBreadth(dy);
+    }
+
+    @Override
+    public void scrollHorizontallyToPixel(VirtualFlowContent<?, ?> content, double pixel) {
+        content.setLengthOffset(pixel);
+    }
+
+    @Override
+    public void scrollVerticallyToPixel(VirtualFlowContent<?, ?> content, double pixel) {
+        content.setBreadthOffset(pixel);
     }
 
     @Override
@@ -284,13 +297,13 @@ final class VerticalHelper implements OrientationHelper {
     }
 
     @Override
-    public ObservableValue<Double> widthEstimateProperty(
+    public Val<Double> widthEstimateProperty(
             VirtualFlowContent<?, ?> content) {
         return content.totalBreadthEstimateProperty();
     }
 
     @Override
-    public ObservableValue<Double> heightEstimateProperty(
+    public Val<Double> heightEstimateProperty(
             VirtualFlowContent<?, ?> content) {
         return content.totalLengthEstimateProperty();
     }
@@ -308,13 +321,23 @@ final class VerticalHelper implements OrientationHelper {
     }
 
     @Override
-    public void scrollHorizontally(VirtualFlowContent<?, ?> content, double dx) {
+    public void scrollHorizontallyBy(VirtualFlowContent<?, ?> content, double dx) {
         content.scrollBreadth(dx);
     }
 
     @Override
-    public void scrollVertically(VirtualFlowContent<?, ?> content, double dy) {
+    public void scrollVerticallyBy(VirtualFlowContent<?, ?> content, double dy) {
         content.scrollLength(dy);
+    }
+
+    @Override
+    public void scrollHorizontallyToPixel(VirtualFlowContent<?, ?> content, double pixel) {
+        content.setBreadthOffset(pixel);
+    }
+
+    @Override
+    public void scrollVerticallyToPixel(VirtualFlowContent<?, ?> content, double pixel) { // length
+        content.setLengthOffset(pixel);
     }
 
     @Override
