@@ -169,22 +169,6 @@ class VirtualFlowContent<T, C extends Cell<T, ?>> extends Region {
         setBreadthOffset(breadthOffset.get() + deltaBreadth);
     }
 
-    /**
-     * Deprecated - use scrollXBy(deltaX) instead
-     */
-    @Deprecated
-    void scrollX(double deltaX) {
-        orientation.scrollHorizontally(this, deltaX);
-    }
-
-    /**
-     * Deprecated - use scrollYBy(deltaX) instead
-     */
-    @Deprecated
-    void scrollY(double deltaY) {
-        orientation.scrollVertically(this, deltaY);
-    }
-
     void scrollXBy(double deltaX) {
         orientation.scrollHorizontallyBy(this, deltaX);
     }

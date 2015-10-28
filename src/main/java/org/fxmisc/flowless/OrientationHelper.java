@@ -57,12 +57,6 @@ interface OrientationHelper {
     Var<Double> horizontalPositionProperty(VirtualFlowContent<?, ?> content);
     Var<Double> verticalPositionProperty(VirtualFlowContent<?, ?> content);
 
-    @Deprecated
-    void scrollHorizontally(VirtualFlowContent<?, ?> content, double dx);
-
-    @Deprecated
-    void scrollVertically(VirtualFlowContent<?, ?> content, double dy);
-
     void scrollHorizontallyBy(VirtualFlowContent<?, ?> content, double dx);
     void scrollVerticallyBy(VirtualFlowContent<?, ?> content, double dy);
     void scrollHorizontallyToPixel(VirtualFlowContent<?, ?> content, double pixel);
@@ -178,18 +172,6 @@ final class HorizontalHelper implements OrientationHelper {
     public Var<Double> verticalPositionProperty(
             VirtualFlowContent<?, ?> content) {
         return content.breadthPositionEstimateProperty();
-    }
-
-    @Override
-    @Deprecated
-    public void scrollHorizontally(VirtualFlowContent<?, ?> content, double dx) {
-        content.scrollLength(dx);
-    }
-
-    @Override
-    @Deprecated
-    public void scrollVertically(VirtualFlowContent<?, ?> content, double dx) {
-        content.scrollBreadth(dx);
     }
 
     @Override
@@ -336,18 +318,6 @@ final class VerticalHelper implements OrientationHelper {
     public Var<Double> verticalPositionProperty(
             VirtualFlowContent<?, ?> content) {
         return content.lengthPositionEstimateProperty();
-    }
-
-    @Override
-    @Deprecated
-    public void scrollHorizontally(VirtualFlowContent<?, ?> content, double dx) {
-        content.scrollBreadth(dx);
-    }
-
-    @Override
-    @Deprecated
-    public void scrollVertically(VirtualFlowContent<?, ?> content, double dy) {
-        content.scrollLength(dy);
     }
 
     @Override
