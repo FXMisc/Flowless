@@ -193,11 +193,11 @@ class VirtualFlowContent<T, C extends Cell<T, ?>> extends Region {
         return orientation.heightEstimateProperty(this);
     }
 
-    Val<Double> horizontalPositionProperty() {
+    Var<Double> horizontalPositionProperty() {
         return orientation.horizontalPositionProperty(this);
     }
 
-    Val<Double> verticalPositionProperty() {
+    Var<Double> verticalPositionProperty() {
         return orientation.verticalPositionProperty(this);
     }
 

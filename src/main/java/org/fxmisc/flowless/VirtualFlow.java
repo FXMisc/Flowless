@@ -247,11 +247,11 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region {
         return content.totalHeightEstimateProperty();
     }
 
-    public Val<Double> estimatedScrollXProperty() {
+    public Var<Double> estimatedScrollXProperty() {
         return content.horizontalPositionProperty();
     }
 
-    public Val<Double> estimatedScrollYProperty() {
+    public Var<Double> estimatedScrollYProperty() {
         return content.verticalPositionProperty();
     }
 
