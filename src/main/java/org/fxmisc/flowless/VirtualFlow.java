@@ -76,7 +76,7 @@ class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virtualized
         return lengthPositionEstimate.asVar(this::setLengthPosition);
     }
 
-    VirtualFlow(
+    private VirtualFlow(
             ObservableList<T> items,
             Function<? super T, ? extends C> cellFactory,
             OrientationHelper orientation,
