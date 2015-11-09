@@ -1,66 +1,26 @@
 package org.fxmisc.flowless;
 
-import java.util.Optional;
-import java.util.function.Function;
-
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
-import javafx.beans.property.ReadOnlyDoubleProperty;
-import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
 import javafx.geometry.Orientation;
-import javafx.geometry.Point2D;
+import javafx.scene.Node;
 import javafx.scene.control.ScrollBar;
-import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Region;
 
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
-public class VirtualFlow<T, C extends Cell<T, ?>> extends Region {
-
-    public static enum Gravity { FRONT, REAR }
-
-    public static <T, C extends Cell<T, ?>> VirtualFlow<T, C> createHorizontal(
-            ObservableList<T> items,
-            Function<? super T, ? extends C> cellFactory) {
-        return createHorizontal(items, cellFactory, Gravity.FRONT);
-    }
-
-    public static <T, C extends Cell<T, ?>> VirtualFlow<T, C> createHorizontal(
-            ObservableList<T> items,
-            Function<? super T, ? extends C> cellFactory,
-            Gravity gravity) {
-        return new VirtualFlow<>(items, cellFactory, new HorizontalHelper(), gravity);
-    }
-
-    public static <T, C extends Cell<T, ?>> VirtualFlow<T, C> createVertical(
-            ObservableList<T> items,
-            Function<? super T, ? extends C> cellFactory) {
-        return createVertical(items, cellFactory, Gravity.FRONT);
-    }
-
-    public static <T, C extends Cell<T, ?>> VirtualFlow<T, C> createVertical(
-            ObservableList<T> items,
-            Function<? super T, ? extends C> cellFactory,
-            Gravity gravity) {
-        return new VirtualFlow<>(items, cellFactory, new VerticalHelper(), gravity);
-    }
+public class VirtualFlow<V extends Node & Virtualized> extends Region implements Virtualized {
 
     private final ScrollBar hbar;
     private final ScrollBar vbar;
-    private final VirtualFlowContent<T, C> content;
+    private final V content;
 
-
-    private VirtualFlow(
-            ObservableList<T> items,
-            Function<? super T, ? extends C> cellFactory,
-            OrientationHelper orientation,
-            Gravity gravity) {
+    public VirtualFlow(V content) {
         this.getStyleClass().add("virtual-flow");
-        this.content = new VirtualFlowContent<>(
-                items, cellFactory, orientation, gravity);
+        this.content = content;
 
         // create scrollbars
         hbar = new ScrollBar();
@@ -71,8 +31,8 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region {
         // scrollbar ranges
         hbar.setMin(0);
         vbar.setMin(0);
-        hbar.maxProperty().bind(orientation.widthEstimateProperty(content));
-        vbar.maxProperty().bind(orientation.heightEstimateProperty(content));
+        hbar.maxProperty().bind(content.totalWidthEstimateProperty());
+        vbar.maxProperty().bind(content.totalHeightEstimateProperty());
 
         // scrollbar increments
         setupUnitIncrement(hbar);
@@ -83,40 +43,33 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region {
         // scrollbar positions
         Bindings.bindBidirectional(
                 Var.doubleVar(hbar.valueProperty()),
-                orientation.horizontalPositionProperty(content));
+                content.estimatedScrollXProperty());
         Bindings.bindBidirectional(
                 Var.doubleVar(vbar.valueProperty()),
-                orientation.verticalPositionProperty(content));
-
-        // scroll content by mouse scroll
-        this.addEventHandler(ScrollEvent.SCROLL, se -> {
-            scrollXBy(-se.getDeltaX());
-            scrollYBy(-se.getDeltaY());
-            se.consume();
-        });
+                content.estimatedScrollYProperty());
 
         // scrollbar visibility
         Val<Double> layoutWidth = Val.map(layoutBoundsProperty(), Bounds::getWidth);
         Val<Double> layoutHeight = Val.map(layoutBoundsProperty(), Bounds::getHeight);
         Val<Boolean> needsHBar0 = Val.combine(
-                orientation.widthEstimateProperty(content),
+                content.totalWidthEstimateProperty(),
                 layoutWidth,
                 (cw, lw) -> cw > lw);
         Val<Boolean> needsVBar0 = Val.combine(
-                orientation.heightEstimateProperty(content),
+                content.totalHeightEstimateProperty(),
                 layoutHeight,
                 (ch, lh) -> ch > lh);
         Val<Boolean> needsHBar = Val.combine(
                 needsHBar0,
                 needsVBar0,
-                orientation.widthEstimateProperty(content),
+                content.totalWidthEstimateProperty(),
                 vbar.widthProperty(),
                 layoutWidth,
                 (needsH, needsV, cw, vbw, lw) -> needsH || needsV && cw + vbw.doubleValue() > lw);
         Val<Boolean> needsVBar = Val.combine(
                 needsVBar0,
                 needsHBar0,
-                orientation.heightEstimateProperty(content),
+                content.totalHeightEstimateProperty(),
                 hbar.heightProperty(),
                 layoutHeight,
                 (needsV, needsH, ch, hbh, lh) -> needsV || needsH && ch + hbh.doubleValue() > lh);
@@ -130,115 +83,6 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region {
         getChildren().addAll(content, hbar, vbar);
     }
 
-    public void dispose() {
-        content.dispose();
-    }
-
-    @Override
-    public Orientation getContentBias() {
-        return content.getContentBias();
-    }
-
-    public double getViewportWidth() {
-        return content.getWidth();
-    }
-
-    public double getViewportHeight() {
-        return content.getHeight();
-    }
-
-    public ReadOnlyDoubleProperty breadthOffsetProperty() {
-        return content.breadthOffsetProperty();
-    }
-
-    public Bounds cellToViewport(C cell, Bounds bounds) {
-        return cell.getNode().localToParent(bounds);
-    }
-
-    public Point2D cellToViewport(C cell, Point2D point) {
-        return cell.getNode().localToParent(point);
-    }
-
-    public Point2D cellToViewport(C cell, double x, double y) {
-        return cell.getNode().localToParent(x, y);
-    }
-
-    public void show(int index) {
-        content.show(index);
-    }
-
-    public void show(double primaryAxisOffset) {
-        content.show(primaryAxisOffset);
-    }
-
-    public void showAsFirst(int itemIndex) {
-        content.showAsFirst(itemIndex);
-    }
-
-    public void showAsLast(int itemIndex) {
-        content.showAsLast(itemIndex);
-    }
-
-    public void showAtOffset(int itemIndex, double offset) {
-        content.showAtOffset(itemIndex, offset);
-    }
-
-    public void show(int itemIndex, Bounds region) {
-        content.showRegion(itemIndex, region);
-    }
-
-    /**
-     * Scroll the content horizontally by the given amount.
-     * @param deltaX positive value scrolls right, negative value scrolls left
-     * @deprecated use {@link #scrollXBy(double)} instead
-     */
-    @Deprecated
-    public void scrollX(double deltaX) {
-        content.scrollXBy(deltaX);
-    }
-
-    /**
-     * Scroll the content vertically by the given amount.
-     * @param deltaY positive value scrolls down, negative value scrolls up
-     * @deprecated use {@link #scrollYBy(double)} instead
-     */
-    @Deprecated
-    public void scrollY(double deltaY) {
-        content.scrollYBy(deltaY);
-    }
-
-    /**
-     * Scroll the content horizontally by the given amount.
-     * @param deltaX positive value scrolls right, negative value scrolls left
-     */
-    public void scrollXBy(double deltaX) {
-        content.scrollXBy(deltaX);
-    }
-
-    /**
-     * Scroll the content vertically by the given amount.
-     * @param deltaY positive value scrolls down, negative value scrolls up
-     */
-    public void scrollYBy(double deltaY) {
-        content.scrollYBy(deltaY);
-    }
-
-    /**
-     * Scroll the content horizontally to the pixel
-     * @param pixel - the pixel position to which to scroll
-     */
-    public void scrollXToPixel(double pixel) {
-        content.scrollXToPixel(pixel);
-    }
-
-    /**
-     * Scroll the content vertically to the pixel
-     * @param pixel - the pixel position to which to scroll
-     */
-    public void scrollYToPixel(double pixel) {
-        content.scrollYToPixel(pixel);
-    }
-
     public Val<Double> totalWidthEstimateProperty() {
         return content.totalWidthEstimateProperty();
     }
@@ -248,51 +92,11 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region {
     }
 
     public Var<Double> estimatedScrollXProperty() {
-        return content.horizontalPositionProperty();
+        return content.estimatedScrollXProperty();
     }
 
     public Var<Double> estimatedScrollYProperty() {
-        return content.verticalPositionProperty();
-    }
-
-    /**
-     * If the item is out of view, instantiates a new cell for the item.
-     * The returned cell will be properly sized, but not properly positioned
-     * relative to the cells in the viewport, unless it is itself in the
-     * viewport.
-     *
-     * @return Cell for the given item. The cell will be valid only until the
-     * next layout pass. It should therefore not be stored. It is intended to
-     * be used for measurement purposes only.
-     */
-    public C getCell(int itemIndex) {
-        return content.getCellFor(itemIndex);
-    }
-
-    public Optional<C> getCellIfVisible(int itemIndex) {
-        return content.getCellIfVisible(itemIndex);
-    }
-
-    public ObservableList<C> visibleCells() {
-        return content.visibleCells();
-    }
-
-    /**
-     * Hits this virtual flow at the given coordinates.
-     * @param x x offset from the left edge of the viewport
-     * @param y y offset from the top edge of the viewport
-     * @return hit info containing the cell that was hit and coordinates
-     * relative to the cell. If the hit was before the cells (i.e. above a
-     * vertical flow content or left of a horizontal flow content), returns
-     * a <em>hit before cells</em> containing offset from the top left corner
-     * of the content. If the hit was after the cells (i.e. below a vertical
-     * flow content or right of a horizontal flow content), returns a
-     * <em>hit after cells</em> containing offset from the top right corner of
-     * the content of a horizontal flow or bottom left corner of the content of
-     * a vertical flow.
-     */
-    public VirtualFlowHit<C> hit(double x, double y) {
-        return content.hit(x, y);
+        return content.estimatedScrollYProperty();
     }
 
     @Override

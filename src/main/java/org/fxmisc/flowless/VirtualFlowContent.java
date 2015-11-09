@@ -8,16 +8,45 @@ import javafx.beans.property.ReadOnlyDoubleWrapper;
 import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
 import javafx.geometry.Orientation;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.shape.Rectangle;
 
-import org.fxmisc.flowless.VirtualFlow.Gravity;
 import org.reactfx.collection.MemoizationList;
 import org.reactfx.util.Lists;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
-class VirtualFlowContent<T, C extends Cell<T, ?>> extends Region {
+class VirtualFlowContent<T, C extends Cell<T, ?>> extends Region implements Virtualized {
+
+    public static enum Gravity { FRONT, REAR }
+
+    public static <T, C extends Cell<T, ?>> VirtualFlowContent<T, C> createHorizontal(
+            ObservableList<T> items,
+            Function<? super T, ? extends C> cellFactory) {
+        return createHorizontal(items, cellFactory, Gravity.FRONT);
+    }
+
+    public static <T, C extends Cell<T, ?>> VirtualFlowContent<T, C> createHorizontal(
+            ObservableList<T> items,
+            Function<? super T, ? extends C> cellFactory,
+            Gravity gravity) {
+        return new VirtualFlowContent<>(items, cellFactory, new HorizontalHelper(), gravity);
+    }
+
+    public static <T, C extends Cell<T, ?>> VirtualFlowContent<T, C> createVertical(
+            ObservableList<T> items,
+            Function<? super T, ? extends C> cellFactory) {
+        return createVertical(items, cellFactory, Gravity.FRONT);
+    }
+
+    public static <T, C extends Cell<T, ?>> VirtualFlowContent<T, C> createVertical(
+            ObservableList<T> items,
+            Function<? super T, ? extends C> cellFactory,
+            Gravity gravity) {
+        return new VirtualFlowContent<>(items, cellFactory, new VerticalHelper(), gravity);
+    }
+
     private final ObservableList<T> items;
     private final OrientationHelper orientation;
     private final CellListManager<T, C> cellListManager;
@@ -83,6 +112,13 @@ class VirtualFlowContent<T, C extends Cell<T, ?>> extends Region {
                 sizeTracker.totalLengthEstimateProperty(),
                 (off, vpLen, totalLen) -> offsetToScrollbarPosition(off, vpLen, totalLen))
                 .orElseConst(0.0);
+
+        // scroll content by mouse scroll
+        this.addEventHandler(ScrollEvent.SCROLL, se -> {
+            scrollXBy(-se.getDeltaX());
+            scrollYBy(-se.getDeltaY());
+            se.consume();
+        });
     }
 
     public void dispose() {
@@ -185,19 +221,19 @@ class VirtualFlowContent<T, C extends Cell<T, ?>> extends Region {
         orientation.scrollVerticallyToPixel(this, pixel);
     }
 
-    Val<Double> totalWidthEstimateProperty() {
+    public Val<Double> totalWidthEstimateProperty() {
         return orientation.widthEstimateProperty(this);
     }
 
-    Val<Double> totalHeightEstimateProperty() {
+    public Val<Double> totalHeightEstimateProperty() {
         return orientation.heightEstimateProperty(this);
     }
 
-    Var<Double> horizontalPositionProperty() {
+    public Var<Double> estimatedScrollXProperty() {
         return orientation.horizontalPositionProperty(this);
     }
 
-    Var<Double> verticalPositionProperty() {
+    public Var<Double> estimatedScrollYProperty() {
         return orientation.verticalPositionProperty(this);
     }
 

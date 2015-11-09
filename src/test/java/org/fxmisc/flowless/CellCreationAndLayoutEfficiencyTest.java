@@ -36,7 +36,7 @@ public class CellCreationAndLayoutEfficiencyTest {
         for(int i = 0; i < 20; ++i) {
             items.addAll("red", "green", "blue", "purple");
         }
-        VirtualFlow<String, ?> flow = VirtualFlow.createVertical(
+        VirtualFlowContent<String, ?> flow = VirtualFlowContent.createVertical(
                 items,
                 color -> {
                     cellCreations.inc();
