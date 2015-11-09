@@ -19,7 +19,7 @@ public class VirtualizedScrollPane<V extends Node & Virtualized> extends Region 
     private final V content;
 
     public VirtualizedScrollPane(V content) {
-        this.getStyleClass().add("virtual-flow");
+        this.getStyleClass().add("virtualized-scroll-pane");
         this.content = content;
 
         // create scrollbars

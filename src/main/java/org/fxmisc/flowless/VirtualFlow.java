@@ -81,7 +81,7 @@ class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virtualized
             Function<? super T, ? extends C> cellFactory,
             OrientationHelper orientation,
             Gravity gravity) {
-        this.getStyleClass().add("virtual-flow-content");
+        this.getStyleClass().add("virtual-flow");
         this.items = items;
         this.orientation = orientation;
         this.cellListManager = new CellListManager<>(items, cellFactory);
