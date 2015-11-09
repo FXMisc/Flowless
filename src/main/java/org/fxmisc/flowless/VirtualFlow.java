@@ -3,22 +3,21 @@ package org.fxmisc.flowless;
 import java.util.Optional;
 import java.util.function.Function;
 
-import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.property.ReadOnlyDoubleWrapper;
 import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
 import javafx.geometry.Orientation;
-import javafx.geometry.Point2D;
-import javafx.scene.control.ScrollBar;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Region;
+import javafx.scene.shape.Rectangle;
 
+import org.reactfx.collection.MemoizationList;
+import org.reactfx.util.Lists;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
-public class VirtualFlow<T, C extends Cell<T, ?>> extends Region {
+class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virtualized {
 
     public static enum Gravity { FRONT, REAR }
 
@@ -48,45 +47,70 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region {
         return new VirtualFlow<>(items, cellFactory, new VerticalHelper(), gravity);
     }
 
-    private final ScrollBar hbar;
-    private final ScrollBar vbar;
-    private final VirtualFlowContent<T, C> content;
+    private final ObservableList<T> items;
+    private final OrientationHelper orientation;
+    private final CellListManager<T, C> cellListManager;
+    private final SizeTracker sizeTracker;
+    private final CellPositioner<T, C> cellPositioner;
+    private final Navigator<T, C> navigator;
 
+    // non-negative
+    private final ReadOnlyDoubleWrapper breadthOffset = new ReadOnlyDoubleWrapper(0.0);
+    public ReadOnlyDoubleProperty breadthOffsetProperty() {
+        return breadthOffset.getReadOnlyProperty();
+    }
 
-    private VirtualFlow(
+    public Val<Double> totalBreadthEstimateProperty() {
+        return sizeTracker.maxCellBreadthProperty();
+    }
+
+    private final Val<Double> breadthPositionEstimate;
+    public Var<Double> breadthPositionEstimateProperty() {
+        return breadthPositionEstimate.asVar(this::setBreadthPosition);
+    }
+
+    private final Val<Double> lengthOffsetEstimate;
+
+    private final Val<Double> lengthPositionEstimate;
+    public Var<Double> lengthPositionEstimateProperty() {
+        return lengthPositionEstimate.asVar(this::setLengthPosition);
+    }
+
+    VirtualFlow(
             ObservableList<T> items,
             Function<? super T, ? extends C> cellFactory,
             OrientationHelper orientation,
             Gravity gravity) {
         this.getStyleClass().add("virtual-flow");
-        this.content = new VirtualFlowContent<>(
-                items, cellFactory, orientation, gravity);
+        this.items = items;
+        this.orientation = orientation;
+        this.cellListManager = new CellListManager<>(items, cellFactory);
+        MemoizationList<C> cells = cellListManager.getLazyCellList();
+        this.sizeTracker = new SizeTracker(orientation, layoutBoundsProperty(), cells);
+        this.cellPositioner = new CellPositioner<>(cellListManager, orientation, sizeTracker);
+        this.navigator = new Navigator<>(cellListManager, cellPositioner, orientation, gravity, sizeTracker);
 
-        // create scrollbars
-        hbar = new ScrollBar();
-        vbar = new ScrollBar();
-        hbar.setOrientation(Orientation.HORIZONTAL);
-        vbar.setOrientation(Orientation.VERTICAL);
+        getChildren().add(navigator);
+        clipProperty().bind(Val.map(
+                layoutBoundsProperty(),
+                b -> new Rectangle(b.getWidth(), b.getHeight())));
 
-        // scrollbar ranges
-        hbar.setMin(0);
-        vbar.setMin(0);
-        hbar.maxProperty().bind(orientation.widthEstimateProperty(content));
-        vbar.maxProperty().bind(orientation.heightEstimateProperty(content));
 
-        // scrollbar increments
-        setupUnitIncrement(hbar);
-        setupUnitIncrement(vbar);
-        hbar.blockIncrementProperty().bind(hbar.visibleAmountProperty());
-        vbar.blockIncrementProperty().bind(vbar.visibleAmountProperty());
+        // set up bindings
+        breadthPositionEstimate = Val.combine(
+                breadthOffset,
+                sizeTracker.viewportBreadthProperty(),
+                sizeTracker.maxCellBreadthProperty(),
+                (off, vpBr, totalBr) -> offsetToScrollbarPosition(off.doubleValue(), vpBr, totalBr));
 
-        // scrollbar positions
-        Bindings.bindBidirectional(
-                Var.doubleVar(hbar.valueProperty()),
-                orientation.horizontalPositionProperty(content));
-        Bindings.bindBidirectional(
-                Var.doubleVar(vbar.valueProperty()),
-                orientation.verticalPositionProperty(content));
+        lengthOffsetEstimate = sizeTracker.lengthOffsetEstimateProperty();
+
+        lengthPositionEstimate = Val.combine(
+                lengthOffsetEstimate,
+                sizeTracker.viewportLengthProperty(),
+                sizeTracker.totalLengthEstimateProperty(),
+                (off, vpLen, totalLen) -> offsetToScrollbarPosition(off, vpLen, totalLen))
+                .orElseConst(0.0);
 
         // scroll content by mouse scroll
         this.addEventHandler(ScrollEvent.SCROLL, se -> {
@@ -94,275 +118,288 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region {
             scrollYBy(-se.getDeltaY());
             se.consume();
         });
-
-        // scrollbar visibility
-        Val<Double> layoutWidth = Val.map(layoutBoundsProperty(), Bounds::getWidth);
-        Val<Double> layoutHeight = Val.map(layoutBoundsProperty(), Bounds::getHeight);
-        Val<Boolean> needsHBar0 = Val.combine(
-                orientation.widthEstimateProperty(content),
-                layoutWidth,
-                (cw, lw) -> cw > lw);
-        Val<Boolean> needsVBar0 = Val.combine(
-                orientation.heightEstimateProperty(content),
-                layoutHeight,
-                (ch, lh) -> ch > lh);
-        Val<Boolean> needsHBar = Val.combine(
-                needsHBar0,
-                needsVBar0,
-                orientation.widthEstimateProperty(content),
-                vbar.widthProperty(),
-                layoutWidth,
-                (needsH, needsV, cw, vbw, lw) -> needsH || needsV && cw + vbw.doubleValue() > lw);
-        Val<Boolean> needsVBar = Val.combine(
-                needsVBar0,
-                needsHBar0,
-                orientation.heightEstimateProperty(content),
-                hbar.heightProperty(),
-                layoutHeight,
-                (needsV, needsH, ch, hbh, lh) -> needsV || needsH && ch + hbh.doubleValue() > lh);
-        hbar.visibleProperty().bind(needsHBar);
-        vbar.visibleProperty().bind(needsVBar);
-
-        // request layout later, because if currently in layout, the request is ignored
-        hbar.visibleProperty().addListener(obs -> Platform.runLater(() -> requestLayout()));
-        vbar.visibleProperty().addListener(obs -> Platform.runLater(() -> requestLayout()));
-
-        getChildren().addAll(content, hbar, vbar);
     }
 
     public void dispose() {
-        content.dispose();
+        navigator.dispose();
+        sizeTracker.dispose();
+        cellListManager.dispose();
     }
 
-    @Override
-    public Orientation getContentBias() {
-        return content.getContentBias();
-    }
-
-    public double getViewportWidth() {
-        return content.getWidth();
-    }
-
-    public double getViewportHeight() {
-        return content.getHeight();
-    }
-
-    public ReadOnlyDoubleProperty breadthOffsetProperty() {
-        return content.breadthOffsetProperty();
-    }
-
-    public Bounds cellToViewport(C cell, Bounds bounds) {
-        return cell.getNode().localToParent(bounds);
-    }
-
-    public Point2D cellToViewport(C cell, Point2D point) {
-        return cell.getNode().localToParent(point);
-    }
-
-    public Point2D cellToViewport(C cell, double x, double y) {
-        return cell.getNode().localToParent(x, y);
-    }
-
-    public void show(int index) {
-        content.show(index);
-    }
-
-    public void show(double primaryAxisOffset) {
-        content.show(primaryAxisOffset);
-    }
-
-    public void showAsFirst(int itemIndex) {
-        content.showAsFirst(itemIndex);
-    }
-
-    public void showAsLast(int itemIndex) {
-        content.showAsLast(itemIndex);
-    }
-
-    public void showAtOffset(int itemIndex, double offset) {
-        content.showAtOffset(itemIndex, offset);
-    }
-
-    public void show(int itemIndex, Bounds region) {
-        content.showRegion(itemIndex, region);
-    }
-
-    /**
-     * Scroll the content horizontally by the given amount.
-     * @param deltaX positive value scrolls right, negative value scrolls left
-     * @deprecated use {@link #scrollXBy(double)} instead
-     */
-    @Deprecated
-    public void scrollX(double deltaX) {
-        content.scrollXBy(deltaX);
-    }
-
-    /**
-     * Scroll the content vertically by the given amount.
-     * @param deltaY positive value scrolls down, negative value scrolls up
-     * @deprecated use {@link #scrollYBy(double)} instead
-     */
-    @Deprecated
-    public void scrollY(double deltaY) {
-        content.scrollYBy(deltaY);
-    }
-
-    /**
-     * Scroll the content horizontally by the given amount.
-     * @param deltaX positive value scrolls right, negative value scrolls left
-     */
-    public void scrollXBy(double deltaX) {
-        content.scrollXBy(deltaX);
-    }
-
-    /**
-     * Scroll the content vertically by the given amount.
-     * @param deltaY positive value scrolls down, negative value scrolls up
-     */
-    public void scrollYBy(double deltaY) {
-        content.scrollYBy(deltaY);
-    }
-
-    /**
-     * Scroll the content horizontally to the pixel
-     * @param pixel - the pixel position to which to scroll
-     */
-    public void scrollXToPixel(double pixel) {
-        content.scrollXToPixel(pixel);
-    }
-
-    /**
-     * Scroll the content vertically to the pixel
-     * @param pixel - the pixel position to which to scroll
-     */
-    public void scrollYToPixel(double pixel) {
-        content.scrollYToPixel(pixel);
-    }
-
-    public Val<Double> totalWidthEstimateProperty() {
-        return content.totalWidthEstimateProperty();
-    }
-
-    public Val<Double> totalHeightEstimateProperty() {
-        return content.totalHeightEstimateProperty();
-    }
-
-    public Var<Double> estimatedScrollXProperty() {
-        return content.horizontalPositionProperty();
-    }
-
-    public Var<Double> estimatedScrollYProperty() {
-        return content.verticalPositionProperty();
-    }
-
-    /**
-     * If the item is out of view, instantiates a new cell for the item.
-     * The returned cell will be properly sized, but not properly positioned
-     * relative to the cells in the viewport, unless it is itself in the
-     * viewport.
-     *
-     * @return Cell for the given item. The cell will be valid only until the
-     * next layout pass. It should therefore not be stored. It is intended to
-     * be used for measurement purposes only.
-     */
-    public C getCell(int itemIndex) {
-        return content.getCellFor(itemIndex);
+    public C getCellFor(int itemIndex) {
+        Lists.checkIndex(itemIndex, items.size());
+        return cellPositioner.getSizedCell(itemIndex);
     }
 
     public Optional<C> getCellIfVisible(int itemIndex) {
-        return content.getCellIfVisible(itemIndex);
+        return cellPositioner.getCellIfVisible(itemIndex);
     }
 
     public ObservableList<C> visibleCells() {
-        return content.visibleCells();
+        return cellListManager.getLazyCellList().memoizedItems();
     }
 
-    /**
-     * Hits this virtual flow at the given coordinates.
-     * @param x x offset from the left edge of the viewport
-     * @param y y offset from the top edge of the viewport
-     * @return hit info containing the cell that was hit and coordinates
-     * relative to the cell. If the hit was before the cells (i.e. above a
-     * vertical flow content or left of a horizontal flow content), returns
-     * a <em>hit before cells</em> containing offset from the top left corner
-     * of the content. If the hit was after the cells (i.e. below a vertical
-     * flow content or right of a horizontal flow content), returns a
-     * <em>hit after cells</em> containing offset from the top right corner of
-     * the content of a horizontal flow or bottom left corner of the content of
-     * a vertical flow.
-     */
-    public VirtualFlowHit<C> hit(double x, double y) {
-        return content.hit(x, y);
-    }
-
-    @Override
-    protected double computePrefWidth(double height) {
-        return content.prefWidth(height);
-    }
-
-    @Override
-    protected double computePrefHeight(double width) {
-        return content.prefHeight(width);
-    }
-
-    @Override
-    protected double computeMinWidth(double height) {
-        return vbar.minWidth(-1);
-    }
-
-    @Override
-    protected double computeMinHeight(double width) {
-        return hbar.minHeight(-1);
-    }
-
-    @Override
-    protected double computeMaxWidth(double height) {
-        return content.maxWidth(height);
-    }
-
-    @Override
-    protected double computeMaxHeight(double width) {
-        return content.maxHeight(width);
+    public Val<Double> totalLengthEstimateProperty() {
+        return sizeTracker.totalLengthEstimateProperty();
     }
 
     @Override
     protected void layoutChildren() {
-        double layoutWidth = getLayoutBounds().getWidth();
-        double layoutHeight = getLayoutBounds().getHeight();
-        boolean vbarVisible = vbar.isVisible();
-        boolean hbarVisible = hbar.isVisible();
-        double vbarWidth = vbarVisible ? vbar.prefWidth(-1) : 0;
-        double hbarHeight = hbarVisible ? hbar.prefHeight(-1) : 0;
 
-        double w = layoutWidth - vbarWidth;
-        double h = layoutHeight - hbarHeight;
-
-        content.resize(w, h);
-
-        hbar.setVisibleAmount(w);
-        vbar.setVisibleAmount(h);
-
-        if(vbarVisible) {
-            vbar.resizeRelocate(layoutWidth - vbarWidth, 0, vbarWidth, h);
+        // navigate to the target position and fill viewport
+        while(true) {
+            double oldLayoutBreadth = sizeTracker.getCellLayoutBreadth();
+            orientation.resize(navigator, oldLayoutBreadth, sizeTracker.getViewportLength());
+            navigator.layout();
+            if(oldLayoutBreadth == sizeTracker.getCellLayoutBreadth()) {
+                break;
+            }
         }
 
-        if(hbarVisible) {
-            hbar.resizeRelocate(0, layoutHeight - hbarHeight, w, hbarHeight);
+        orientation.relocate(navigator, -breadthOffset.get(), 0);
+    }
+
+    @Override
+    protected final double computePrefWidth(double height) {
+        switch(getContentBias()) {
+            case HORIZONTAL: // vertical flow
+                return computePrefBreadth();
+            case VERTICAL: // horizontal flow
+                return computePrefLength(height);
+            default:
+                throw new AssertionError("Unreachable code");
         }
     }
 
-    private static void setupUnitIncrement(ScrollBar bar) {
-        bar.unitIncrementProperty().bind(new DoubleBinding() {
-            { bind(bar.maxProperty(), bar.visibleAmountProperty()); }
+    @Override
+    protected final double computePrefHeight(double width) {
+        switch(getContentBias()) {
+            case HORIZONTAL: // vertical flow
+                return computePrefLength(width);
+            case VERTICAL: // horizontal flow
+                return computePrefBreadth();
+            default:
+                throw new AssertionError("Unreachable code");
+        }
+    }
 
-            @Override
-            protected double computeValue() {
-                double max = bar.getMax();
-                double visible = bar.getVisibleAmount();
-                return max > visible
-                        ? 16 / (max - visible) * max
-                        : 0;
+    private double computePrefBreadth() {
+        return 100;
+    }
+
+    private double computePrefLength(double breadth) {
+        return 100;
+    }
+
+    @Override
+    public final Orientation getContentBias() {
+        return orientation.getContentBias();
+    }
+
+    void scrollLength(double deltaLength) {
+        setLengthOffset(lengthOffsetEstimate.getValue() + deltaLength);
+    }
+
+    void scrollBreadth(double deltaBreadth) {
+        setBreadthOffset(breadthOffset.get() + deltaBreadth);
+    }
+
+    void scrollXBy(double deltaX) {
+        orientation.scrollHorizontallyBy(this, deltaX);
+    }
+
+    void scrollYBy(double deltaY) {
+        orientation.scrollVerticallyBy(this, deltaY);
+    }
+
+    void scrollXToPixel(double pixel) {
+        orientation.scrollHorizontallyToPixel(this, pixel);
+    }
+
+    void scrollYToPixel(double pixel) {
+        orientation.scrollVerticallyToPixel(this, pixel);
+    }
+
+    public Val<Double> totalWidthEstimateProperty() {
+        return orientation.widthEstimateProperty(this);
+    }
+
+    public Val<Double> totalHeightEstimateProperty() {
+        return orientation.heightEstimateProperty(this);
+    }
+
+    public Var<Double> estimatedScrollXProperty() {
+        return orientation.horizontalPositionProperty(this);
+    }
+
+    public Var<Double> estimatedScrollYProperty() {
+        return orientation.verticalPositionProperty(this);
+    }
+
+    VirtualFlowHit<C> hit(double x, double y) {
+        double bOff = orientation.getX(x, y);
+        double lOff = orientation.getY(x, y);
+
+        bOff += breadthOffset.get();
+
+        if(items.isEmpty()) {
+            return orientation.hitAfterCells(bOff, lOff);
+        }
+
+        layout();
+
+        int firstVisible = cellPositioner.getFirstVisibleIndex().getAsInt();
+        firstVisible = navigator.fillBackwardFrom0(firstVisible, lOff);
+        C firstCell = cellPositioner.getVisibleCell(firstVisible);
+
+        int lastVisible = cellPositioner.getLastVisibleIndex().getAsInt();
+        lastVisible = navigator.fillForwardFrom0(lastVisible, lOff);
+        C lastCell = cellPositioner.getVisibleCell(lastVisible);
+
+        if(lOff < orientation.minY(firstCell)) {
+            return orientation.hitBeforeCells(bOff, lOff - orientation.minY(firstCell));
+        } else if(lOff >= orientation.maxY(lastCell)) {
+            return orientation.hitAfterCells(bOff, lOff - orientation.maxY(lastCell));
+        } else {
+            for(int i = firstVisible; i <= lastVisible; ++i) {
+                C cell = cellPositioner.getVisibleCell(i);
+                if(lOff < orientation.maxY(cell)) {
+                    return orientation.cellHit(i, cell, bOff, lOff - orientation.minY(cell));
+                }
             }
-        });
+            throw new AssertionError("unreachable code");
+        }
+    }
+
+    void show(double viewportOffset) {
+        if(viewportOffset < 0) {
+            navigator.scrollTargetPositionBy(viewportOffset);
+        } else if(viewportOffset > sizeTracker.getViewportLength()) {
+            navigator.scrollTargetPositionBy(viewportOffset - sizeTracker.getViewportLength());
+        } else {
+            // do nothing, offset already in the viewport
+        }
+    }
+
+    void show(int itemIdx) {
+        navigator.setTargetPosition(new MinDistanceTo(itemIdx));
+    }
+
+    void showAsFirst(int itemIdx) {
+        navigator.setTargetPosition(new StartOffStart(itemIdx, 0.0));
+    }
+
+    void showAsLast(int itemIdx) {
+        navigator.setTargetPosition(new EndOffEnd(itemIdx, 0.0));
+    }
+
+    void showAtOffset(int itemIdx, double offset) {
+        navigator.setTargetPosition(new StartOffStart(itemIdx, offset));
+    }
+
+    void showRegion(int itemIndex, Bounds region) {
+      navigator.showLengthRegion(itemIndex, orientation.minY(region), orientation.maxY(region));
+      showBreadthRegion(orientation.minX(region), orientation.maxX(region));
+    }
+
+    private void showBreadthRegion(double fromX, double toX) {
+        double bOff = breadthOffset.get();
+        double spaceBefore = fromX - bOff;
+        double spaceAfter = sizeTracker.getViewportBreadth() - toX + bOff;
+        if(spaceBefore < 0 && spaceAfter > 0) {
+            double shift = Math.min(-spaceBefore, spaceAfter);
+            setBreadthOffset(bOff - shift);
+        } else if(spaceAfter < 0 && spaceBefore > 0) {
+            double shift = Math.max(spaceAfter, -spaceBefore);
+            setBreadthOffset(bOff - shift);
+        }
+    }
+
+    private void setLengthPosition(double pos) {
+        setLengthOffset(lengthPositionToPixels(pos));
+    }
+
+    private void setBreadthPosition(double pos) {
+        setBreadthOffset(breadthPositionToPixels(pos));
+    }
+
+    void setLengthOffset(double pixels) {
+        double total = totalLengthEstimateProperty().getOrElse(0.0);
+        double length = sizeTracker.getViewportLength();
+        double max = Math.max(total - length, 0);
+        double current = lengthOffsetEstimate.getValue();
+
+        if(pixels > max) pixels = max;
+        if(pixels < 0) pixels = 0;
+
+        double diff = pixels - current;
+        if(diff == 0) {
+            // do nothing
+        } else if(Math.abs(diff) < length) { // distance less than one screen
+            navigator.scrollTargetPositionBy(diff);
+        } else {
+            jumpToAbsolutePosition(pixels);
+        }
+    }
+
+    void setBreadthOffset(double pixels) {
+        double total = totalBreadthEstimateProperty().getValue();
+        double breadth = sizeTracker.getViewportBreadth();
+        double max = Math.max(total - breadth, 0);
+        double current = breadthOffset.get();
+
+        if(pixels > max) pixels = max;
+        if(pixels < 0) pixels = 0;
+
+        if(pixels != current) {
+            breadthOffset.set(pixels);
+            requestLayout();
+            // TODO: could be safely relocated right away?
+            // (Does relocation request layout?)
+        }
+    }
+
+    private void jumpToAbsolutePosition(double pixels) {
+        if(items.isEmpty()) {
+            return;
+        }
+
+        // guess the first visible cell and its offset in the viewport
+        double avgLen = sizeTracker.getAverageLengthEstimate().orElse(0.0);
+        if(avgLen == 0.0) return;
+        int first = (int) Math.floor(pixels / avgLen);
+        double firstOffset = -(pixels % avgLen);
+
+        if(first < items.size()) {
+            navigator.setTargetPosition(new StartOffStart(first, firstOffset));
+        } else {
+            navigator.setTargetPosition(new EndOffEnd(items.size() - 1, 0.0));
+        }
+    }
+
+    private double lengthPositionToPixels(double pos) {
+        double total = totalLengthEstimateProperty().getOrElse(0.0);
+        double length = sizeTracker.getViewportLength();
+        return scrollbarPositionToOffset(pos, length, total);
+    }
+
+    private double breadthPositionToPixels(double pos) {
+        double total = totalBreadthEstimateProperty().getValue();
+        double breadth = sizeTracker.getViewportBreadth();
+        return scrollbarPositionToOffset(pos, breadth, total);
+    }
+
+    private static double offsetToScrollbarPosition(
+            double contentOffset, double viewportSize, double contentSize) {
+        return contentSize > viewportSize
+                ? contentOffset / (contentSize - viewportSize) * contentSize
+                : 0;
+    }
+
+    private static double scrollbarPositionToOffset(
+            double scrollbarPos, double viewportSize, double contentSize) {
+        return contentSize > viewportSize
+                ? scrollbarPos / contentSize * (contentSize - viewportSize)
+                : 0;
     }
 }
