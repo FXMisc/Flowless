@@ -8,7 +8,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.layout.Region;
 
-import org.fxmisc.flowless.VirtualFlowContent.Gravity;
+import org.fxmisc.flowless.VirtualFlow.Gravity;
 import org.reactfx.Subscription;
 import org.reactfx.collection.LiveList;
 import org.reactfx.collection.MemoizationList;
