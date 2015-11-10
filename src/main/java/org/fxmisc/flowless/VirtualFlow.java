@@ -138,7 +138,7 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
      * next layout pass. It should therefore not be stored. It is intended to
      * be used for measurement purposes only.
      */
-    public C getCellFor(int itemIndex) {
+    public C getCell(int itemIndex) {
         Lists.checkIndex(itemIndex, items.size());
         return cellPositioner.getSizedCell(itemIndex);
     }
