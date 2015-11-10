@@ -1,6 +1,7 @@
 package org.fxmisc.flowless;
 
 import javafx.application.Platform;
+import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
 import javafx.geometry.Bounds;
@@ -17,6 +18,9 @@ public class VirtualizedScrollPane<V extends Node & Virtualized> extends Region 
     private final ScrollBar hbar;
     private final ScrollBar vbar;
     private final V content;
+
+    private Var<Double> hbarValue;
+    private Var<Double> vbarValue;
 
     public VirtualizedScrollPane(V content) {
         this.getStyleClass().add("virtualized-scroll-pane");
@@ -41,11 +45,13 @@ public class VirtualizedScrollPane<V extends Node & Virtualized> extends Region 
         vbar.blockIncrementProperty().bind(vbar.visibleAmountProperty());
 
         // scrollbar positions
+        hbarValue = Var.doubleVar(hbar.valueProperty());
+        vbarValue = Var.doubleVar(vbar.valueProperty());
         Bindings.bindBidirectional(
-                Var.doubleVar(hbar.valueProperty()),
+                hbarValue,
                 content.estimatedScrollXProperty());
         Bindings.bindBidirectional(
-                Var.doubleVar(vbar.valueProperty()),
+                vbarValue,
                 content.estimatedScrollYProperty());
 
         // scrollbar visibility
@@ -80,7 +86,32 @@ public class VirtualizedScrollPane<V extends Node & Virtualized> extends Region 
         hbar.visibleProperty().addListener(obs -> Platform.runLater(() -> requestLayout()));
         vbar.visibleProperty().addListener(obs -> Platform.runLater(() -> requestLayout()));
 
+        getChildren().addListener((Observable obs) -> dispose());
+
         getChildren().addAll(content, hbar, vbar);
+    }
+
+    /**
+     * Unbinds scrolling from Content before returning Content.
+     * @return - the content
+     */
+    V removeContent() {
+        getChildren().clear();
+        return content;
+    }
+
+    private void dispose() {
+        hbarValue.unbindBidirectional(content.estimatedScrollXProperty());
+        vbarValue.unbindBidirectional(content.estimatedScrollYProperty());
+        unbindScrollBar(hbar);
+        unbindScrollBar(vbar);
+    }
+
+    private void unbindScrollBar(ScrollBar bar) {
+        bar.maxProperty().unbind();
+        bar.unitIncrementProperty().unbind();
+        bar.blockIncrementProperty().unbind();
+        bar.visibleProperty().unbind();
     }
 
     public Val<Double> totalWidthEstimateProperty() {
