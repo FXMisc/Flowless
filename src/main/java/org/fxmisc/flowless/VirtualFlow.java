@@ -18,7 +18,7 @@ import org.reactfx.util.Lists;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
-class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virtualized {
+public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virtualized {
 
     public static enum Gravity { FRONT, REAR }
 
