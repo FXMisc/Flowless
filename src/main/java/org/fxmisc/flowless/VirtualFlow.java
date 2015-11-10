@@ -8,6 +8,7 @@ import javafx.beans.property.ReadOnlyDoubleWrapper;
 import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
 import javafx.geometry.Orientation;
+import javafx.geometry.Point2D;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.shape.Rectangle;
@@ -152,6 +153,18 @@ class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virtualized
 
     public Val<Double> totalLengthEstimateProperty() {
         return sizeTracker.totalLengthEstimateProperty();
+    }
+
+    public Bounds cellToViewport(C cell, Bounds bounds) {
+        return cell.getNode().localToParent(bounds);
+    }
+
+    public Point2D cellToViewport(C cell, Point2D point) {
+        return cell.getNode().localToParent(point);
+    }
+
+    public Point2D cellToViewport(C cell, double x, double y) {
+        return cell.getNode().localToParent(x, y);
     }
 
     @Override
