@@ -232,7 +232,7 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
      * Scroll the content horizontally by the given amount.
      * @param deltaX positive value scrolls right, negative value scrolls left
      */
-    void scrollXBy(double deltaX) {
+    public void scrollXBy(double deltaX) {
         orientation.scrollHorizontallyBy(this, deltaX);
     }
 
@@ -240,7 +240,7 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
      * Scroll the content vertically by the given amount.
      * @param deltaY positive value scrolls down, negative value scrolls up
      */
-    void scrollYBy(double deltaY) {
+    public void scrollYBy(double deltaY) {
         orientation.scrollVerticallyBy(this, deltaY);
     }
 
@@ -248,7 +248,7 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
      * Scroll the content horizontally to the pixel
      * @param pixel - the pixel position to which to scroll
      */
-    void scrollXToPixel(double pixel) {
+    public void scrollXToPixel(double pixel) {
         orientation.scrollHorizontallyToPixel(this, pixel);
     }
 
@@ -256,7 +256,7 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
      * Scroll the content vertically to the pixel
      * @param pixel - the pixel position to which to scroll
      */
-    void scrollYToPixel(double pixel) {
+    public void scrollYToPixel(double pixel) {
         orientation.scrollVerticallyToPixel(this, pixel);
     }
 
@@ -290,7 +290,7 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
      * the content of a horizontal flow or bottom left corner of the content of
      * a vertical flow.
      */
-    VirtualFlowHit<C> hit(double x, double y) {
+    public VirtualFlowHit<C> hit(double x, double y) {
         double bOff = orientation.getX(x, y);
         double lOff = orientation.getY(x, y);
 
@@ -325,7 +325,7 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
         }
     }
 
-    void show(double viewportOffset) {
+    public void show(double viewportOffset) {
         if(viewportOffset < 0) {
             navigator.scrollTargetPositionBy(viewportOffset);
         } else if(viewportOffset > sizeTracker.getViewportLength()) {
@@ -335,23 +335,23 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
         }
     }
 
-    void show(int itemIdx) {
+    public void show(int itemIdx) {
         navigator.setTargetPosition(new MinDistanceTo(itemIdx));
     }
 
-    void showAsFirst(int itemIdx) {
+    public void showAsFirst(int itemIdx) {
         navigator.setTargetPosition(new StartOffStart(itemIdx, 0.0));
     }
 
-    void showAsLast(int itemIdx) {
+    public void showAsLast(int itemIdx) {
         navigator.setTargetPosition(new EndOffEnd(itemIdx, 0.0));
     }
 
-    void showAtOffset(int itemIdx, double offset) {
+    public void showAtOffset(int itemIdx, double offset) {
         navigator.setTargetPosition(new StartOffStart(itemIdx, offset));
     }
 
-    void showRegion(int itemIndex, Bounds region) {
+    public void show(int itemIndex, Bounds region) {
       navigator.showLengthRegion(itemIndex, orientation.minY(region), orientation.maxY(region));
       showBreadthRegion(orientation.minX(region), orientation.maxX(region));
     }
