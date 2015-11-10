@@ -127,6 +127,16 @@ class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virtualized
         cellListManager.dispose();
     }
 
+    /**
+     * If the item is out of view, instantiates a new cell for the item.
+     * The returned cell will be properly sized, but not properly positioned
+     * relative to the cells in the viewport, unless it is itself in the
+     * viewport.
+     *
+     * @return Cell for the given item. The cell will be valid only until the
+     * next layout pass. It should therefore not be stored. It is intended to
+     * be used for measurement purposes only.
+     */
     public C getCellFor(int itemIndex) {
         Lists.checkIndex(itemIndex, items.size());
         return cellPositioner.getSizedCell(itemIndex);
@@ -205,18 +215,34 @@ class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virtualized
         setBreadthOffset(breadthOffset.get() + deltaBreadth);
     }
 
+    /**
+     * Scroll the content horizontally by the given amount.
+     * @param deltaX positive value scrolls right, negative value scrolls left
+     */
     void scrollXBy(double deltaX) {
         orientation.scrollHorizontallyBy(this, deltaX);
     }
 
+    /**
+     * Scroll the content vertically by the given amount.
+     * @param deltaY positive value scrolls down, negative value scrolls up
+     */
     void scrollYBy(double deltaY) {
         orientation.scrollVerticallyBy(this, deltaY);
     }
 
+    /**
+     * Scroll the content horizontally to the pixel
+     * @param pixel - the pixel position to which to scroll
+     */
     void scrollXToPixel(double pixel) {
         orientation.scrollHorizontallyToPixel(this, pixel);
     }
 
+    /**
+     * Scroll the content vertically to the pixel
+     * @param pixel - the pixel position to which to scroll
+     */
     void scrollYToPixel(double pixel) {
         orientation.scrollVerticallyToPixel(this, pixel);
     }
@@ -237,6 +263,20 @@ class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virtualized
         return orientation.verticalPositionProperty(this);
     }
 
+    /**
+     * Hits this virtual flow at the given coordinates.
+     * @param x x offset from the left edge of the viewport
+     * @param y y offset from the top edge of the viewport
+     * @return hit info containing the cell that was hit and coordinates
+     * relative to the cell. If the hit was before the cells (i.e. above a
+     * vertical flow content or left of a horizontal flow content), returns
+     * a <em>hit before cells</em> containing offset from the top left corner
+     * of the content. If the hit was after the cells (i.e. below a vertical
+     * flow content or right of a horizontal flow content), returns a
+     * <em>hit after cells</em> containing offset from the top right corner of
+     * the content of a horizontal flow or bottom left corner of the content of
+     * a vertical flow.
+     */
     VirtualFlowHit<C> hit(double x, double y) {
         double bOff = orientation.getX(x, y);
         double lOff = orientation.getY(x, y);
