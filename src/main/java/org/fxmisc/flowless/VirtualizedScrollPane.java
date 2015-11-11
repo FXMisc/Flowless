@@ -86,9 +86,8 @@ public class VirtualizedScrollPane<V extends Node & Virtualized> extends Region 
         hbar.visibleProperty().addListener(obs -> Platform.runLater(() -> requestLayout()));
         vbar.visibleProperty().addListener(obs -> Platform.runLater(() -> requestLayout()));
 
-        getChildren().addListener((Observable obs) -> dispose());
-
         getChildren().addAll(content, hbar, vbar);
+        getChildren().addListener((Observable obs) -> dispose());
     }
 
     /**
