@@ -1,7 +1,6 @@
 package org.fxmisc.flowless;
 
 import javafx.beans.property.DoubleProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.geometry.Bounds;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
@@ -52,15 +51,15 @@ interface OrientationHelper {
     default void resize(Cell<?, ?> cell, double breadth, double length) { resize(cell.getNode(), breadth, length); }
     default void relocate(Cell<?, ?> cell, double b0, double l0) { relocate(cell.getNode(), b0, l0); }
 
-    Val<Double> widthEstimateProperty(VirtualFlowContent<?, ?> content);
-    Val<Double> heightEstimateProperty(VirtualFlowContent<?, ?> content);
-    Var<Double> horizontalPositionProperty(VirtualFlowContent<?, ?> content);
-    Var<Double> verticalPositionProperty(VirtualFlowContent<?, ?> content);
+    Val<Double> widthEstimateProperty(VirtualFlow<?, ?> content);
+    Val<Double> heightEstimateProperty(VirtualFlow<?, ?> content);
+    Var<Double> horizontalPositionProperty(VirtualFlow<?, ?> content);
+    Var<Double> verticalPositionProperty(VirtualFlow<?, ?> content);
 
-    void scrollHorizontallyBy(VirtualFlowContent<?, ?> content, double dx);
-    void scrollVerticallyBy(VirtualFlowContent<?, ?> content, double dy);
-    void scrollHorizontallyToPixel(VirtualFlowContent<?, ?> content, double pixel);
-    void scrollVerticallyToPixel(VirtualFlowContent<?, ?> content, double pixel);
+    void scrollHorizontallyBy(VirtualFlow<?, ?> content, double dx);
+    void scrollVerticallyBy(VirtualFlow<?, ?> content, double dy);
+    void scrollHorizontallyToPixel(VirtualFlow<?, ?> content, double pixel);
+    void scrollVerticallyToPixel(VirtualFlow<?, ?> content, double pixel);
 
     <C extends Cell<?, ?>> VirtualFlowHit<C> hitBeforeCells(double bOff, double lOff);
     <C extends Cell<?, ?>> VirtualFlowHit<C> hitAfterCells(double bOff, double lOff);
@@ -152,45 +151,45 @@ final class HorizontalHelper implements OrientationHelper {
 
     @Override
     public Val<Double> widthEstimateProperty(
-            VirtualFlowContent<?, ?> content) {
+            VirtualFlow<?, ?> content) {
         return content.totalLengthEstimateProperty();
     }
 
     @Override
     public Val<Double> heightEstimateProperty(
-            VirtualFlowContent<?, ?> content) {
+            VirtualFlow<?, ?> content) {
         return content.totalBreadthEstimateProperty();
     }
 
     @Override
     public Var<Double> horizontalPositionProperty(
-            VirtualFlowContent<?, ?> content) {
+            VirtualFlow<?, ?> content) {
         return content.lengthPositionEstimateProperty();
     }
 
     @Override
     public Var<Double> verticalPositionProperty(
-            VirtualFlowContent<?, ?> content) {
+            VirtualFlow<?, ?> content) {
         return content.breadthPositionEstimateProperty();
     }
 
     @Override
-    public void scrollHorizontallyBy(VirtualFlowContent<?, ?> content, double dx) {
+    public void scrollHorizontallyBy(VirtualFlow<?, ?> content, double dx) {
         content.scrollLength(dx);
     }
 
     @Override
-    public void scrollVerticallyBy(VirtualFlowContent<?, ?> content, double dy) {
+    public void scrollVerticallyBy(VirtualFlow<?, ?> content, double dy) {
         content.scrollBreadth(dy);
     }
 
     @Override
-    public void scrollHorizontallyToPixel(VirtualFlowContent<?, ?> content, double pixel) {
+    public void scrollHorizontallyToPixel(VirtualFlow<?, ?> content, double pixel) {
         content.setLengthOffset(pixel);
     }
 
     @Override
-    public void scrollVerticallyToPixel(VirtualFlowContent<?, ?> content, double pixel) {
+    public void scrollVerticallyToPixel(VirtualFlow<?, ?> content, double pixel) {
         content.setBreadthOffset(pixel);
     }
 
@@ -298,45 +297,45 @@ final class VerticalHelper implements OrientationHelper {
 
     @Override
     public Val<Double> widthEstimateProperty(
-            VirtualFlowContent<?, ?> content) {
+            VirtualFlow<?, ?> content) {
         return content.totalBreadthEstimateProperty();
     }
 
     @Override
     public Val<Double> heightEstimateProperty(
-            VirtualFlowContent<?, ?> content) {
+            VirtualFlow<?, ?> content) {
         return content.totalLengthEstimateProperty();
     }
 
     @Override
     public Var<Double> horizontalPositionProperty(
-            VirtualFlowContent<?, ?> content) {
+            VirtualFlow<?, ?> content) {
         return content.breadthPositionEstimateProperty();
     }
 
     @Override
     public Var<Double> verticalPositionProperty(
-            VirtualFlowContent<?, ?> content) {
+            VirtualFlow<?, ?> content) {
         return content.lengthPositionEstimateProperty();
     }
 
     @Override
-    public void scrollHorizontallyBy(VirtualFlowContent<?, ?> content, double dx) {
+    public void scrollHorizontallyBy(VirtualFlow<?, ?> content, double dx) {
         content.scrollBreadth(dx);
     }
 
     @Override
-    public void scrollVerticallyBy(VirtualFlowContent<?, ?> content, double dy) {
+    public void scrollVerticallyBy(VirtualFlow<?, ?> content, double dy) {
         content.scrollLength(dy);
     }
 
     @Override
-    public void scrollHorizontallyToPixel(VirtualFlowContent<?, ?> content, double pixel) {
+    public void scrollHorizontallyToPixel(VirtualFlow<?, ?> content, double pixel) {
         content.setBreadthOffset(pixel);
     }
 
     @Override
-    public void scrollVerticallyToPixel(VirtualFlowContent<?, ?> content, double pixel) { // length
+    public void scrollVerticallyToPixel(VirtualFlow<?, ?> content, double pixel) { // length
         content.setLengthOffset(pixel);
     }
 
