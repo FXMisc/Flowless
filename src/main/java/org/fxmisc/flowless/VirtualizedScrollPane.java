@@ -91,10 +91,18 @@ public class VirtualizedScrollPane<V extends Node & Virtualized> extends Region 
     }
 
     /**
+     * Does not unbind scrolling from Content before returning Content.
+     * @return - the content
+     */
+    public V getContent() {
+        return content;
+    }
+
+    /**
      * Unbinds scrolling from Content before returning Content.
      * @return - the content
      */
-    V removeContent() {
+    public V removeContent() {
         getChildren().clear();
         return content;
     }
