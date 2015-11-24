@@ -17,7 +17,7 @@ public class VirtualizedScrollPane<V extends Node & Virtualized> extends Region 
 
     private final ScrollBar hbar;
     private final ScrollBar vbar;
-    private final V content;
+    protected final V content;
 
     private Var<Double> hbarValue;
     private Var<Double> vbarValue;
@@ -167,6 +167,10 @@ public class VirtualizedScrollPane<V extends Node & Virtualized> extends Region 
         return content.maxHeight(width);
     }
 
+    /**
+     * To change how content is laid out while not changing how the scroll bars
+     * are laid out, see {@link #layoutContent(double, double)}
+     */
     @Override
     protected void layoutChildren() {
         double layoutWidth = getLayoutBounds().getWidth();
@@ -179,7 +183,7 @@ public class VirtualizedScrollPane<V extends Node & Virtualized> extends Region 
         double w = layoutWidth - vbarWidth;
         double h = layoutHeight - hbarHeight;
 
-        content.resize(w, h);
+        layoutContent(w, h);
 
         hbar.setVisibleAmount(w);
         vbar.setVisibleAmount(h);
@@ -191,6 +195,17 @@ public class VirtualizedScrollPane<V extends Node & Virtualized> extends Region 
         if(hbarVisible) {
             hbar.resizeRelocate(0, layoutHeight - hbarHeight, w, hbarHeight);
         }
+    }
+
+    /**
+     * To change how content is laid out, rather than overriding {@link #layoutChildren()},
+     * which correctly handles the appearance of the scroll bars when they are needed,
+     * one should override this method.
+     * @param width the width available for content during layout
+     * @param height the height available for content during layout
+     */
+    protected void layoutContent(double width, double height) {
+        content.resize(width, height);
     }
 
     private static void setupUnitIncrement(ScrollBar bar) {
