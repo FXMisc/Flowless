@@ -32,7 +32,7 @@ public class ScaledVirtualized<V extends Node & Virtualized> extends Region impl
     private Var<Double> estScrollX;
     private Var<Double> estScrollY;
 
-    ScaledVirtualized(V content) {
+    public ScaledVirtualized(V content) {
         super();
         this.content = content;
         getChildren().add(content);
