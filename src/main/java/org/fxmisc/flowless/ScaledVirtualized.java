@@ -23,7 +23,7 @@ import org.reactfx.value.Var;
  * </pre>
  * @param <V> the {@link Virtualized} content to be scaled when inside a {@link VirtualizedScrollPane}
  */
-class ScaledVirtualized<V extends Node & Virtualized> extends Region implements Virtualized {
+public class ScaledVirtualized<V extends Node & Virtualized> extends Region implements Virtualized {
     private final V content;
     private Scale scale = new Scale();
 
