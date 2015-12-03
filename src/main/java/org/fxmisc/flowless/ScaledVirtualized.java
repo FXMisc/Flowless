@@ -37,6 +37,7 @@ public class ScaledVirtualized<V extends Node & Virtualized> extends Region impl
         this.content = content;
         getChildren().add(content);
         getTransforms().add(scale);
+
         estHeight = Val.combine(
                 content.totalHeightEstimateProperty(),
                 scale.yProperty(),
@@ -57,6 +58,13 @@ public class ScaledVirtualized<V extends Node & Virtualized> extends Region impl
                 scrollY -> scrollY * scale.getY(),
                 scrollY -> scrollY / scale.getY()
         );
+
+        scale.xProperty()     .addListener((obs, ov, nv) -> layoutChildren());
+        scale.yProperty()     .addListener((obs, ov, nv) -> layoutChildren());
+        scale.zProperty()     .addListener((obs, ov, nv) -> layoutChildren());
+        scale.pivotXProperty().addListener((obs, ov, nv) -> layoutChildren());
+        scale.pivotYProperty().addListener((obs, ov, nv) -> layoutChildren());
+        scale.pivotZProperty().addListener((obs, ov, nv) -> layoutChildren());
     }
 
     @Override
