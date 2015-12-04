@@ -59,12 +59,12 @@ public class ScaledVirtualized<V extends Node & Virtualized> extends Region impl
                 scrollY -> scrollY / scale.getY()
         );
 
-        scale.xProperty()     .addListener((obs, ov, nv) -> layoutChildren());
-        scale.yProperty()     .addListener((obs, ov, nv) -> layoutChildren());
-        scale.zProperty()     .addListener((obs, ov, nv) -> layoutChildren());
-        scale.pivotXProperty().addListener((obs, ov, nv) -> layoutChildren());
-        scale.pivotYProperty().addListener((obs, ov, nv) -> layoutChildren());
-        scale.pivotZProperty().addListener((obs, ov, nv) -> layoutChildren());
+        scale.xProperty()     .addListener((obs, ov, nv) -> requestLayout());
+        scale.yProperty()     .addListener((obs, ov, nv) -> requestLayout());
+        scale.zProperty()     .addListener((obs, ov, nv) -> requestLayout());
+        scale.pivotXProperty().addListener((obs, ov, nv) -> requestLayout());
+        scale.pivotYProperty().addListener((obs, ov, nv) -> requestLayout());
+        scale.pivotZProperty().addListener((obs, ov, nv) -> requestLayout());
     }
 
     @Override
@@ -94,7 +94,7 @@ public class ScaledVirtualized<V extends Node & Virtualized> extends Region impl
         return estWidth;
     }
 
-    public Scale scaleProperty() {
+    public Scale getScale() {
         return scale;
     }
 }
