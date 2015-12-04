@@ -25,7 +25,7 @@ import org.reactfx.value.Var;
  */
 public class ScaledVirtualized<V extends Node & Virtualized> extends Region implements Virtualized {
     private final V content;
-    private Scale scale = new Scale();
+    private Scale zoom = new Scale();
 
     private Val<Double> estHeight;
     private Val<Double> estWidth;
@@ -36,42 +36,42 @@ public class ScaledVirtualized<V extends Node & Virtualized> extends Region impl
         super();
         this.content = content;
         getChildren().add(content);
-        getTransforms().add(scale);
+        getTransforms().add(zoom);
 
         estHeight = Val.combine(
                 content.totalHeightEstimateProperty(),
-                scale.yProperty(),
+                zoom.yProperty(),
                 (estHeight, scaleFactor) -> estHeight * scaleFactor.doubleValue()
         );
         estWidth = Val.combine(
                 content.totalWidthEstimateProperty(),
-                scale.xProperty(),
+                zoom.xProperty(),
                 (estWidth, scaleFactor) -> estWidth * scaleFactor.doubleValue()
         );
         estScrollX = Var.mapBidirectional(
                 content.estimatedScrollXProperty(),
-                scrollX -> scrollX * scale.getX(),
-                scrollX -> scrollX / scale.getX()
+                scrollX -> scrollX * zoom.getX(),
+                scrollX -> scrollX / zoom.getX()
         );
         estScrollY = Var.mapBidirectional(
                 content.estimatedScrollYProperty(),
-                scrollY -> scrollY * scale.getY(),
-                scrollY -> scrollY / scale.getY()
+                scrollY -> scrollY * zoom.getY(),
+                scrollY -> scrollY / zoom.getY()
         );
 
-        scale.xProperty()     .addListener((obs, ov, nv) -> requestLayout());
-        scale.yProperty()     .addListener((obs, ov, nv) -> requestLayout());
-        scale.zProperty()     .addListener((obs, ov, nv) -> requestLayout());
-        scale.pivotXProperty().addListener((obs, ov, nv) -> requestLayout());
-        scale.pivotYProperty().addListener((obs, ov, nv) -> requestLayout());
-        scale.pivotZProperty().addListener((obs, ov, nv) -> requestLayout());
+        zoom.xProperty()     .addListener((obs, ov, nv) -> requestLayout());
+        zoom.yProperty()     .addListener((obs, ov, nv) -> requestLayout());
+        zoom.zProperty()     .addListener((obs, ov, nv) -> requestLayout());
+        zoom.pivotXProperty().addListener((obs, ov, nv) -> requestLayout());
+        zoom.pivotYProperty().addListener((obs, ov, nv) -> requestLayout());
+        zoom.pivotZProperty().addListener((obs, ov, nv) -> requestLayout());
     }
 
     @Override
     protected void layoutChildren() {
         double width = getLayoutBounds().getWidth();
         double height = getLayoutBounds().getHeight();
-        content.resize(width / scale.getX(), height/ scale.getY());
+        content.resize(width / zoom.getX(), height/ zoom.getY());
     }
 
     @Override
@@ -94,7 +94,13 @@ public class ScaledVirtualized<V extends Node & Virtualized> extends Region impl
         return estWidth;
     }
 
-    public Scale getScale() {
-        return scale;
+    /**
+     * The {@link Scale} object that scales the virtualized content: named "zoom"
+     * to prevent confusion with {@link Node#getScaleX()}, etc. Not to be confused
+     * with {@link Node#getOnZoom()} or similar methods/objects.
+     * @return
+     */
+    public Scale getZoom() {
+        return zoom;
     }
 }
