@@ -143,11 +143,23 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
         return cellPositioner.getSizedCell(itemIndex);
     }
 
+    /**
+     * This method calls {@link #layout()} as a side-effect to insure
+     * that the VirtualFlow is up-to-date in light of any changes
+     */
     public Optional<C> getCellIfVisible(int itemIndex) {
+        // insure cells are up-to-date in light of any changes
+        layout();
         return cellPositioner.getCellIfVisible(itemIndex);
     }
 
+    /**
+     * This method calls {@link #layout()} as a side-effect to insure
+     * that the VirtualFlow is up-to-date in light of any changes
+     */
     public ObservableList<C> visibleCells() {
+        // insure cells are up-to-date in light of any changes
+        layout();
         return cellListManager.getLazyCellList().memoizedItems();
     }
 
