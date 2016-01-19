@@ -1,6 +1,7 @@
 package org.fxmisc.flowless;
 
-import javafx.application.Platform;
+import static javafx.scene.control.ScrollPane.ScrollBarPolicy.*;
+
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
@@ -8,8 +9,10 @@ import javafx.geometry.Bounds;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollBar;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.Region;
 
+import javafx.scene.layout.StackPane;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
@@ -22,7 +25,23 @@ public class VirtualizedScrollPane<V extends Node & Virtualized> extends Region 
     private Var<Double> hbarValue;
     private Var<Double> vbarValue;
 
-    public VirtualizedScrollPane(V content) {
+    /** The Policy for the Horizontal ScrollBar */
+    private final Var<ScrollPane.ScrollBarPolicy> hbarPolicy;
+    public final ScrollPane.ScrollBarPolicy getHbarPolicy() { return hbarPolicy.getValue(); }
+    public final void setHbarPolicy(ScrollPane.ScrollBarPolicy value) { hbarPolicy.setValue(value); }
+    public final Var<ScrollPane.ScrollBarPolicy> hbarPolicyProperty() { return hbarPolicy; }
+
+    /** The Policy for the Vertical ScrollBar */
+    private final Var<ScrollPane.ScrollBarPolicy> vbarPolicy;
+    public final ScrollPane.ScrollBarPolicy getVbarPolicy() { return vbarPolicy.getValue(); }
+    public final void setVbarPolicy(ScrollPane.ScrollBarPolicy value) { vbarPolicy.setValue(value); }
+    public final Var<ScrollPane.ScrollBarPolicy> vbarPolicyProperty() { return vbarPolicy; }
+
+    private final Val<Boolean> shouldDisplayHorizontal;
+    private final Val<Boolean> shouldDisplayVertical;
+    private final Val<Boolean> shouldDisplayBoth;
+
+    public VirtualizedScrollPane(V content, ScrollPane.ScrollBarPolicy hPolicy, ScrollPane.ScrollBarPolicy vPolicy) {
         this.getStyleClass().add("virtualized-scroll-pane");
         this.content = content;
 
@@ -55,6 +74,9 @@ public class VirtualizedScrollPane<V extends Node & Virtualized> extends Region 
                 content.estimatedScrollYProperty());
 
         // scrollbar visibility
+        hbarPolicy = Var.newSimpleVar(hPolicy);
+        vbarPolicy = Var.newSimpleVar(vPolicy);
+
         Val<Double> layoutWidth = Val.map(layoutBoundsProperty(), Bounds::getWidth);
         Val<Double> layoutHeight = Val.map(layoutBoundsProperty(), Bounds::getHeight);
         Val<Boolean> needsHBar0 = Val.combine(
@@ -79,15 +101,40 @@ public class VirtualizedScrollPane<V extends Node & Virtualized> extends Region 
                 hbar.heightProperty(),
                 layoutHeight,
                 (needsV, needsH, ch, hbh, lh) -> needsV || needsH && ch + hbh.doubleValue() > lh);
-        hbar.visibleProperty().bind(needsHBar);
-        vbar.visibleProperty().bind(needsVBar);
 
-        // request layout later, because if currently in layout, the request is ignored
-        hbar.visibleProperty().addListener(obs -> Platform.runLater(() -> requestLayout()));
-        vbar.visibleProperty().addListener(obs -> Platform.runLater(() -> requestLayout()));
+        shouldDisplayHorizontal = Val.flatMap(hbarPolicy, policy -> {
+            switch (policy) {
+                case NEVER:
+                    return Val.constant(false);
+                case ALWAYS:
+                    return Val.constant(true);
+                default: // AS_NEEDED
+                    return needsHBar;
+            }
+        });
+        shouldDisplayVertical = Val.flatMap(vbarPolicy, policy -> {
+            switch (policy) {
+                case NEVER:
+                    return Val.constant(false);
+                case ALWAYS:
+                    return Val.constant(true);
+                default: // AS_NEEDED
+                    return needsVBar;
+            }
+        });
+
+        shouldDisplayBoth = Val.combine(shouldDisplayHorizontal, shouldDisplayVertical, (displayH, displayV) -> displayH && displayV);
+        shouldDisplayBoth.addListener(obs -> requestLayout());
+
+        hbar.visibleProperty().bind(shouldDisplayHorizontal);
+        vbar.visibleProperty().bind(shouldDisplayVertical);
 
         getChildren().addAll(content, hbar, vbar);
         getChildren().addListener((Observable obs) -> dispose());
+    }
+
+    public VirtualizedScrollPane(V content) {
+        this(content, AS_NEEDED, AS_NEEDED);
     }
 
     /**
@@ -171,25 +218,50 @@ public class VirtualizedScrollPane<V extends Node & Virtualized> extends Region 
     protected void layoutChildren() {
         double layoutWidth = getLayoutBounds().getWidth();
         double layoutHeight = getLayoutBounds().getHeight();
-        boolean vbarVisible = vbar.isVisible();
-        boolean hbarVisible = hbar.isVisible();
-        double vbarWidth = vbarVisible ? vbar.prefWidth(-1) : 0;
-        double hbarHeight = hbarVisible ? hbar.prefHeight(-1) : 0;
 
-        double w = layoutWidth - vbarWidth;
-        double h = layoutHeight - hbarHeight;
+        if (shouldDisplayBoth.getValue()) {
+            double vbarWidth = vbar.prefWidth(-1);
+            double hbarHeight = hbar.prefHeight(-1);
 
-        content.resize(w, h);
+            double contentWidth = layoutWidth - vbarWidth;
+            double contentHeight = layoutHeight - hbarHeight;
 
-        hbar.setVisibleAmount(w);
-        vbar.setVisibleAmount(h);
+            content.resize(contentWidth, contentHeight);
 
-        if(vbarVisible) {
-            vbar.resizeRelocate(layoutWidth - vbarWidth, 0, vbarWidth, h);
-        }
+            hbar.setVisibleAmount(contentWidth);
+            hbar.resizeRelocate(0, contentHeight, contentWidth, hbarHeight);
 
-        if(hbarVisible) {
-            hbar.resizeRelocate(0, layoutHeight - hbarHeight, w, hbarHeight);
+            vbar.setVisibleAmount(contentHeight);
+            vbar.resizeRelocate(contentWidth, 0, vbarWidth, contentHeight);
+        } else {
+            if (shouldDisplayVertical.getValue()) {
+                double vbarWidth = vbar.prefWidth(-1);
+
+                double contentWidth = layoutWidth - vbarWidth;
+
+                content.resize(contentWidth, layoutHeight);
+
+                vbar.setVisibleAmount(layoutHeight);
+                vbar.resizeRelocate(contentWidth, 0, vbarWidth, layoutHeight);
+
+                hbar.setVisibleAmount(0);
+            } else if (shouldDisplayHorizontal.getValue()) {
+                double hbarHeight = hbar.prefHeight(-1);
+
+                double contentHeight = layoutHeight - hbarHeight;
+
+                content.resize(layoutWidth, contentHeight);
+
+                hbar.setVisibleAmount(layoutWidth);
+                hbar.resizeRelocate(0, contentHeight, layoutWidth, hbarHeight);
+
+                vbar.setVisibleAmount(0);
+            } else {
+                content.resize(layoutWidth, layoutHeight);
+
+                hbar.setVisibleAmount(0);
+                vbar.setVisibleAmount(0);
+            }
         }
     }
 
