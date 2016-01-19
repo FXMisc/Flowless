@@ -21,6 +21,7 @@ public class VirtualizedScrollPane<V extends Node & Virtualized> extends Region 
     private final ScrollBar hbar;
     private final ScrollBar vbar;
     private final V content;
+    private final StackPane corner = new StackPane();
 
     private Var<Double> hbarValue;
     private Var<Double> vbarValue;
@@ -129,7 +130,7 @@ public class VirtualizedScrollPane<V extends Node & Virtualized> extends Region 
         hbar.visibleProperty().bind(shouldDisplayHorizontal);
         vbar.visibleProperty().bind(shouldDisplayVertical);
 
-        getChildren().addAll(content, hbar, vbar);
+        getChildren().addAll(content, hbar, vbar, corner);
         getChildren().addListener((Observable obs) -> dispose());
     }
 
@@ -233,6 +234,8 @@ public class VirtualizedScrollPane<V extends Node & Virtualized> extends Region 
 
             vbar.setVisibleAmount(contentHeight);
             vbar.resizeRelocate(contentWidth, 0, vbarWidth, contentHeight);
+
+            corner.resizeRelocate(contentWidth, contentHeight, vbarWidth, hbarHeight);
         } else {
             if (shouldDisplayVertical.getValue()) {
                 double vbarWidth = vbar.prefWidth(-1);
@@ -262,6 +265,7 @@ public class VirtualizedScrollPane<V extends Node & Virtualized> extends Region 
                 hbar.setVisibleAmount(0);
                 vbar.setVisibleAmount(0);
             }
+            corner.resize(0, 0);
         }
     }
 
