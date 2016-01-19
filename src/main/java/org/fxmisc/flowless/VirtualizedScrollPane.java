@@ -12,27 +12,26 @@ import javafx.scene.control.ScrollBar;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.Region;
 
-import javafx.scene.layout.StackPane;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
 public class VirtualizedScrollPane<V extends Node & Virtualized> extends Region implements Virtualized {
 
+    private final class Corner extends Region {}
+
     private final ScrollBar hbar;
     private final ScrollBar vbar;
     private final V content;
-    private final StackPane corner = new StackPane();
+    private final Corner corner = new Corner();
 
     private Var<Double> hbarValue;
     private Var<Double> vbarValue;
 
-    /** The Policy for the Horizontal ScrollBar */
     private final Var<ScrollPane.ScrollBarPolicy> hbarPolicy;
     public final ScrollPane.ScrollBarPolicy getHbarPolicy() { return hbarPolicy.getValue(); }
     public final void setHbarPolicy(ScrollPane.ScrollBarPolicy value) { hbarPolicy.setValue(value); }
     public final Var<ScrollPane.ScrollBarPolicy> hbarPolicyProperty() { return hbarPolicy; }
 
-    /** The Policy for the Vertical ScrollBar */
     private final Var<ScrollPane.ScrollBarPolicy> vbarPolicy;
     public final ScrollPane.ScrollBarPolicy getVbarPolicy() { return vbarPolicy.getValue(); }
     public final void setVbarPolicy(ScrollPane.ScrollBarPolicy value) { vbarPolicy.setValue(value); }
