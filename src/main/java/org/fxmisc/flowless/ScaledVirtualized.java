@@ -98,7 +98,6 @@ public class ScaledVirtualized<V extends Node & Virtualized> extends Region impl
      * The {@link Scale} object that scales the virtualized content: named "zoom"
      * to prevent confusion with {@link Node#getScaleX()}, etc. Not to be confused
      * with {@link Node#getOnZoom()} or similar methods/objects.
-     * @return
      */
     public Scale getZoom() {
         return zoom;
