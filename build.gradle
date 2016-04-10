@@ -2,6 +2,7 @@ version = '0.5-SNAPSHOT'
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
+apply plugin: 'osgi'
 
 buildscript {
     repositories {
