@@ -8,10 +8,13 @@ import javafx.geometry.Bounds;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollBar;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.Region;
 
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
+
+import static javafx.scene.control.ScrollPane.ScrollBarPolicy.AS_NEEDED;
 
 public class VirtualizedScrollPane<V extends Node & Virtualized> extends Region implements Virtualized {
 
@@ -22,7 +25,22 @@ public class VirtualizedScrollPane<V extends Node & Virtualized> extends Region 
     private Var<Double> hbarValue;
     private Var<Double> vbarValue;
 
-    public VirtualizedScrollPane(V content) {
+    /** The Policy for the Horizontal ScrollBar */
+    private final Var<ScrollPane.ScrollBarPolicy> hbarPolicy;
+    public final ScrollPane.ScrollBarPolicy getHbarPolicy() { return hbarPolicy.getValue(); }
+    public final void setHbarPolicy(ScrollPane.ScrollBarPolicy value) { hbarPolicy.setValue(value); }
+    public final Var<ScrollPane.ScrollBarPolicy> hbarPolicyProperty() { return hbarPolicy; }
+
+    /** The Policy for the Vertical ScrollBar */
+    private final Var<ScrollPane.ScrollBarPolicy> vbarPolicy;
+    public final ScrollPane.ScrollBarPolicy getVbarPolicy() { return vbarPolicy.getValue(); }
+    public final void setVbarPolicy(ScrollPane.ScrollBarPolicy value) { vbarPolicy.setValue(value); }
+    public final Var<ScrollPane.ScrollBarPolicy> vbarPolicyProperty() { return vbarPolicy; }
+
+    /**
+     * Constructs a VirtualizedScrollPane with the given content and policies
+     */
+    public VirtualizedScrollPane(V content, ScrollPane.ScrollBarPolicy hPolicy, ScrollPane.ScrollBarPolicy vPolicy) {
         this.getStyleClass().add("virtualized-scroll-pane");
         this.content = content;
 
@@ -55,6 +73,9 @@ public class VirtualizedScrollPane<V extends Node & Virtualized> extends Region 
                 content.estimatedScrollYProperty());
 
         // scrollbar visibility
+        hbarPolicy = Var.newSimpleVar(hPolicy);
+        vbarPolicy = Var.newSimpleVar(vPolicy);
+
         Val<Double> layoutWidth = Val.map(layoutBoundsProperty(), Bounds::getWidth);
         Val<Double> layoutHeight = Val.map(layoutBoundsProperty(), Bounds::getHeight);
         Val<Boolean> needsHBar0 = Val.combine(
@@ -79,15 +100,44 @@ public class VirtualizedScrollPane<V extends Node & Virtualized> extends Region 
                 hbar.heightProperty(),
                 layoutHeight,
                 (needsV, needsH, ch, hbh, lh) -> needsV || needsH && ch + hbh.doubleValue() > lh);
-        hbar.visibleProperty().bind(needsHBar);
-        vbar.visibleProperty().bind(needsVBar);
+
+        Val<Boolean> shouldDisplayHorizontal = Val.flatMap(hbarPolicy, policy -> {
+            switch (policy) {
+                case NEVER:
+                    return Val.constant(false);
+                case ALWAYS:
+                    return Val.constant(true);
+                default: // AS_NEEDED
+                    return needsHBar;
+            }
+        });
+        Val<Boolean> shouldDisplayVertical = Val.flatMap(vbarPolicy, policy -> {
+            switch (policy) {
+                case NEVER:
+                    return Val.constant(false);
+                case ALWAYS:
+                    return Val.constant(true);
+                default: // AS_NEEDED
+                    return needsVBar;
+            }
+        });
 
         // request layout later, because if currently in layout, the request is ignored
-        hbar.visibleProperty().addListener(obs -> Platform.runLater(() -> requestLayout()));
-        vbar.visibleProperty().addListener(obs -> Platform.runLater(() -> requestLayout()));
+        shouldDisplayHorizontal.addListener(obs -> Platform.runLater(this::requestLayout));
+        shouldDisplayVertical.addListener(obs -> Platform.runLater(this::requestLayout));
+
+        hbar.visibleProperty().bind(shouldDisplayHorizontal);
+        vbar.visibleProperty().bind(shouldDisplayVertical);
 
         getChildren().addAll(content, hbar, vbar);
         getChildren().addListener((Observable obs) -> dispose());
+    }
+
+    /**
+     * Constructs a VirtualizedScrollPane that only displays its horizontal and vertical scroll bars as needed
+     */
+    public VirtualizedScrollPane(V content) {
+        this(content, AS_NEEDED, AS_NEEDED);
     }
 
     /**
