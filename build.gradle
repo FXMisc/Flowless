@@ -28,7 +28,7 @@ group = 'org.fxmisc.flowless'
 project.archivesBaseName = 'flowless'
 
 dependencies {
-    compile 'org.reactfx:reactfx:2.0-M4u1'
+    compile 'org.reactfx:reactfx:2.0-M5'
     testCompile "org.testfx:testfx-core:[4.0,4.1)"
     testCompile "org.testfx:testfx-junit:[4.0,4.1)"
 }
