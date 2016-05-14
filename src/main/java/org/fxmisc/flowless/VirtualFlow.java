@@ -272,18 +272,22 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
         orientation.scrollVerticallyToPixel(this, pixel);
     }
 
+    @Override
     public Val<Double> totalWidthEstimateProperty() {
         return orientation.widthEstimateProperty(this);
     }
 
+    @Override
     public Val<Double> totalHeightEstimateProperty() {
         return orientation.heightEstimateProperty(this);
     }
 
+    @Override
     public Var<Double> estimatedScrollXProperty() {
         return orientation.horizontalPositionProperty(this);
     }
 
+    @Override
     public Var<Double> estimatedScrollYProperty() {
         return orientation.verticalPositionProperty(this);
     }
@@ -339,9 +343,9 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
 
     public void show(double viewportOffset) {
         if(viewportOffset < 0) {
-            navigator.scrollTargetPositionBy(viewportOffset);
+            navigator.scrollCurrentPositionBy(viewportOffset);
         } else if(viewportOffset > sizeTracker.getViewportLength()) {
-            navigator.scrollTargetPositionBy(viewportOffset - sizeTracker.getViewportLength());
+            navigator.scrollCurrentPositionBy(viewportOffset - sizeTracker.getViewportLength());
         } else {
             // do nothing, offset already in the viewport
         }
@@ -402,7 +406,7 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
         if(diff == 0) {
             // do nothing
         } else if(Math.abs(diff) < length) { // distance less than one screen
-            navigator.scrollTargetPositionBy(diff);
+            navigator.scrollCurrentPositionBy(diff);
         } else {
             jumpToAbsolutePosition(pixels);
         }

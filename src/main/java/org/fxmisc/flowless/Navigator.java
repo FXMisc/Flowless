@@ -25,6 +25,7 @@ extends Region implements TargetPositionVisitor {
     private final SizeTracker sizeTracker;
     private final Subscription itemsSubscription;
 
+    private TargetPosition currentPosition = TargetPosition.BEGINNING;
     private TargetPosition targetPosition = TargetPosition.BEGINNING;
 
     public Navigator(
@@ -65,7 +66,8 @@ extends Region implements TargetPositionVisitor {
             targetPosition.clamp(cells.size())
                     .accept(this);
         }
-        targetPosition = getCurrentPosition();
+        currentPosition = getCurrentPosition();
+        targetPosition = currentPosition;
     }
 
     public void setTargetPosition(TargetPosition targetPosition) {
@@ -73,8 +75,8 @@ extends Region implements TargetPositionVisitor {
         requestLayout();
     }
 
-    public void scrollTargetPositionBy(double delta) {
-        targetPosition = targetPosition.scrollBy(delta);
+    public void scrollCurrentPositionBy(double delta) {
+        targetPosition = currentPosition.scrollBy(delta);
         requestLayout();
     }
 
