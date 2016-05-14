@@ -3,8 +3,6 @@ package org.fxmisc.flowless;
 import java.util.Optional;
 import java.util.function.Function;
 
-import javafx.beans.property.ReadOnlyDoubleProperty;
-import javafx.beans.property.ReadOnlyDoubleWrapper;
 import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
 import javafx.geometry.Orientation;
@@ -56,25 +54,19 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
     private final Navigator<T, C> navigator;
 
     // non-negative
-    private final ReadOnlyDoubleWrapper breadthOffset = new ReadOnlyDoubleWrapper(0.0);
-    public ReadOnlyDoubleProperty breadthOffsetProperty() {
-        return breadthOffset.getReadOnlyProperty();
+    private final Var<Double> breadthOffset0 = Var.newSimpleVar(0.0);
+    private final Var<Double> breadthOffset = breadthOffset0.asVar(this::setBreadthOffset);
+    public Var<Double> breadthOffsetProperty() {
+        return breadthOffset;
     }
 
     public Val<Double> totalBreadthEstimateProperty() {
         return sizeTracker.maxCellBreadthProperty();
     }
 
-    private final Val<Double> breadthPositionEstimate;
-    public Var<Double> breadthPositionEstimateProperty() {
-        return breadthPositionEstimate.asVar(this::setBreadthPosition);
-    }
-
-    private final Val<Double> lengthOffsetEstimate;
-
-    private final Val<Double> lengthPositionEstimate;
-    public Var<Double> lengthPositionEstimateProperty() {
-        return lengthPositionEstimate.asVar(this::setLengthPosition);
+    private final Var<Double> lengthOffsetEstimate;
+    public Var<Double> lengthOffsetEstimateProperty() {
+        return lengthOffsetEstimate;
     }
 
     private VirtualFlow(
@@ -96,23 +88,7 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
                 layoutBoundsProperty(),
                 b -> new Rectangle(b.getWidth(), b.getHeight())));
 
-
-        // set up bindings
-
-        breadthPositionEstimate = Val.combine(
-                breadthOffset,
-                sizeTracker.viewportBreadthProperty(),
-                sizeTracker.maxCellBreadthProperty(),
-                (off, vpBr, totalBr) -> offsetToScrollbarPosition(off.doubleValue(), vpBr, totalBr));
-
-        lengthOffsetEstimate = sizeTracker.lengthOffsetEstimateProperty();
-
-        lengthPositionEstimate = Val.combine(
-                lengthOffsetEstimate,
-                sizeTracker.viewportLengthProperty(),
-                sizeTracker.totalLengthEstimateProperty(),
-                (off, vpLen, totalLen) -> offsetToScrollbarPosition(off, vpLen, totalLen))
-                .orElseConst(0.0);
+        lengthOffsetEstimate = sizeTracker.lengthOffsetEstimateProperty().asVar(this::setLengthOffset);
 
         // scroll content by mouse scroll
         this.addEventHandler(ScrollEvent.SCROLL, se -> {
@@ -192,7 +168,7 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
             }
         }
 
-        orientation.relocate(navigator, -breadthOffset.get(), 0);
+        orientation.relocate(navigator, -breadthOffset0.getValue(), 0);
     }
 
     @Override
@@ -237,7 +213,7 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
     }
 
     void scrollBreadth(double deltaBreadth) {
-        setBreadthOffset(breadthOffset.get() + deltaBreadth);
+        setBreadthOffset(breadthOffset0.getValue() + deltaBreadth);
     }
 
     /**
@@ -284,12 +260,12 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
 
     @Override
     public Var<Double> estimatedScrollXProperty() {
-        return orientation.horizontalPositionProperty(this);
+        return orientation.estimatedScrollXProperty(this);
     }
 
     @Override
     public Var<Double> estimatedScrollYProperty() {
-        return orientation.verticalPositionProperty(this);
+        return orientation.estimatedScrollYProperty(this);
     }
 
     /**
@@ -310,7 +286,7 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
         double bOff = orientation.getX(x, y);
         double lOff = orientation.getY(x, y);
 
-        bOff += breadthOffset.get();
+        bOff += breadthOffset0.getValue();
 
         if(items.isEmpty()) {
             return orientation.hitAfterCells(bOff, lOff);
@@ -373,7 +349,7 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
     }
 
     private void showBreadthRegion(double fromX, double toX) {
-        double bOff = breadthOffset.get();
+        double bOff = breadthOffset0.getValue();
         double spaceBefore = fromX - bOff;
         double spaceAfter = sizeTracker.getViewportBreadth() - toX + bOff;
         if(spaceBefore < 0 && spaceAfter > 0) {
@@ -383,14 +359,6 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
             double shift = Math.max(spaceAfter, -spaceBefore);
             setBreadthOffset(bOff - shift);
         }
-    }
-
-    private void setLengthPosition(double pos) {
-        setLengthOffset(lengthPositionToPixels(pos));
-    }
-
-    private void setBreadthPosition(double pos) {
-        setBreadthOffset(breadthPositionToPixels(pos));
     }
 
     void setLengthOffset(double pixels) {
@@ -416,13 +384,13 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
         double total = totalBreadthEstimateProperty().getValue();
         double breadth = sizeTracker.getViewportBreadth();
         double max = Math.max(total - breadth, 0);
-        double current = breadthOffset.get();
+        double current = breadthOffset0.getValue();
 
         if(pixels > max) pixels = max;
         if(pixels < 0) pixels = 0;
 
         if(pixels != current) {
-            breadthOffset.set(pixels);
+            breadthOffset0.setValue(pixels);
             requestLayout();
             // TODO: could be safely relocated right away?
             // (Does relocation request layout?)
@@ -445,31 +413,5 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
         } else {
             navigator.setTargetPosition(new EndOffEnd(items.size() - 1, 0.0));
         }
-    }
-
-    private double lengthPositionToPixels(double pos) {
-        double total = totalLengthEstimateProperty().getOrElse(0.0);
-        double length = sizeTracker.getViewportLength();
-        return scrollbarPositionToOffset(pos, length, total);
-    }
-
-    private double breadthPositionToPixels(double pos) {
-        double total = totalBreadthEstimateProperty().getValue();
-        double breadth = sizeTracker.getViewportBreadth();
-        return scrollbarPositionToOffset(pos, breadth, total);
-    }
-
-    private static double offsetToScrollbarPosition(
-            double contentOffset, double viewportSize, double contentSize) {
-        return contentSize > viewportSize
-                ? contentOffset / (contentSize - viewportSize) * contentSize
-                : 0;
-    }
-
-    private static double scrollbarPositionToOffset(
-            double scrollbarPos, double viewportSize, double contentSize) {
-        return contentSize > viewportSize
-                ? scrollbarPos / contentSize * (contentSize - viewportSize)
-                : 0;
     }
 }

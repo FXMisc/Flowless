@@ -53,8 +53,8 @@ interface OrientationHelper {
 
     Val<Double> widthEstimateProperty(VirtualFlow<?, ?> content);
     Val<Double> heightEstimateProperty(VirtualFlow<?, ?> content);
-    Var<Double> horizontalPositionProperty(VirtualFlow<?, ?> content);
-    Var<Double> verticalPositionProperty(VirtualFlow<?, ?> content);
+    Var<Double> estimatedScrollXProperty(VirtualFlow<?, ?> content);
+    Var<Double> estimatedScrollYProperty(VirtualFlow<?, ?> content);
 
     void scrollHorizontallyBy(VirtualFlow<?, ?> content, double dx);
     void scrollVerticallyBy(VirtualFlow<?, ?> content, double dy);
@@ -162,15 +162,15 @@ final class HorizontalHelper implements OrientationHelper {
     }
 
     @Override
-    public Var<Double> horizontalPositionProperty(
+    public Var<Double> estimatedScrollXProperty(
             VirtualFlow<?, ?> content) {
-        return content.lengthPositionEstimateProperty();
+        return content.lengthOffsetEstimateProperty();
     }
 
     @Override
-    public Var<Double> verticalPositionProperty(
+    public Var<Double> estimatedScrollYProperty(
             VirtualFlow<?, ?> content) {
-        return content.breadthPositionEstimateProperty();
+        return content.breadthOffsetProperty();
     }
 
     @Override
@@ -308,15 +308,15 @@ final class VerticalHelper implements OrientationHelper {
     }
 
     @Override
-    public Var<Double> horizontalPositionProperty(
+    public Var<Double> estimatedScrollXProperty(
             VirtualFlow<?, ?> content) {
-        return content.breadthPositionEstimateProperty();
+        return content.breadthOffsetProperty();
     }
 
     @Override
-    public Var<Double> verticalPositionProperty(
+    public Var<Double> estimatedScrollYProperty(
             VirtualFlow<?, ?> content) {
-        return content.lengthPositionEstimateProperty();
+        return content.lengthOffsetEstimateProperty();
     }
 
     @Override
