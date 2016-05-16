@@ -19,8 +19,6 @@ final class SizeTracker {
     private final MemoizationList<? extends Cell<?, ?>> cells;
     private final MemoizationList<Double> breadths;
     private final Val<Double> maxKnownMinBreadth;
-    private final Val<Double> viewportBreadth;
-    private final Val<Double> viewportLength;
     private final Val<Double> breadthForCells;
     private final MemoizationList<Double> lengths;
     private final Val<Double> averageLengthEstimate;
@@ -40,10 +38,10 @@ final class SizeTracker {
         this.maxKnownMinBreadth = breadths.memoizedItems()
                 .reduce(Math::max)
                 .orElseConst(0.0);
-        this.viewportBreadth = Val.map(viewportBounds, orientation::breadth);
-        this.viewportLength = Val.map(viewportBounds, orientation::length);
         this.breadthForCells = Val.combine(
-                maxKnownMinBreadth, viewportBreadth, Math::max);
+                maxKnownMinBreadth,
+                viewportBounds,
+                (a, b) -> Math.max(a, orientation.breadth(b)));
 
         Val<Function<Cell<?, ?>, Double>> lengthFn = avoidFalseInvalidations(breadthForCells).map(
                 breadth -> cell -> orientation.prefLength(cell, breadth));
@@ -134,16 +132,8 @@ final class SizeTracker {
         return maxKnownMinBreadth;
     }
 
-    public Val<Double> viewportBreadthProperty() {
-        return viewportBreadth;
-    }
-
     public double getViewportBreadth() {
         return orientation.breadth(viewportBounds.get());
-    }
-
-    public Val<Double> viewportLengthProperty() {
-        return viewportLength;
     }
 
     public double getViewportLength() {
