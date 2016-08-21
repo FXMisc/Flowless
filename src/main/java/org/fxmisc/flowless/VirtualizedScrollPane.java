@@ -262,7 +262,7 @@ public class VirtualizedScrollPane<V extends Node & Virtualized> extends Region 
         double offset = scrollbarPositionToOffset(
                 pos,
                 content.getLayoutBounds().getWidth(),
-                content.totalHeightEstimateProperty().getValue());
+                content.totalWidthEstimateProperty().getValue());
         content.estimatedScrollXProperty().setValue(offset);
     }
 
