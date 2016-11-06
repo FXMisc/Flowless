@@ -3,6 +3,7 @@ package org.fxmisc.flowless;
 import static javafx.scene.control.ScrollPane.ScrollBarPolicy.*;
 
 import javafx.application.Platform;
+import javafx.beans.NamedArg;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
@@ -40,7 +41,11 @@ public class VirtualizedScrollPane<V extends Node & Virtualized> extends Region 
     /**
      * Constructs a VirtualizedScrollPane with the given content and policies
      */
-    public VirtualizedScrollPane(V content, ScrollPane.ScrollBarPolicy hPolicy, ScrollPane.ScrollBarPolicy vPolicy) {
+    public VirtualizedScrollPane(
+        @NamedArg("content") V content,
+        @NamedArg("hPolicy") ScrollPane.ScrollBarPolicy hPolicy,
+        @NamedArg("vPolicy") ScrollPane.ScrollBarPolicy vPolicy
+    ) {
         this.getStyleClass().add("virtualized-scroll-pane");
         this.content = content;
 
@@ -147,7 +152,7 @@ public class VirtualizedScrollPane<V extends Node & Virtualized> extends Region 
     /**
      * Constructs a VirtualizedScrollPane that only displays its horizontal and vertical scroll bars as needed
      */
-    public VirtualizedScrollPane(V content) {
+    public VirtualizedScrollPane(@NamedArg("content") V content) {
         this(content, AS_NEEDED, AS_NEEDED);
     }
 
