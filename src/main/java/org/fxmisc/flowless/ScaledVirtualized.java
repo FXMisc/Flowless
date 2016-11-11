@@ -94,6 +94,26 @@ public class ScaledVirtualized<V extends Node & Virtualized> extends Region impl
         return estWidth;
     }
 
+    @Override
+    public void scrollXBy(double deltaX) {
+        content.scrollXBy(deltaX);
+    }
+
+    @Override
+    public void scrollYBy(double deltaY) {
+        content.scrollYBy(deltaY);
+    }
+
+    @Override
+    public void scrollXToPixel(double pixel) {
+        content.scrollXToPixel(pixel);
+    }
+
+    @Override
+    public void scrollYToPixel(double pixel) {
+        content.scrollYToPixel(pixel);
+    }
+
     /**
      * The {@link Scale} object that scales the virtualized content: named "zoom"
      * to prevent confusion with {@link Node#getScaleX()}, etc. Not to be confused
