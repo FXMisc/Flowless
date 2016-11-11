@@ -220,6 +220,7 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
      * Scroll the content horizontally by the given amount.
      * @param deltaX positive value scrolls right, negative value scrolls left
      */
+    @Override
     public void scrollXBy(double deltaX) {
         orientation.scrollHorizontallyBy(this, deltaX);
     }
@@ -228,6 +229,7 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
      * Scroll the content vertically by the given amount.
      * @param deltaY positive value scrolls down, negative value scrolls up
      */
+    @Override
     public void scrollYBy(double deltaY) {
         orientation.scrollVerticallyBy(this, deltaY);
     }
@@ -236,6 +238,7 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
      * Scroll the content horizontally to the pixel
      * @param pixel - the pixel position to which to scroll
      */
+    @Override
     public void scrollXToPixel(double pixel) {
         orientation.scrollHorizontallyToPixel(this, pixel);
     }
@@ -244,6 +247,7 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
      * Scroll the content vertically to the pixel
      * @param pixel - the pixel position to which to scroll
      */
+    @Override
     public void scrollYToPixel(double pixel) {
         orientation.scrollVerticallyToPixel(this, pixel);
     }

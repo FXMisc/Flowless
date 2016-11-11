@@ -203,6 +203,26 @@ public class VirtualizedScrollPane<V extends Node & Virtualized> extends Region 
     }
 
     @Override
+    public void scrollXBy(double deltaX) {
+        content.scrollXBy(deltaX);
+    }
+
+    @Override
+    public void scrollYBy(double deltaY) {
+        content.scrollYBy(deltaY);
+    }
+
+    @Override
+    public void scrollXToPixel(double pixel) {
+        content.scrollXToPixel(pixel);
+    }
+
+    @Override
+    public void scrollYToPixel(double pixel) {
+        content.scrollYToPixel(pixel);
+    }
+
+    @Override
     protected double computePrefWidth(double height) {
         return content.prefWidth(height);
     }
