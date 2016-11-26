@@ -168,7 +168,7 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
         this.getStyleClass().add("virtual-flow");
         this.items = items;
         this.orientation = orientation;
-        this.cellListManager = new CellListManager<>(items, cellFactory);
+        this.cellListManager = new CellListManager<>(this, items, cellFactory);
         this.gravity.set(gravity);
         MemoizationList<C> cells = cellListManager.getLazyCellList();
         this.sizeTracker = new SizeTracker(orientation, layoutBoundsProperty(), cells);
@@ -183,7 +183,7 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
         lengthOffsetEstimate = sizeTracker.lengthOffsetEstimateProperty().asVar(this::setLengthOffset);
 
         // scroll content by mouse scroll
-        this.addEventHandler(ScrollEvent.SCROLL, se -> {
+        this.addEventHandler(ScrollEvent.ANY, se -> {
             scrollXBy(-se.getDeltaX());
             scrollYBy(-se.getDeltaY());
             se.consume();
