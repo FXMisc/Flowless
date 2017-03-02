@@ -68,14 +68,14 @@ public class VirtualizedScrollPane<V extends Node & Virtualized> extends Region 
                     content.estimatedScrollXProperty(),
                     Val.map(content.layoutBoundsProperty(), Bounds::getWidth),
                     content.totalWidthEstimateProperty(),
-                    (off, vpBr, total) -> offsetToScrollbarPosition(off.doubleValue(), vpBr, total))
+                    VirtualizedScrollPane::offsetToScrollbarPosition)
                 .asVar(this::setHPosition);
         Var<Double> vPosEstimate = Val
                 .combine(
                     content.estimatedScrollYProperty(),
                     Val.map(content.layoutBoundsProperty(), Bounds::getHeight),
                     content.totalHeightEstimateProperty(),
-                    (off, vpLen, total) -> offsetToScrollbarPosition(off, vpLen, total))
+                    VirtualizedScrollPane::offsetToScrollbarPosition)
                 .orElseConst(0.0)
                 .asVar(this::setVPosition);
         hbarValue = Var.doubleVar(hbar.valueProperty());
@@ -200,6 +200,26 @@ public class VirtualizedScrollPane<V extends Node & Virtualized> extends Region 
     @Override
     public Var<Double> estimatedScrollYProperty() {
         return content.estimatedScrollYProperty();
+    }
+
+    @Override
+    public void scrollXBy(double deltaX) {
+        content.scrollXBy(deltaX);
+    }
+
+    @Override
+    public void scrollYBy(double deltaY) {
+        content.scrollYBy(deltaY);
+    }
+
+    @Override
+    public void scrollXToPixel(double pixel) {
+        content.scrollXToPixel(pixel);
+    }
+
+    @Override
+    public void scrollYToPixel(double pixel) {
+        content.scrollYToPixel(pixel);
     }
 
     @Override
