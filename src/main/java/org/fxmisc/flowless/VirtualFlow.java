@@ -7,6 +7,7 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
 import javafx.geometry.Orientation;
 import javafx.geometry.Point2D;
+import javafx.scene.Node;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.shape.Rectangle;
@@ -16,30 +17,30 @@ import org.reactfx.util.Lists;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
-public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virtualized {
+public class VirtualFlow<T, C extends Cell<T, ? extends Node>> extends Region implements Virtualized {
 
     public static enum Gravity { FRONT, REAR }
 
-    public static <T, C extends Cell<T, ?>> VirtualFlow<T, C> createHorizontal(
+    public static <T, C extends Cell<T, ? extends Node>> VirtualFlow<T, C> createHorizontal(
             ObservableList<T> items,
             Function<? super T, ? extends C> cellFactory) {
         return createHorizontal(items, cellFactory, Gravity.FRONT);
     }
 
-    public static <T, C extends Cell<T, ?>> VirtualFlow<T, C> createHorizontal(
+    public static <T, C extends Cell<T, ? extends Node>> VirtualFlow<T, C> createHorizontal(
             ObservableList<T> items,
             Function<? super T, ? extends C> cellFactory,
             Gravity gravity) {
         return new VirtualFlow<>(items, cellFactory, new HorizontalHelper(), gravity);
     }
 
-    public static <T, C extends Cell<T, ?>> VirtualFlow<T, C> createVertical(
+    public static <T, C extends Cell<T, ? extends Node>> VirtualFlow<T, C> createVertical(
             ObservableList<T> items,
             Function<? super T, ? extends C> cellFactory) {
         return createVertical(items, cellFactory, Gravity.FRONT);
     }
 
-    public static <T, C extends Cell<T, ?>> VirtualFlow<T, C> createVertical(
+    public static <T, C extends Cell<T, ? extends Node>> VirtualFlow<T, C> createVertical(
             ObservableList<T> items,
             Function<? super T, ? extends C> cellFactory,
             Gravity gravity) {
