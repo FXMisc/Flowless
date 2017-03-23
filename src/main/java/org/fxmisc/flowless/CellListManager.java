@@ -12,7 +12,7 @@ import org.reactfx.collection.LiveList;
 import org.reactfx.collection.MemoizationList;
 import org.reactfx.collection.QuasiListModification;
 
-final class CellListManager<T, C extends Cell<T, ?>> {
+final class CellListManager<T, C extends Cell<T, ? extends Node>> {
 
     private final CellPool<T, C> cellPool;
     private final MemoizationList<C> cells;
