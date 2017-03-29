@@ -5,6 +5,9 @@ import java.util.function.IntConsumer;
 
 import javafx.scene.Node;
 
+/**
+ * Factory class for wrapping a {@link Cell} and running additional code before/after specific methods
+ */
 abstract class CellWrapper<T, N extends Node, C extends Cell<T, N>>
 implements Cell<T, N> {
 

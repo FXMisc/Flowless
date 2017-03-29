@@ -13,20 +13,39 @@ import org.reactfx.collection.MemoizationList;
 import org.reactfx.value.Val;
 import org.reactfx.value.ValBase;
 
+/**
+ * Estimates the size of the entire viewport (if it was actually completely rendered) based on the known sizes of the
+ * {@link Cell}s whose nodes are currently displayed in the viewport and an estimated average of
+ * {@link Cell}s whose nodes are not displayed in the viewport. The meaning of {@link #breadthForCells} and
+ * {@link #totalLengthEstimate} are dependent upon which implementation of {@link OrientationHelper} is used.
+ */
 final class SizeTracker {
     private final OrientationHelper orientation;
     private final ObservableObjectValue<Bounds> viewportBounds;
     private final MemoizationList<? extends Cell<?, ?>> cells;
+
     private final MemoizationList<Double> breadths;
     private final Val<Double> maxKnownMinBreadth;
+
+    /** Stores either the greatest minimum cell's node's breadth or the viewport's breadth */
     private final Val<Double> breadthForCells;
+
     private final MemoizationList<Double> lengths;
+
+    /** Stores either null or the average length of the cells' nodes currently displayed in the viewport */
     private final Val<Double> averageLengthEstimate;
+
     private final Val<Double> totalLengthEstimate;
     private final Val<Double> lengthOffsetEstimate;
 
     private final Subscription subscription;
 
+    /**
+     * Constructs a SizeTracker
+     *
+     * @param orientation if vertical, breadth = width and length = height;
+     *                    if horizontal, breadth = height and length = width
+     */
     public SizeTracker(
             OrientationHelper orientation,
             ObservableObjectValue<Bounds> viewportBounds,
