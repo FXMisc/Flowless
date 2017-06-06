@@ -168,7 +168,19 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
             }
         }
 
-        orientation.relocate(navigator, -breadthOffset0.getValue(), 0);
+        double viewBreadth = orientation.breadth(this);
+        double navigatorBreadth = orientation.breadth(navigator);
+        double totalBreadth = breadthOffset0.getValue();
+        double breadthDifference = navigatorBreadth - totalBreadth;
+        if (breadthDifference < viewBreadth) {
+            // viewport is scrolled all the way to the end of its breadth.
+            //  but now viewport size (breadth) has increased
+            double adjustment = viewBreadth - breadthDifference;
+            orientation.relocate(navigator, -(totalBreadth - adjustment), 0);
+            breadthOffset0.setValue(totalBreadth - adjustment);
+        } else {
+            orientation.relocate(navigator, -breadthOffset0.getValue(), 0);
+        }
     }
 
     @Override
