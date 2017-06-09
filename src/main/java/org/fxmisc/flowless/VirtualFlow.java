@@ -1,6 +1,7 @@
 package org.fxmisc.flowless;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -495,15 +496,19 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
         }
     };
 
+    private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
+    static {
+        List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(Region.getClassCssMetaData());
+        styleables.add(GRAVITY);
+        STYLEABLES = Collections.unmodifiableList(styleables);
+    }
+
+    public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
+        return STYLEABLES;
+    }
+
     @Override
     public List<CssMetaData<? extends Styleable, ?>> getCssMetaData() {
-        // Get list value and make it modifiable
-        List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(super.getCssMetaData());
-
-        // Add new properties
-        styleables.add(GRAVITY);
-
-        // Return list value
-        return styleables;
+        return getClassCssMetaData();
     }
 }
