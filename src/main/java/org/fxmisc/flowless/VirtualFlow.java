@@ -457,9 +457,9 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
      * or rear (vertical: bottom, horizontal: right) of the virtual flow, depending
      * on the value of the gravity property.
      *
-     * The gravity can also be styled in CSS, using the "-fx-gravity" property,
+     * The gravity can also be styled in CSS, using the "-flowless-gravity" property,
      * for example:
-     * <pre>.virtual-flow { -fx-gravity: rear; }</pre>
+     * <pre>.virtual-flow { -flowless-gravity: rear; }</pre>
      */
     public ObjectProperty<Gravity> gravityProperty()
     {
@@ -478,7 +478,7 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
 
     @SuppressWarnings("unchecked") // Because of the cast we have to perform, below
     private static final CssMetaData<VirtualFlow, Gravity> GRAVITY = new CssMetaData<VirtualFlow, Gravity>(
-            "-fx-gravity",
+            "-flowless-gravity",
             // JavaFX seems to have an odd return type on getEnumConverter: "? extends Enum<?>", not E as the second generic type.
             // Even though if you look at the source, the EnumConverter type it uses does have the type E.
             // To get round this, we cast on return:
