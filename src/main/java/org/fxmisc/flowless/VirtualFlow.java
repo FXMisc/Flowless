@@ -1,9 +1,18 @@
 package org.fxmisc.flowless;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
+import javafx.beans.property.ObjectProperty;
 import javafx.collections.ObservableList;
+import javafx.css.CssMetaData;
+import javafx.css.StyleConverter;
+import javafx.css.Styleable;
+import javafx.css.StyleableObjectProperty;
+import javafx.css.StyleableProperty;
 import javafx.geometry.Bounds;
 import javafx.geometry.Orientation;
 import javafx.geometry.Point2D;
@@ -53,6 +62,27 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
     private final CellPositioner<T, C> cellPositioner;
     private final Navigator<T, C> navigator;
 
+    private final StyleableObjectProperty<Gravity> gravity = new StyleableObjectProperty<Gravity>()
+    {
+        @Override
+        public Object getBean()
+        {
+            return VirtualFlow.this;
+        }
+
+        @Override
+        public String getName()
+        {
+            return "gravity";
+        }
+
+        @Override
+        public CssMetaData<? extends Styleable, Gravity> getCssMetaData()
+        {
+            return GRAVITY;
+        }
+    };
+
     // non-negative
     private final Var<Double> breadthOffset0 = Var.newSimpleVar(0.0);
     private final Var<Double> breadthOffset = breadthOffset0.asVar(this::setBreadthOffset);
@@ -78,10 +108,11 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
         this.items = items;
         this.orientation = orientation;
         this.cellListManager = new CellListManager<>(items, cellFactory);
+        this.gravity.set(gravity);
         MemoizationList<C> cells = cellListManager.getLazyCellList();
         this.sizeTracker = new SizeTracker(orientation, layoutBoundsProperty(), cells);
         this.cellPositioner = new CellPositioner<>(cellListManager, orientation, sizeTracker);
-        this.navigator = new Navigator<>(cellListManager, cellPositioner, orientation, gravity, sizeTracker);
+        this.navigator = new Navigator<>(cellListManager, cellPositioner, orientation, this.gravity, sizeTracker);
 
         getChildren().add(navigator);
         clipProperty().bind(Val.map(
@@ -417,5 +448,67 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
         } else {
             navigator.setTargetPosition(new EndOffEnd(items.size() - 1, 0.0));
         }
+    }
+
+    /**
+     * The gravity of the virtual flow.  When there are not enough cells to fill
+     * the full height (vertical virtual flow) or width (horizontal virtual flow),
+     * the cells are placed either at the front (vertical: top, horizontal: left),
+     * or rear (vertical: bottom, horizontal: right) of the virtual flow, depending
+     * on the value of the gravity property.
+     *
+     * The gravity can also be styled in CSS, using the "-flowless-gravity" property,
+     * for example:
+     * <pre>.virtual-flow { -flowless-gravity: rear; }</pre>
+     */
+    public ObjectProperty<Gravity> gravityProperty()
+    {
+        return gravity;
+    }
+
+    public Gravity getGravity()
+    {
+        return gravity.get();
+    }
+
+    public void setGravity(Gravity gravity)
+    {
+        this.gravity.set(gravity);
+    }
+
+    @SuppressWarnings("unchecked") // Because of the cast we have to perform, below
+    private static final CssMetaData<VirtualFlow, Gravity> GRAVITY = new CssMetaData<VirtualFlow, Gravity>(
+            "-flowless-gravity",
+            // JavaFX seems to have an odd return type on getEnumConverter: "? extends Enum<?>", not E as the second generic type.
+            // Even though if you look at the source, the EnumConverter type it uses does have the type E.
+            // To get round this, we cast on return:
+            (StyleConverter<?, Gravity>) StyleConverter.getEnumConverter(Gravity.class),
+            Gravity.FRONT) {
+
+        @Override
+        public boolean isSettable(VirtualFlow virtualFlow) {
+            return !virtualFlow.gravity.isBound();
+        }
+
+        @Override
+        public StyleableProperty<Gravity> getStyleableProperty(VirtualFlow virtualFlow) {
+            return virtualFlow.gravity;
+        }
+    };
+
+    private static final List<CssMetaData<? extends Styleable, ?>> STYLEABLES;
+    static {
+        List<CssMetaData<? extends Styleable, ?>> styleables = new ArrayList<>(Region.getClassCssMetaData());
+        styleables.add(GRAVITY);
+        STYLEABLES = Collections.unmodifiableList(styleables);
+    }
+
+    public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
+        return STYLEABLES;
+    }
+
+    @Override
+    public List<CssMetaData<? extends Styleable, ?>> getCssMetaData() {
+        return getClassCssMetaData();
     }
 }
