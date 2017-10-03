@@ -46,4 +46,4 @@ deploy:
   on:
     tags: true
     branch: master
-    repo: TomasMikula/Flowless
+    repo: FXMisc/Flowless
