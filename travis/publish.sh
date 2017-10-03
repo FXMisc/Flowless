@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ "$TRAVIS_REPO_SLUG" == "TomasMikula/Flowless" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "master" ]; then
+if [ "$TRAVIS_REPO_SLUG" == "FXMisc/Flowless" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "master" ]; then
   openssl aes-256-cbc -d -k "$ENC_PWD" -in gradle.properties.enc -out gradle.properties
   openssl aes-256-cbc -d -k "$ENC_PWD" -in secring.gpg.enc -out secring.gpg
 

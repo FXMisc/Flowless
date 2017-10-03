@@ -14,13 +14,16 @@ modifyPom {
       }
     }
     scm {
-      url 'scm:git@github.com:TomasMikula/Flowless.git'
-      connection 'scm:git@github.com:TomasMikula/Flowless.git'
-      developerConnection 'scm:git@github.com:TomasMikula/Flowless.git'
+      url 'scm:git@github.com:FXMisc/Flowless.git'
+      connection 'scm:git@github.com:FXMisc/Flowless.git'
+      developerConnection 'scm:git@github.com:FXMisc/Flowless.git'
     }
     developers {
       developer {
         name 'Tomas Mikula'
+      }
+      developer {
+        name 'Jordan Martinez'
       }
     }
   }

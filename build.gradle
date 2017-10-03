@@ -39,7 +39,7 @@ javadoc {
     options.addStringOption('Xdoclint:all,-missing', '-quiet')
 
     // support for JavaFX properties
-    options.addBooleanOption('javafx', true);
+    options.addBooleanOption('javafx', true)
 
     // resolve links to Java and JavaFX Javadocs
     options.links = [
@@ -56,6 +56,6 @@ task fatJar(type: Jar, dependsOn: classes) {
 
 assemble.dependsOn fatJar
 
-task getVersion << {
+task getVersion {
   println version
 }
