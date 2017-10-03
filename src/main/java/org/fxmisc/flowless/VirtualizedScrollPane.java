@@ -7,6 +7,8 @@ import javafx.beans.NamedArg;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
+import javafx.beans.value.ChangeListener;
+import javafx.css.PseudoClass;
 import javafx.geometry.Bounds;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
@@ -19,9 +21,12 @@ import org.reactfx.value.Var;
 
 public class VirtualizedScrollPane<V extends Node & Virtualized> extends Region implements Virtualized {
 
+    private static final PseudoClass CONTENT_FOCUSED = PseudoClass.getPseudoClass("content-focused");
+
     private final ScrollBar hbar;
     private final ScrollBar vbar;
     private final V content;
+    private final ChangeListener<Boolean> contentFocusedListener;
 
     private Var<Double> hbarValue;
     private Var<Double> vbarValue;
@@ -145,6 +150,8 @@ public class VirtualizedScrollPane<V extends Node & Virtualized> extends Region 
         hbar.visibleProperty().bind(shouldDisplayHorizontal);
         vbar.visibleProperty().bind(shouldDisplayVertical);
 
+        contentFocusedListener = (obs, ov, nv) -> pseudoClassStateChanged(CONTENT_FOCUSED, nv);
+        content.focusedProperty().addListener(contentFocusedListener);
         getChildren().addAll(content, hbar, vbar);
         getChildren().addListener((Observable obs) -> dispose());
     }
@@ -174,6 +181,7 @@ public class VirtualizedScrollPane<V extends Node & Virtualized> extends Region 
     }
 
     private void dispose() {
+        content.focusedProperty().removeListener(contentFocusedListener);
         hbarValue.unbindBidirectional(content.estimatedScrollXProperty());
         vbarValue.unbindBidirectional(content.estimatedScrollYProperty());
         unbindScrollBar(hbar);
