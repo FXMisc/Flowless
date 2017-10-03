@@ -25,16 +25,71 @@ import org.reactfx.util.Lists;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
+/**
+ * A VirtualFlow is a memory-efficient viewport that only renders enough of its content to completely fill up the
+ * viewport through its {@link Navigator}. Based on the viewport's {@link Gravity}, it sequentially lays out the
+ * {@link javafx.scene.Node}s of the {@link Cell}s until the viewport is completely filled up or it has no additional
+ * cell's nodes to render.
+ *
+ * <p>
+ *     Since this viewport does not fully render all of its content, the scroll values are estimates based on the nodes
+ *     that are currently displayed in the viewport. If every node that could be rendered is the same width or same
+ *     height, then the corresponding scroll values (e.g., scrollX or totalX) are accurate.
+ *     <em>Note:</em> the VirtualFlow does not have scroll bars by default. These can be added by wrapping this object
+ *     in a {@link VirtualizedScrollPane}.
+ * </p>
+ *
+ * <p>
+ *     Since the viewport can be used to lay out its content horizontally or vertically, it uses two
+ *     orientation-agnostic terms to refer to its width and height: "breadth" and "length," respectively. The viewport
+ *     always lays out its {@link Cell cell}'s {@link javafx.scene.Node}s from "top-to-bottom" or from "bottom-to-top"
+ *     (these terms should be understood in reference to the viewport's {@link OrientationHelper orientation} and
+ *     {@link Gravity}). Thus, its length ("height") is independent as the viewport's bounds are dependent upon
+ *     its parent's bounds whereas its breadth ("width") is dependent upon its length.
+ * </p>
+ *
+ * @param <T> the model content that the {@link Cell#getNode() cell's node} renders
+ * @param <C> the {@link Cell} that can render the model with a {@link javafx.scene.Node}.
+ */
 public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virtualized {
 
-    public static enum Gravity { FRONT, REAR }
+    /**
+     * Determines how the cells in the viewport should be laid out and where any extra unused space should exist
+     * if there are not enough cells to completely fill up the viewport
+     */
+    public static enum Gravity {
+        /**
+         * If using a {@link VerticalHelper vertical viewport}, lays out the content from top-to-bottom. The first
+         * visible item will appear at the top and the last visible item (or unused space) towards the bottom.
+         * <p>
+         * If using a {@link HorizontalHelper horizontal viewport}, lays out the content from left-to-right. The first
+         * visible item will appear at the left and the last visible item (or unused space) towards the right.
+         * </p>
+         */
+        FRONT,
+        /**
+         * If using a {@link VerticalHelper vertical viewport}, lays out the content from bottom-to-top. The first
+         * visible item will appear at the bottom and the last visible item (or unused space) towards the top.
+         * <p>
+         * If using a {@link HorizontalHelper horizontal viewport}, lays out the content from right-to-left. The first
+         * visible item will appear at the right and the last visible item (or unused space) towards the left.
+         * </p>
+         */
+        REAR
+    }
 
+    /**
+     * Creates a viewport that lays out content horizontally from left to right
+     */
     public static <T, C extends Cell<T, ?>> VirtualFlow<T, C> createHorizontal(
             ObservableList<T> items,
             Function<? super T, ? extends C> cellFactory) {
         return createHorizontal(items, cellFactory, Gravity.FRONT);
     }
 
+    /**
+     * Creates a viewport that lays out content horizontally
+     */
     public static <T, C extends Cell<T, ?>> VirtualFlow<T, C> createHorizontal(
             ObservableList<T> items,
             Function<? super T, ? extends C> cellFactory,
@@ -42,12 +97,18 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
         return new VirtualFlow<>(items, cellFactory, new HorizontalHelper(), gravity);
     }
 
+    /**
+     * Creates a viewport that lays out content vertically from top to bottom
+     */
     public static <T, C extends Cell<T, ?>> VirtualFlow<T, C> createVertical(
             ObservableList<T> items,
             Function<? super T, ? extends C> cellFactory) {
         return createVertical(items, cellFactory, Gravity.FRONT);
     }
 
+    /**
+     * Creates a viewport that lays out content vertically from top to bottom
+     */
     public static <T, C extends Cell<T, ?>> VirtualFlow<T, C> createVertical(
             ObservableList<T> items,
             Function<? super T, ? extends C> cellFactory,
@@ -261,6 +322,7 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
 
     /**
      * Scroll the content horizontally by the given amount.
+     *
      * @param deltaX positive value scrolls right, negative value scrolls left
      */
     @Override
@@ -270,6 +332,7 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
 
     /**
      * Scroll the content vertically by the given amount.
+     *
      * @param deltaY positive value scrolls down, negative value scrolls up
      */
     @Override
@@ -279,6 +342,7 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
 
     /**
      * Scroll the content horizontally to the pixel
+     *
      * @param pixel - the pixel position to which to scroll
      */
     @Override
@@ -288,6 +352,7 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
 
     /**
      * Scroll the content vertically to the pixel
+     *
      * @param pixel - the pixel position to which to scroll
      */
     @Override
@@ -317,6 +382,7 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
 
     /**
      * Hits this virtual flow at the given coordinates.
+     *
      * @param x x offset from the left edge of the viewport
      * @param y y offset from the top edge of the viewport
      * @return hit info containing the cell that was hit and coordinates
@@ -364,6 +430,14 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
         }
     }
 
+    /**
+     * Forces the viewport to acts as though it scrolled from 0 to {@code viewportOffset}). <em>Note:</em> the
+     * viewport makes an educated guess as to which cell is actually at {@code viewportOffset} if the viewport's
+     * entire content was completely rendered.
+     *
+     * @param viewportOffset See {@link OrientationHelper} and its implementations for explanation on what the offset
+     *                       means based on which implementation is used.
+     */
     public void show(double viewportOffset) {
         if(viewportOffset < 0) {
             navigator.scrollCurrentPositionBy(viewportOffset);
@@ -374,22 +448,41 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
         }
     }
 
+    /**
+     * Forces the viewport to show the given item by "scrolling" to it
+     */
     public void show(int itemIdx) {
         navigator.setTargetPosition(new MinDistanceTo(itemIdx));
     }
 
+    /**
+     * Forces the viewport to show the given item as the first visible item as determined by its {@link Gravity}.
+     */
     public void showAsFirst(int itemIdx) {
         navigator.setTargetPosition(new StartOffStart(itemIdx, 0.0));
     }
 
+    /**
+     * Forces the viewport to show the given item as the last visible item as determined by its {@link Gravity}.
+     */
     public void showAsLast(int itemIdx) {
         navigator.setTargetPosition(new EndOffEnd(itemIdx, 0.0));
     }
 
+    /**
+     * Forces the viewport to show the given item by "scrolling" to it and then further "scrolling" by {@code offset}
+     * in one layout call (e.g., this method does not "scroll" twice)
+     *
+     * @param offset the offset value as determined by the viewport's {@link OrientationHelper}.
+     */
     public void showAtOffset(int itemIdx, double offset) {
         navigator.setTargetPosition(new StartOffStart(itemIdx, offset));
     }
 
+    /**
+     * Forces the viewport to show the given item by "scrolling" to it and then further "scrolling," so that the
+     * {@code region} is visible, in one layout call (e.g., this method does not "scroll" twice).
+     */
     public void show(int itemIndex, Bounds region) {
       navigator.showLengthRegion(itemIndex, orientation.minY(region), orientation.maxY(region));
       showBreadthRegion(orientation.minX(region), orientation.maxX(region));

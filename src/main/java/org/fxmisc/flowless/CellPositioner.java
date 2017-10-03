@@ -6,6 +6,11 @@ import java.util.OptionalInt;
 
 import org.reactfx.collection.MemoizationList;
 
+/**
+ * Helper class for properly {@link javafx.scene.Node#resize(double, double) resizing} and
+ * {@link javafx.scene.Node#relocate(double, double) relocating} a {@link Cell}'s {@link javafx.scene.Node} as well
+ * as handling calls related to whether a cell's node is visible (displayed in the viewport) or not.
+ */
 final class CellPositioner<T, C extends Cell<T, ?>> {
     private final CellListManager<T, C> cellManager;
     private final OrientationHelper orientation;
@@ -72,6 +77,10 @@ final class CellPositioner<T, C extends Cell<T, ?>> {
         return firstVisibleAfter(0);
     }
 
+    /**
+     * Gets the shortest delta amount by which to scroll the viewport's length in order to fully display a
+     * partially-displayed cell's node.
+     */
     public double shortestDeltaToViewport(C cell) {
         return shortestDeltaToViewport(cell, 0.0, orientation.length(cell));
     }
@@ -86,11 +95,34 @@ final class CellPositioner<T, C extends Cell<T, ?>> {
                0.0;
     }
 
+    /**
+     * Moves the given cell's node's "layoutY" value by {@code delta}. See {@link OrientationHelper}'s javadoc for more
+     * explanation on what quoted terms mean.
+     */
     public void shiftCellBy(C cell, double delta) {
         double y = orientation.minY(cell) + delta;
         relocate(cell, 0, y);
     }
 
+    /**
+     * Properly resizes the cell's node, and sets its "layoutY" value, so that is the first visible
+     * node in the viewport, and further offsets this value by {@code startOffStart}, so that
+     * the node's <em>top</em> edge appears (if negative) "above," (if 0) "at," or (if negative) "below" the viewport's
+     * "top" edge. See {@link OrientationHelper}'s javadoc for more explanation on what quoted terms mean.
+     *
+     * <pre><code>
+     *      --------- top of cell's node if startOffStart is negative
+     *
+     *     __________ "top edge" of viewport / top of cell's node if startOffStart = 0
+     *     |
+     *     |
+     *     |--------- top of cell's node if startOffStart is positive
+     *     |
+     * </code></pre>
+     *
+     * @param itemIndex the index of the item in the list of all (not currently visible) cells
+     * @param startOffStart the amount by which to offset the "layoutY" value of the cell's node
+     */
     public C placeStartAt(int itemIndex, double startOffStart) {
         C cell = getSizedCell(itemIndex);
         relocate(cell, 0, startOffStart);
@@ -98,6 +130,25 @@ final class CellPositioner<T, C extends Cell<T, ?>> {
         return cell;
     }
 
+    /**
+     * Properly resizes the cell's node, and sets its "layoutY" value, so that is the last visible
+     * node in the viewport, and further offsets this value by {@code endOffStart}, so that
+     * the node's <em>top</em> edge appears (if negative) "above," (if 0) "at," or (if negative) "below" the
+     * viewport's "bottom" edge. See {@link OrientationHelper}'s javadoc for more explanation on what quoted terms mean.
+     *
+     * <pre><code>
+     *     |--------- top of cell's node if endOffStart is negative
+     *     |
+     *     |
+     *     |_________ "bottom edge" of viewport / top of cell's node if endOffStart = 0
+     *
+     *
+     *      --------- top of cell's node if endOffStart is positive
+     * </code></pre>
+     *
+     * @param itemIndex the index of the item in the list of all (not currently visible) cells
+     * @param endOffStart the amount by which to offset the "layoutY" value of the cell's node
+     */
     public C placeEndFromStart(int itemIndex, double endOffStart) {
         C cell = getSizedCell(itemIndex);
         relocate(cell, 0, endOffStart - orientation.length(cell));
@@ -105,6 +156,24 @@ final class CellPositioner<T, C extends Cell<T, ?>> {
         return cell;
     }
 
+    /**
+     * Properly resizes the cell's node, and sets its "layoutY" value, so that is the last visible
+     * node in the viewport, and further offsets this value by {@code endOffStart}, so that
+     * the node's <em>bottom</em> edge appears (if negative) "above," (if 0) "at," or (if negative) "below" the
+     * viewport's "bottom" edge. See {@link OrientationHelper}'s javadoc for more explanation on what quoted terms mean.
+     *
+     * <pre><code>
+     *     |--------- bottom of cell's node if endOffEnd is negative
+     *     |
+     *     |_________ "bottom edge" of viewport / bottom of cell's node if endOffEnd = 0
+     *
+     *
+     *      --------- bottom of cell's node if endOffEnd is positive
+     * </code></pre>
+     *
+     * @param itemIndex the index of the item in the list of all (not currently visible) cells
+     * @param endOffEnd the amount by which to offset the "layoutY" value of the cell's node
+     */
     public C placeEndFromEnd(int itemIndex, double endOffEnd) {
         C cell = getSizedCell(itemIndex);
         double y = sizeTracker.getViewportLength() + endOffEnd - orientation.length(cell);
@@ -113,6 +182,25 @@ final class CellPositioner<T, C extends Cell<T, ?>> {
         return cell;
     }
 
+    /**
+     * Properly resizes the cell's node, and sets its "layoutY" value, so that is the last visible
+     * node in the viewport, and further offsets this value by {@code endOffStart}, so that
+     * the node's <em>bottom</em> edge appears (if negative) "above," (if 0) "at," or (if negative) "below" the
+     * viewport's "top" edge. See {@link OrientationHelper}'s javadoc for more explanation on what quoted terms mean.
+     *
+     * <pre><code>
+     *      --------- bottom of cell's node if startOffStart is negative
+     *
+     *     __________ "top edge" of viewport / bottom of cell's node if startOffStart = 0
+     *     |
+     *     |
+     *     |--------- bottom of cell's node if startOffStart is positive
+     *     |
+     * </code></pre>
+     *
+     * @param itemIndex the index of the item in the list of all (not currently visible) cells
+     * @param startOffEnd the amount by which to offset the "layoutY" value of the cell's node
+     */
     public C placeStartFromEnd(int itemIndex, double startOffEnd) {
         C cell = getSizedCell(itemIndex);
         double y = sizeTracker.getViewportLength() + startOffEnd;

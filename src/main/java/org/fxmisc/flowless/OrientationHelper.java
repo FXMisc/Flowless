@@ -8,6 +8,12 @@ import javafx.scene.Node;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
+/**
+ * Helper class for returning the correct value (should the {@code width} or {@code height} be returned?) or calling
+ * the correct method (should {@code setWidth(args)} or {@code setHeight(args)}, so that one one class can be used
+ * instead of a generic with two implementations. See its implementations for more details ({@link VerticalHelper}
+ * and {@link HorizontalHelper}) on what "layoutX", "layoutY", and "viewport offset" values represent.
+ */
 interface OrientationHelper {
     Orientation getContentBias();
     double getX(double x, double y);
@@ -66,6 +72,12 @@ interface OrientationHelper {
     <C extends Cell<?, ?>> VirtualFlowHit<C> cellHit(int itemIndex, C cell, double bOff, double lOff);
 }
 
+/**
+ * Implementation of {@link OrientationHelper} where {@code length} represents width of the node/viewport and
+ * {@code breadth} represents the height of the node/viewport. "layoutY" is {@link javafx.scene.Node#layoutX} and
+ * "layoutX" is {@link javafx.scene.Node#layoutY}. "viewport offset" values are based on width. The viewport's "top"
+ * and "bottom" edges are either it's left/right edges (See {@link org.fxmisc.flowless.VirtualFlow.Gravity}).
+ */
 final class HorizontalHelper implements OrientationHelper {
 
     @Override
@@ -212,6 +224,12 @@ final class HorizontalHelper implements OrientationHelper {
     }
 }
 
+/**
+ * Implementation of {@link OrientationHelper} where {@code breadth} represents width of the node/viewport and
+ * {@code length} represents the height of the node/viewport. "layoutX" is {@link javafx.scene.Node#layoutX} and
+ * "layoutY" is {@link javafx.scene.Node#layoutY}. "viewport offset" values are based on height. The viewport's "top"
+ * and "bottom" edges are either it's top/bottom edges (See {@link org.fxmisc.flowless.VirtualFlow.Gravity}).
+ */
 final class VerticalHelper implements OrientationHelper {
 
     @Override

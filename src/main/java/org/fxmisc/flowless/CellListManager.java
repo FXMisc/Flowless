@@ -12,7 +12,11 @@ import org.reactfx.collection.LiveList;
 import org.reactfx.collection.MemoizationList;
 import org.reactfx.collection.QuasiListModification;
 
-final class CellListManager<T, C extends Cell<T, ?>> {
+/**
+ * Tracks all of the cells that the viewport can display ({@link #cells}) and which cells the viewport is currently
+ * displaying ({@link #presentCells}).
+ */
+final class CellListManager<T, C extends Cell<T, ? extends Node>> {
 
     private final CellPool<T, C> cellPool;
     private final MemoizationList<C> cells;
@@ -39,6 +43,7 @@ final class CellListManager<T, C extends Cell<T, ?>> {
         cellPool.dispose();
     }
 
+    /** Gets the list of nodes that the viewport is displaying */
     public ObservableList<Node> getNodes() {
         return cellNodes;
     }
@@ -64,6 +69,12 @@ final class CellListManager<T, C extends Cell<T, ?>> {
         return cells.get(itemIndex);
     }
 
+    /**
+     * Updates the list of cells to display
+     *
+     * @param fromItem the index of the first item to display
+     * @param toItem the index of the last item to display
+     */
     public void cropTo(int fromItem, int toItem) {
         fromItem = Math.max(fromItem, 0);
         toItem = Math.min(toItem, cells.size());

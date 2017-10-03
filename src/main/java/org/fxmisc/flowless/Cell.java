@@ -5,6 +5,10 @@ import java.util.function.IntConsumer;
 
 import javafx.scene.Node;
 
+/**
+ * Provides efficient memory usage by wrapping a {@link Node} within this object and reusing it when
+ * {@link #isReusable()} is true.
+ */
 @FunctionalInterface
 public interface Cell<T, N extends Node> {
     static <T, N extends Node> Cell<T, N> wrapNode(N node) {

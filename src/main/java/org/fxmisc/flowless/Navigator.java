@@ -16,6 +16,14 @@ import org.reactfx.collection.MemoizationList;
 import org.reactfx.collection.QuasiListChange;
 import org.reactfx.collection.QuasiListModification;
 
+/**
+ * Responsible for laying out cells' nodes within the viewport based on a single anchor node. In a layout call,
+ * this anchor node is positioned in the viewport before any other node and then nodes are positioned above and
+ * below that anchor node sequentially. This sequential layout continues until the viewport's "top" and "bottom" edges
+ * are reached or there are no other cells' nodes to render. In this latter case (when there is not enough content to
+ * fill up the entire viewport), the displayed cells are repositioned towards the "ground," based on the
+ * {@link VirtualFlow}'s {@link Gravity} value, and any remaining unused space counts as the "sky."
+ */
 final class Navigator<T, C extends Cell<T, ?>>
 extends Region implements TargetPositionVisitor {
     private final CellListManager<T, C> cellListManager;
@@ -73,11 +81,18 @@ extends Region implements TargetPositionVisitor {
         targetPosition = currentPosition;
     }
 
+    /**
+     * Sets the {@link TargetPosition} used to layout the anchor node and re-lays out the viewport
+     */
     public void setTargetPosition(TargetPosition targetPosition) {
         this.targetPosition = targetPosition;
         requestLayout();
     }
 
+    /**
+     * Sets the {@link TargetPosition} used to layout the anchor node to the current position scrolled by {@code delta}
+     * and re-lays out the viewport
+     */
     public void scrollCurrentPositionBy(double delta) {
         targetPosition = currentPosition.scrollBy(delta);
         requestLayout();
@@ -271,6 +286,12 @@ extends Region implements TargetPositionVisitor {
         return i;
     }
 
+    /**
+     * Starting from the anchor cell's node, fills the viewport from the anchor to the "ground" and then from the anchor
+     * to the "sky".
+     *
+     * @param itemIndex the index of the anchor cell
+     */
     private void fillViewportFrom(int itemIndex) {
         // cell for itemIndex is assumed to be placed correctly
 

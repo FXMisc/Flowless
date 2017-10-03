@@ -4,6 +4,10 @@ import javafx.geometry.Point2D;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
+/**
+ * Specifies an object that does not have scroll bars by default but which can have scroll bars added to it
+ * by wrapping it in a {@link VirtualizedScrollPane}.
+ */
 public interface Virtualized {
     Val<Double> totalWidthEstimateProperty();
     Val<Double> totalHeightEstimateProperty();

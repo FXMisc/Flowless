@@ -1,20 +1,51 @@
 package org.fxmisc.flowless;
 
+/**
+ * Defines where the {@link Navigator} should place the anchor cell's node in the viewport. Its three implementations
+ * are {@link StartOffStart}, {@link EndOffEnd}, and {@link MinDistanceTo}.
+ */
 interface TargetPosition {
     static TargetPosition BEGINNING = new StartOffStart(0, 0.0);
 
+    /**
+     * When the list of items, those displayed in the viewport, and those that are not, are modified, transforms
+     * this change to account for those modifications.
+     *
+     * @param pos the cell index where the change begins
+     * @param removedSize the amount of cells that were removed, starting from {@code pos}
+     * @param addedSize the amount of cells that were added, starting from {@code pos}
+     */
     TargetPosition transformByChange(int pos, int removedSize, int addedSize);
+
+
     TargetPosition scrollBy(double delta);
+
+    /**
+     * Visitor Pattern: prevents type-checking the implementation
+     */
     void accept(TargetPositionVisitor visitor);
+
+    /**
+     * Insures this position's item index is between 0 and {@code size}
+     */
     TargetPosition clamp(int size);
 }
 
+/**
+ * Uses the Visitor Pattern, so {@link Navigator} does not need to check the type of the {@link TargetPosition}
+ * before using it to determine how to fill the viewport.
+ */
 interface TargetPositionVisitor {
+
     void visit(StartOffStart targetPosition);
     void visit(EndOffEnd targetPosition);
     void visit(MinDistanceTo targetPosition);
 }
 
+/**
+ * A {@link TargetPosition} that instructs its {@link TargetPositionVisitor} to use the cell at {@link #itemIndex}
+ * as the anchor cell, showing it at the "top" of the viewport and to offset it by {@link #offsetFromStart}.
+ */
 final class StartOffStart implements TargetPosition {
     final int itemIndex;
     final double offsetFromStart;
@@ -68,6 +99,10 @@ final class StartOffStart implements TargetPosition {
     }
 }
 
+/**
+ * A {@link TargetPosition} that instructs its {@link TargetPositionVisitor} to use the cell at {@link #itemIndex}
+ * as the anchor cell, showing it at the "bottom" of the viewport and to offset it by {@link #offsetFromEnd}.
+ */
 final class EndOffEnd implements TargetPosition {
     final int itemIndex;
     final double offsetFromEnd;
@@ -154,6 +189,10 @@ final class MinDistanceTo implements TargetPosition {
     }
 }
 
+/**
+ * Helper class: stores an {@link #offset} value, which should either be offset from the start if {@link #fromStart}
+ * is true or from the end if false.
+ */
 class Offset {
     public static Offset fromStart(double offset) {
         return new Offset(offset, true);
