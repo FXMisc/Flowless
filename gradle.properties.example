@@ -1,5 +1,5 @@
-sonatypeUsername = <username>
-sonatypePassword = <password>
+nexusUsername = <username>
+nexusPassword = <password>
 
 signing.keyId = <key id>
 signing.password = <key passphrase>
