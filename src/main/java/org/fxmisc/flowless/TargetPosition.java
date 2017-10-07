@@ -62,8 +62,13 @@ final class StartOffStart implements TargetPosition {
             // change before the target item, just update item index
             return new StartOffStart(itemIndex - removedSize + addedSize, offsetFromStart);
         } else if(itemIndex >= pos) {
-            // target item deleted, show the first inserted at the target offset
-            return new StartOffStart(pos, offsetFromStart);
+            // target item deleted
+            if (addedSize == removedSize) {
+                return this;
+            } else {
+                // show the first inserted at the target offset
+                return new StartOffStart(pos, offsetFromStart);
+            }
         } else {
             // change after the target item, target position not affected
             return this;
@@ -119,8 +124,13 @@ final class EndOffEnd implements TargetPosition {
             // change before the target item, just update item index
             return new EndOffEnd(itemIndex - removedSize + addedSize, offsetFromEnd);
         } else if(itemIndex >= pos) {
-            // target item deleted, show the last inserted at the target offset
-            return new EndOffEnd(pos + addedSize - 1, offsetFromEnd);
+            // target item deleted
+            if (addedSize == removedSize) {
+                return this;
+            } else {
+                // show the last inserted at the target offset
+                return new EndOffEnd(pos + addedSize - 1, offsetFromEnd);
+            }
         } else {
             // change after the target item, target position not affected
             return this;
@@ -165,8 +175,13 @@ final class MinDistanceTo implements TargetPosition {
             // change before the target item, just update item index
             return new MinDistanceTo(itemIndex - removedSize + addedSize, minY, maxY);
         } else if(itemIndex >= pos) {
-            // target item deleted, show the first inserted
-            return new MinDistanceTo(pos, Offset.fromStart(0.0), Offset.fromEnd(0.0));
+            // target item deleted
+            if (addedSize == removedSize) {
+                return this;
+            } else {
+                // show the first inserted
+                return new MinDistanceTo(pos, Offset.fromStart(0.0), Offset.fromEnd(0.0));
+            }
         } else {
             // change after the target item, target position not affected
             return this;
