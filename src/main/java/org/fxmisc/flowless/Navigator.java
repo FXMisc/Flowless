@@ -357,8 +357,9 @@ extends Region implements TargetPositionVisitor {
 
     private double distanceFromSky(int itemIndex) {
         C cell = positioner.getVisibleCell(itemIndex);
+        int lastIndex = cellListManager.getLazyCellList().size() - 1;
         return gravity.get() == Gravity.FRONT
-                ? sizeTracker.getViewportLength() - orientation.maxY(cell)
+                ? itemIndex == lastIndex ? 0 : sizeTracker.getViewportLength() - orientation.maxY(cell)
                 : orientation.minY(cell);
     }
 
