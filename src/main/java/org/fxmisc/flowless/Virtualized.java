@@ -9,10 +9,18 @@ import org.reactfx.value.Var;
  * by wrapping it in a {@link VirtualizedScrollPane}.
  */
 public interface Virtualized {
+
     Val<Double> totalWidthEstimateProperty();
+    default double getTotalWidthEstimate() { return totalHeightEstimateProperty().getValue(); }
+
     Val<Double> totalHeightEstimateProperty();
+    default double getTotalHeightEstimate() { return totalHeightEstimateProperty().getValue(); }
+
     Var<Double> estimatedScrollXProperty();
+    default double getEstimatedScrollX() { return estimatedScrollXProperty().getValue(); }
+
     Var<Double> estimatedScrollYProperty();
+    default double getEstimatedScrollY() { return estimatedScrollYProperty().getValue(); }
 
     /**
      * Convenience method: scroll horizontally by {@code deltas.getX()} and vertically by {@code deltas.getY()}
