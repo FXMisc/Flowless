@@ -488,6 +488,24 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
       showBreadthRegion(orientation.minX(region), orientation.maxX(region));
     }
 
+    /**
+     * Get the index of the first visible cell (at the time of the last layout).
+     * 
+     * @return The index of the first visible cell
+     */
+    public int getFirstVisibleIndex() {
+        return navigator.getFirstVisibleIndex();
+    }
+    
+    /**
+     * Get the index of the last visible cell (at the time of the last layout).
+     * 
+     * @return The index of the last visible cell
+     */
+    public int getLastVisibleIndex() {
+        return navigator.getLastVisibleIndex();
+    }
+    
     private void showBreadthRegion(double fromX, double toX) {
         double bOff = breadthOffset0.getValue();
         double spaceBefore = fromX - bOff;
