@@ -407,11 +407,11 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
 
         layout();
 
-        int firstVisible = cellPositioner.getFirstVisibleIndex().getAsInt();
+        int firstVisible = getFirstVisibleIndex();
         firstVisible = navigator.fillBackwardFrom0(firstVisible, lOff);
         C firstCell = cellPositioner.getVisibleCell(firstVisible);
 
-        int lastVisible = cellPositioner.getLastVisibleIndex().getAsInt();
+        int lastVisible = getLastVisibleIndex();
         lastVisible = navigator.fillForwardFrom0(lastVisible, lOff);
         C lastCell = cellPositioner.getVisibleCell(lastVisible);
 

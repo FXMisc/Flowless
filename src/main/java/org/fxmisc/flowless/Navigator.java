@@ -101,13 +101,12 @@ extends Region implements TargetPositionVisitor {
     }
 
     private TargetPosition getCurrentPosition() {
-        OptionalInt firstVisible = positioner.getFirstVisibleIndex();
-        if(firstVisible.isPresent()) {
-            int idx = firstVisible.getAsInt();
-            C cell = positioner.getVisibleCell(idx);
-            return new StartOffStart(idx, orientation.minY(cell));
-        } else {
+        if (cellListManager.getLazyCellList().getMemoizedCount() == 0) {
             return TargetPosition.BEGINNING;
+        }
+        else {
+            C cell = positioner.getVisibleCell(firstVisibleIndex);
+            return new StartOffStart(firstVisibleIndex, orientation.minY(cell));
         }
     }
 
