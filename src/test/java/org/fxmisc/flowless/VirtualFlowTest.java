@@ -1,14 +1,16 @@
 package org.fxmisc.flowless;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.shape.Rectangle;
-
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 public class VirtualFlowTest {
 
@@ -47,4 +49,35 @@ public class VirtualFlowTest {
         assertEquals(-10.0, rect.getBoundsInParent().getMinY(), 0.01);
     }
 
+    @Test
+    public void fastVisibleIndexTest() {
+        ObservableList<Rectangle> items = FXCollections.observableArrayList();
+        for (int i = 0; i < 100; i++) {
+            items.add(new Rectangle(500, 100));
+        }
+
+        VirtualFlow<Rectangle, Cell<Rectangle, Rectangle>> vf = VirtualFlow.createVertical(items, Cell::wrapNode);
+        vf.resize(100, 450); // size of VirtualFlow enough to show several cells
+        vf.layout();
+
+        ObservableList<Cell<Rectangle,Rectangle>> visibleCells = vf.visibleCells();
+        
+        vf.show(0);
+        vf.layout();
+        assertSame(visibleCells.get(0), vf.getCell(vf.getFirstVisibleIndex()));
+        assertSame(visibleCells.get(visibleCells.size() - 1), vf.getCell(vf.getLastVisibleIndex()));
+        assertTrue(vf.getFirstVisibleIndex() <= 0 && 0 <= vf.getLastVisibleIndex());
+        
+        vf.show(50);
+        vf.layout();
+        assertSame(visibleCells.get(0), vf.getCell(vf.getFirstVisibleIndex()));
+        assertSame(visibleCells.get(visibleCells.size() - 1), vf.getCell(vf.getLastVisibleIndex()));
+        assertTrue(vf.getFirstVisibleIndex() <= 50 && 50 <= vf.getLastVisibleIndex());
+
+        vf.show(99);
+        vf.layout();
+        assertSame(visibleCells.get(0), vf.getCell(vf.getFirstVisibleIndex()));
+        assertSame(visibleCells.get(visibleCells.size() - 1), vf.getCell(vf.getLastVisibleIndex()));
+        assertTrue(vf.getFirstVisibleIndex() <= 99 && 99 <= vf.getLastVisibleIndex());
+    }
 }

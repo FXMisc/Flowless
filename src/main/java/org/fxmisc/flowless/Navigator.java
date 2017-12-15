@@ -36,6 +36,8 @@ extends Region implements TargetPositionVisitor {
 
     private TargetPosition currentPosition = TargetPosition.BEGINNING;
     private TargetPosition targetPosition = TargetPosition.BEGINNING;
+    private int firstVisibleIndex = -1;
+    private int lastVisibleIndex = -1;
 
     public Navigator(
             CellListManager<T, C> cellListManager,
@@ -99,13 +101,12 @@ extends Region implements TargetPositionVisitor {
     }
 
     private TargetPosition getCurrentPosition() {
-        OptionalInt firstVisible = positioner.getFirstVisibleIndex();
-        if(firstVisible.isPresent()) {
-            int idx = firstVisible.getAsInt();
-            C cell = positioner.getVisibleCell(idx);
-            return new StartOffStart(idx, orientation.minY(cell));
-        } else {
+        if (cellListManager.getLazyCellList().getMemoizedCount() == 0) {
             return TargetPosition.BEGINNING;
+        }
+        else {
+            C cell = positioner.getVisibleCell(firstVisibleIndex);
+            return new StartOffStart(firstVisibleIndex, orientation.minY(cell));
         }
     }
 
@@ -179,6 +180,24 @@ extends Region implements TargetPositionVisitor {
         fillViewportFrom(targetPosition.itemIndex);
     }
 
+    /**
+     * Get the index of the first visible cell (at the time of the last layout).
+     * 
+     * @return The index of the first visible cell
+     */
+    public int getFirstVisibleIndex() {
+        return firstVisibleIndex;
+    }
+    
+    /**
+     * Get the index of the last visible cell (at the time of the last layout).
+     * 
+     * @return The index of the last visible cell
+     */
+    public int getLastVisibleIndex() {
+        return lastVisibleIndex;
+    }
+    
     private void placeToViewport(int itemIndex, Offset from, Offset to) {
         C cell = positioner.getVisibleCell(itemIndex);
         double fromY = from.isFromStart()
@@ -327,6 +346,8 @@ extends Region implements TargetPositionVisitor {
                 orientation.minY(positioner.getVisibleCell(last)) >= sizeTracker.getViewportLength()) {
             --last;
         }
+        firstVisibleIndex = first;
+        lastVisibleIndex = last;
         positioner.cropTo(first, last + 1);
     }
 
