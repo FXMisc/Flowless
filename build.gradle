@@ -1,8 +1,20 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        // Needed only for SNAPSHOT versions
+        maven { url "http://oss.sonatype.org/content/repositories/snapshots/" }
+    }
+    dependencies {
+        classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.11.0"
+    }
+}
+
 version = '0.6.1-SNAPSHOT'
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'osgi'
+apply plugin: 'io.codearte.nexus-staging'
 
 buildscript {
     repositories {
@@ -58,3 +70,7 @@ task fatJar(type: Jar, dependsOn: classes) {
 }
 
 assemble.dependsOn fatJar
+
+nexusStaging {
+    packageGroup = "org.fxmisc.flowless"
+}
