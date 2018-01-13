@@ -71,6 +71,12 @@ task fatJar(type: Jar, dependsOn: classes) {
 
 assemble.dependsOn fatJar
 
+task getVersion {
+    doLast {
+        println version
+    }
+}
+
 nexusStaging {
     packageGroup = "org.fxmisc.flowless"
 }
