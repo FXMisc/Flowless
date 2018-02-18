@@ -3,6 +3,7 @@ package org.fxmisc.flowless;
 import static javafx.scene.control.ScrollPane.ScrollBarPolicy.*;
 
 import javafx.application.Platform;
+import javafx.beans.DefaultProperty;
 import javafx.beans.NamedArg;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
@@ -19,6 +20,7 @@ import javafx.scene.layout.Region;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
+@DefaultProperty("content")
 public class VirtualizedScrollPane<V extends Node & Virtualized> extends Region implements Virtualized {
 
     private static final PseudoClass CONTENT_FOCUSED = PseudoClass.getPseudoClass("content-focused");
