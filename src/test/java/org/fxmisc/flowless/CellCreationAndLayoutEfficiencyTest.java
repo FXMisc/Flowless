@@ -1,31 +1,26 @@
 package org.fxmisc.flowless;
 
-import static org.junit.Assert.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-
-import org.junit.Before;
 import org.junit.Test;
-import org.testfx.api.FxRobot;
-import org.testfx.api.FxToolkit;
 
-public class CellCreationAndLayoutEfficiencyTest {
+import static org.junit.Assert.assertEquals;
 
-    StackPane stackPane;
+public class CellCreationAndLayoutEfficiencyTest extends FlowlessTestBase {
 
-    @Before
-    public void setupSpec() throws Exception {
-        FxToolkit.registerPrimaryStage();
-        FxToolkit.setupStage(Stage::show);
-        FxToolkit.setupScene(() -> {
-            stackPane = new StackPane();
-            return new Scene(stackPane, 200, 400);
-            // 25 cells (each 16px high) fit into the viewport
-        });
+    private StackPane stackPane;
+
+    @Override
+    public void start(Stage stage) throws Exception {
+        super.start(stage);
+        stackPane = new StackPane();
+        // 25 cells (each 16px high) fit into the viewport
+        stage.setScene(new Scene(stackPane, 200, 400));
+        stage.show();
     }
 
     @Test
@@ -52,39 +47,37 @@ public class CellCreationAndLayoutEfficiencyTest {
                     return Cell.wrapNode(reg);
                 });
 
-        FxRobot fxRobot = new FxRobot();
-
-        fxRobot.interact(() -> stackPane.getChildren().add(flow));
+        interact(() -> stackPane.getChildren().add(flow));
         cellCreations.reset();
         cellLayouts.reset();
 
         // update an item in the viewport
-        fxRobot.interact(() -> items.set(10, "yellow"));
+        interact(() -> items.set(10, "yellow"));
         assertEquals(1, cellCreations.getAndReset());
         assertEquals(1, cellLayouts.getAndReset());
 
         // update an item outside the viewport
-        fxRobot.interact(() -> items.set(30, "yellow"));
+        interact(() -> items.set(30, "yellow"));
         assertEquals(0, cellCreations.getAndReset());
         assertEquals(0, cellLayouts.getAndReset());
 
         // delete an item in the middle of the viewport
-        fxRobot.interact(() -> items.remove(12));
+        interact(() -> items.remove(12));
         assertEquals(1, cellCreations.getAndReset());
         assertEquals(1, cellLayouts.getAndReset());
 
         // add an item in the middle of the viewport
-        fxRobot.interact(() -> items.add(12, "yellow"));
+        interact(() -> items.add(12, "yellow"));
         assertEquals(1, cellCreations.getAndReset());
         assertEquals(1, cellLayouts.getAndReset());
 
         // scroll 5 items down
-        fxRobot.interact(() -> flow.showAsFirst(5));
+        interact(() -> flow.showAsFirst(5));
         assertEquals(5, cellCreations.getAndReset());
         assertEquals(5, cellLayouts.getAndReset());
 
         // scroll 50 items down (only 25 fit into the viewport)
-        fxRobot.interact(() -> flow.showAsFirst(55));
+        interact(() -> flow.showAsFirst(55));
         assertEquals(25, cellCreations.getAndReset());
         assertEquals(25, cellLayouts.getAndReset());
     }

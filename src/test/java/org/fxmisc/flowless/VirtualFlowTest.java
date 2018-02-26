@@ -4,20 +4,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.embed.swing.JFXPanel;
 import javafx.scene.shape.Rectangle;
 
-public class VirtualFlowTest {
-
-    @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
-        new JFXPanel();
-    }
+public class VirtualFlowTest extends FlowlessTestBase {
 
     @Test
     public void idempotentShowTest() {
