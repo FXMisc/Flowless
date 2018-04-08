@@ -5,6 +5,7 @@ import java.util.function.Function;
 
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
+import javafx.scene.input.ScrollEvent;
 
 import org.reactfx.EventStreams;
 import org.reactfx.Subscription;
@@ -18,6 +19,7 @@ import org.reactfx.collection.QuasiListModification;
  */
 final class CellListManager<T, C extends Cell<T, ? extends Node>> {
 
+    private final Node owner;
     private final CellPool<T, C> cellPool;
     private final MemoizationList<C> cells;
     private final LiveList<C> presentCells;
@@ -26,8 +28,10 @@ final class CellListManager<T, C extends Cell<T, ? extends Node>> {
     private final Subscription presentCellsSubscription;
 
     public CellListManager(
+            Node owner,
             ObservableList<T> items,
             Function<? super T, ? extends C> cellFactory) {
+        this.owner = owner;
         this.cellPool = new CellPool<>(cellFactory);
         this.cells = LiveList.map(items, this::cellForItem).memoize();
         this.presentCells = cells.memoizedItems();
@@ -96,7 +100,36 @@ final class CellListManager<T, C extends Cell<T, ? extends Node>> {
         // It will be made visible when it is positioned.
         node.setVisible(false);
 
+        if (cell.isReusable()) {
+            // if cell is reused i think adding event handler
+            // would cause resource leakage.
+            node.setOnScroll(this::pushScrollEvent);
+            node.setOnScrollStarted(this::pushScrollEvent);
+            node.setOnScrollFinished(this::pushScrollEvent);
+        } else {
+            node.addEventHandler(ScrollEvent.ANY, this::pushScrollEvent);
+        }
+
         return cell;
+    }
+
+    /**
+     * Push scroll events received by cell nodes directly to
+     * the 'owner' Node. (Generally likely to be a VirtualFlow
+     * but not required.)
+     *
+     * Normal bubbling of scroll events gets interrupted during
+     * a scroll gesture when the Cell's Node receiving the event
+     * has moved out of the viewport and is thus removed from
+     * the Navigator's children list. This breaks expected trackpad
+     * scrolling behaviour, at least on macOS.
+     * 
+     * So here we take over event-bubbling duties for ScrollEvent
+     * and push them ourselves directly to the given owner.
+     */
+    private void pushScrollEvent(ScrollEvent se) {
+        owner.fireEvent(se);
+        se.consume();
     }
 
     private void presentCellsChanged(QuasiListModification<? extends C> mod) {
