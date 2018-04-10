@@ -106,6 +106,8 @@ final class CellListManager<T, C extends Cell<T, ? extends Node>> {
             node.setOnScroll(this::pushScrollEvent);
             node.setOnScrollStarted(this::pushScrollEvent);
             node.setOnScrollFinished(this::pushScrollEvent);
+
+            // pointless change to run a Mac build
         } else {
             node.addEventHandler(ScrollEvent.ANY, this::pushScrollEvent);
         }
