@@ -1,3 +1,5 @@
+**This project is no longer being maintained. See [this issue](https://github.com/FXMisc/Flowless/issues/68) for more details.**
+
 Flowless
 ========
 
