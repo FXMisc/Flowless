@@ -62,8 +62,9 @@ final class SizeTracker {
                 viewportBounds,
                 (a, b) -> Math.max(a, orientation.breadth(b)));
 
-        Val<Function<Cell<?, ?>, Double>> lengthFn = avoidFalseInvalidations(breadthForCells).map(
-                breadth -> cell -> orientation.prefLength(cell, breadth));
+        Val<Function<Cell<?, ?>, Double>> lengthFn;
+        lengthFn = (orientation instanceof HorizontalHelper ? breadthForCells : avoidFalseInvalidations(breadthForCells))
+                .map(breadth -> cell -> orientation.prefLength(cell, breadth));
 
         this.lengths = cells.mapDynamic(lengthFn).memoize();
 
