@@ -6,7 +6,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
+import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ObservableList;
 import javafx.css.CssMetaData;
 import javafx.css.StyleConverter;
@@ -14,6 +17,7 @@ import javafx.css.Styleable;
 import javafx.css.StyleableObjectProperty;
 import javafx.css.StyleableProperty;
 import javafx.geometry.Bounds;
+import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Point2D;
 import javafx.scene.input.ScrollEvent;
