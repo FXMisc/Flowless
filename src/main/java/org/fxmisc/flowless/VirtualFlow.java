@@ -160,6 +160,21 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
         return lengthOffsetEstimate;
     }
 
+    private BooleanProperty autoGrowProp = new SimpleBooleanProperty();
+    /**
+     * For Horizontal flows the width will auto grow, and for Vertical flows the height will auto grow,
+     * according to the number and size of each item in the VirtualFlow. The default is false.
+     */
+    public BooleanProperty autoGrowProperty() {
+        return autoGrowProp;
+    }
+    public void setAutoGrow( boolean value ) {
+        autoGrowProp.set( value );
+    }
+    public boolean isAutoGrow() {
+        return autoGrowProp.get();
+    }
+
     private VirtualFlow(
             ObservableList<T> items,
             Function<? super T, ? extends C> cellFactory,
@@ -303,7 +318,41 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
         return 100;
     }
 
-    private double computePrefLength(double breadth) {
+    private double computePrefLength(double breadth)
+    {
+        if ( autoGrowProp.get() )
+        {
+            if ( getWidth() == 0.0 || getHeight() == 0 )
+            {
+                Platform.runLater( () -> requestLayout() );
+            }
+            else
+            {
+                double size = 0.0;
+                Insets in = getInsets();
+
+                if ( getContentBias() == Orientation.HORIZONTAL )    // vertical flow
+                {
+                    for ( int p = 0; p < items.size(); p++ ) {
+                        size += getCell( p ).getNode().getLayoutBounds().getHeight();
+                    }
+
+                    if ( size > 0.0 ) {
+                        return size + in.getTop() + in.getBottom();
+                    }
+                }
+                else                                                // horizontal flow
+                {
+                    for ( int p = 0; p < items.size(); p++ ) {
+                        size += getCell( p ).getNode().getLayoutBounds().getWidth();
+                    }
+
+                    if ( size > 0.0 ) {
+                        return size + in.getLeft() + in.getRight();
+                    }
+                }
+            }
+        }
         return 100;
     }
 
