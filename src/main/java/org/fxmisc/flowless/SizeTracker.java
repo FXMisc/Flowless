@@ -1,5 +1,6 @@
 package org.fxmisc.flowless;
 
+import java.time.Duration;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -7,6 +8,7 @@ import javafx.beans.value.ObservableObjectValue;
 import javafx.geometry.Bounds;
 import javafx.scene.control.IndexRange;
 
+import org.reactfx.EventStreams;
 import org.reactfx.Subscription;
 import org.reactfx.collection.LiveList;
 import org.reactfx.collection.MemoizationList;
@@ -117,11 +119,15 @@ final class SizeTracker {
 
         Val<Double> firstCellMinY = firstVisibleCell.flatMap(orientation::minYProperty);
 
-        lengthOffsetEstimate = Val.combine(
-                totalKnownLengthBeforeFirstVisibleCell,
-                unknownLengthEstimateBeforeFirstVisibleCell,
-                firstCellMinY,
-                (a, b, minY) -> a + b - minY).orElseConst(0.0);
+        lengthOffsetEstimate = Val.wrap( EventStreams.combine(
+            totalKnownLengthBeforeFirstVisibleCell.values(),
+            unknownLengthEstimateBeforeFirstVisibleCell.values(),
+            firstCellMinY.values()
+         )
+        .filter( t3 -> t3.test( (a,b,minY) -> a != null && b != null && minY != null ) )
+        .thenRetainLatestFor( Duration.ofMillis( 1 ) )
+        .map( t3 -> t3.map( (a,b,minY) -> Double.valueOf( a + b - minY ) ) )
+        .toBinding( 0.0 ) );
 
         // pinning totalLengthEstimate and lengthOffsetEstimate
         // binds it all together and enables memoization
