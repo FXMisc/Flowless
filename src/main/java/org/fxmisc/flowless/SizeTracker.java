@@ -8,6 +8,7 @@ import javafx.beans.value.ObservableObjectValue;
 import javafx.geometry.Bounds;
 import javafx.scene.control.IndexRange;
 
+import org.reactfx.EventStreams;
 import org.reactfx.Subscription;
 import org.reactfx.collection.LiveList;
 import org.reactfx.collection.MemoizationList;
