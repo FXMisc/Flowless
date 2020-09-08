@@ -127,14 +127,22 @@ extends Region implements TargetPositionVisitor {
 
     @Override
     public void visit(StartOffStart targetPosition) {
-        placeStartAtMayCrop(targetPosition.itemIndex, targetPosition.offsetFromStart);
+        cropToNeighborhoodOf( targetPosition.itemIndex );  // Fix for issue #70 (!)
+        positioner.placeStartAt( targetPosition.itemIndex, targetPosition.offsetFromStart );
         fillViewportFrom(targetPosition.itemIndex);
     }
 
     @Override
     public void visit(EndOffEnd targetPosition) {
-        placeEndOffEndMayCrop(targetPosition.itemIndex, targetPosition.offsetFromEnd);
+        cropToNeighborhoodOf( targetPosition.itemIndex );  // Related to issue #70 (?)
+        positioner.placeEndFromEnd( targetPosition.itemIndex, targetPosition.offsetFromEnd );
         fillViewportFrom(targetPosition.itemIndex);
+    }
+
+    private void cropToNeighborhoodOf( int itemIndex ) {
+        int begin = Math.max( 0, getFirstVisibleIndex() );
+        int end = Math.max( itemIndex, getLastVisibleIndex() );
+        positioner.cropTo( Math.min( begin, itemIndex ), end+1 );
     }
 
     @Override
