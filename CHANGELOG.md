@@ -1,5 +1,25 @@
 # Change Log
 
+## [v0.6.2](https://github.com/FXMisc/Flowless/tree/v0.6.2) (2020-10-02)
+[Full Changelog](https://github.com/FXMisc/Flowless/compare/v0.6.1...v0.6.2)
+
+**Fixed issues:**
+
+- Bidirectional binding of length properties does not update both values correctly [\#43](https://github.com/FXMisc/Flowless/issues/43)
+- Suspend VirtualFlow's scroll-related values until fully rendered [\#60](https://github.com/FXMisc/Flowless/issues/60)
+- Fix cells larger than viewport layout efficiency [\#70](https://github.com/FXMisc/Flowless/issues/70)
+- Fix SizeTracker horizontal resize [\#72](https://github.com/FXMisc/Flowless/issues/72)
+- Keyboard paging computation error [\#73](https://github.com/FXMisc/Flowless/issues/73)
+
+## [v0.6.1](https://github.com/FXMisc/Flowless/tree/v0.6.1) (2018-04-18)
+[Full Changelog](https://github.com/FXMisc/Flowless/compare/v0.6...v0.6.1)
+
+**Merged pull requests:**
+
+- Add accessors for the index of the first and last visible cell [\#59](https://github.com/FXMisc/Flowless/pull/59) ([DavinMcCall](https://github.com/davmac314))
+- Set 'content' as default VirtualizedScrollPane FXML property [\#61](https://github.com/FXMisc/Flowless/pull/61) ([HollisWaite](https://github.com/hwaite))
+- Correct trackpad scrolling gestures under MacOS [\#64](https://github.com/FXMisc/Flowless/pull/64) ([RachelGreenham](https://github.com/StrangeNoises) and [EduGarcia](https://github.com/Arcnor))
+
 ## [v0.6](https://github.com/FXMisc/Flowless/tree/v0.6) (2017-10-08)
 [Full Changelog](https://github.com/FXMisc/Flowless/compare/v0.5.2...v0.6)
 

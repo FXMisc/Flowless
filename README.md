@@ -1,5 +1,3 @@
-**This project is no longer being maintained. See [this issue](https://github.com/FXMisc/Flowless/issues/68) for more details.**
-
 Flowless
 ========
 
@@ -75,27 +73,27 @@ Include Flowless in your project
 
 | Group ID            | Artifact ID | Version |
 | :---------:         | :---------: | :-----: |
-| org.fxmisc.flowless | flowless    | 0.6.1   |
+| org.fxmisc.flowless | flowless    | 0.6.2   |
 
 #### Gradle example
 
 ```groovy
 dependencies {
-    compile group: 'org.fxmisc.flowless', name: 'flowless', version: '0.6.1'
+    compile group: 'org.fxmisc.flowless', name: 'flowless', version: '0.6.2'
 }
 ```
 
 #### Sbt example
 
 ```scala
-libraryDependencies += "org.fxmisc.flowless" % "flowless" % "0.6.1"
+libraryDependencies += "org.fxmisc.flowless" % "flowless" % "0.6.2"
 ```
 
 #### Manual download
 
-Download the [0.6.1 jar](https://github.com/TomasMikula/Flowless/releases/tag/v0.6.1) and place it on your classpath.
+Download the [0.6.2 jar](https://github.com/FXMisc/Flowless/releases/tag/v0.6.2) and place it on your classpath.
 
 Documentation
 -------------
 
-[Javadoc](http://fxmisc.github.io/flowless/javadoc/0.6.1/org/fxmisc/flowless/package-summary.html)
+[Javadoc](http://fxmisc.github.io/flowless/javadoc/0.6.2/org/fxmisc/flowless/package-summary.html)
