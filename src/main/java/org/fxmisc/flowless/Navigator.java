@@ -301,9 +301,9 @@ extends Region implements TargetPositionVisitor {
         return fillBackwardFrom0(itemIndex, upTo);
     }
 
-    // does not re-place the anchor cell
+    // Does replace the anchor cell, otherwise it's not included in ListModification events (see RichTextFX/issues/998)
     int fillBackwardFrom0(int itemIndex, double upTo) {
-        double min = orientation.minY(positioner.getVisibleCell(itemIndex));
+        double min = orientation.minY(positioner.getVisibleCell(itemIndex))-1.0;
         int i = itemIndex;
         while(min > upTo && i > 0) {
             --i;
