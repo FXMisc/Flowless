@@ -1,5 +1,16 @@
 # Change Log
 
+## [v0.6.3](https://github.com/FXMisc/Flowless/tree/v0.6.3) (2021-02-23)
+[Full Changelog](https://github.com/FXMisc/Flowless/compare/v0.6.2...v0.6.3)
+
+**Fixed issues:**
+
+- VirtualizedScrollPane causes high CPU and GPU on idle with 125% screen scaling [\#81](https://github.com/FXMisc/Flowless/issues/81)
+
+**Merged pull requests:**
+
+- Scrollbars height/width ceiled to nearest pixel if this region's snapToPixel property is true [\#82](https://github.com/FXMisc/Flowless/pull/82) ([FredericThevenet](https://github.com/fthevenet))
+
 ## [v0.6.2](https://github.com/FXMisc/Flowless/tree/v0.6.2) (2020-10-02)
 [Full Changelog](https://github.com/FXMisc/Flowless/compare/v0.6.1...v0.6.2)
 
