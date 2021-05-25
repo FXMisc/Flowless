@@ -66,6 +66,9 @@ final class CellListManager<T, C extends Cell<T, ? extends Node>> {
     }
 
     public Optional<C> getCellIfPresent(int itemIndex) {
+        if (itemIndex>=cells.size()||itemIndex<0) {
+           return Optional.empty();
+        }
         return cells.getIfMemoized(itemIndex); // getIfMemoized() may throw
     }
 
