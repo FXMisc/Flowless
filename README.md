@@ -17,7 +17,7 @@ Here is a comparison of JavaFX's ListView vs. Flowless on a list of 80 items, 25
 | scroll 50 items down                         | 25/25 | 50/25 | 25/25 |
 
 
-Here is the [source code](https://gist.github.com/TomasMikula/1dcee2cc4e5dab421913) of this mini-benchmark.
+Here is the [source code](https://gist.github.com/Jugen/2d392fd72ebec9db3c5d2aca1f8f5eb5) of this mini-benchmark.
 
 Use case for Flowless
 ---------------------
