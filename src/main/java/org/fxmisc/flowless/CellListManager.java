@@ -84,7 +84,7 @@ final class CellListManager<T, C extends Cell<T, ? extends Node>> {
      */
     public void cropTo(int fromItem, int toItem) {
         fromItem = Math.max(fromItem, 0);
-        toItem = Math.min(toItem, cells.size());
+        toItem = Math.max(Math.min(toItem, cells.size()), 0);
         cells.forget(0, fromItem);
         cells.forget(toItem, cells.size());
     }
