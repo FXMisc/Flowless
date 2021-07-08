@@ -1,5 +1,16 @@
 # Change Log
 
+## [v0.6.4](https://github.com/FXMisc/Flowless/tree/v0.6.4) (2021-07-08)
+[Full Changelog](https://github.com/FXMisc/Flowless/compare/v0.6.3...v0.6.4)
+
+**Fixed issues:**
+
+- Improved getCellIfPresent parameter check [\#90](https://github.com/FXMisc/Flowless/issues/90)
+
+**Merged pull requests:**
+
+- Fix for negative toItem variable [\#92](https://github.com/FXMisc/Flowless/pull/92) ([TomaszChudyk](https://github.com/tchudyk))
+
 ## [v0.6.3](https://github.com/FXMisc/Flowless/tree/v0.6.3) (2021-02-23)
 [Full Changelog](https://github.com/FXMisc/Flowless/compare/v0.6.2...v0.6.3)
 
