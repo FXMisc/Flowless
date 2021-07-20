@@ -5,6 +5,7 @@ import java.util.function.Function;
 
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
+import javafx.scene.control.IndexRange;
 import javafx.scene.input.ScrollEvent;
 
 import org.reactfx.EventStreams;
@@ -85,8 +86,13 @@ final class CellListManager<T, C extends Cell<T, ? extends Node>> {
     public void cropTo(int fromItem, int toItem) {
         fromItem = Math.max(fromItem, 0);
         toItem = Math.max(Math.min(toItem, cells.size()), 0);
-        cells.forget(0, fromItem);
-        cells.forget(toItem, cells.size());
+        IndexRange memorizedRange = cells.getMemoizedItemsRange();
+        if (memorizedRange.getStart() < fromItem) {
+            cells.forget(0, fromItem);
+        }
+        if (memorizedRange.getEnd() > toItem) {
+            cells.forget(toItem, cells.size());
+        }
     }
 
     private C cellForItem(T item) {
