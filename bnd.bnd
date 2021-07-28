@@ -1,0 +1,5 @@
+-exportcontents: org.fxmisc.flowless.*
+
+# Make sure that the Bundle-SymbolicName remains the same as with the deprecated OSGi gradle plugin
+Bundle-SymbolicName: org.fxmisc.flowless
+Bundle-Name: flowless
