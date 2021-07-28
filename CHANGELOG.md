@@ -1,5 +1,13 @@
 # Change Log
 
+## [v0.6.5](https://github.com/FXMisc/Flowless/tree/v0.6.5) (2021-07-28)
+[Full Changelog](https://github.com/FXMisc/Flowless/compare/v0.6.4...v0.6.5)
+
+**Merged pull requests:**
+
+- Crop cells only if memorizedRange is bigger than expected range [\#94](https://github.com/FXMisc/Flowless/pull/94) ([TomaszChudyk](https://github.com/tchudyk))
+- Gradle 7.0.2 upgrade [\#95](https://github.com/FXMisc/Flowless/pull/95)
+
 ## [v0.6.4](https://github.com/FXMisc/Flowless/tree/v0.6.4) (2021-07-08)
 [Full Changelog](https://github.com/FXMisc/Flowless/compare/v0.6.3...v0.6.4)
 
