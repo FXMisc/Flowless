@@ -92,8 +92,10 @@ public class VirtualizedScrollPane<V extends Node & Virtualized> extends Region 
                 .asVar(this::setVPosition);
         hbarValue = Var.doubleVar(hbar.valueProperty());
         vbarValue = Var.doubleVar(vbar.valueProperty());
-        Bindings.bindBidirectional(hbarValue, hPosEstimate);
-        Bindings.bindBidirectional(vbarValue, vPosEstimate);
+        hbarValue.addListener((observable, oldValue, newValue) -> hPosEstimate.setValue(newValue));
+        hPosEstimate.addListener((observable, oldValue, newValue) -> hbarValue.setValue(newValue));
+        vbarValue.addListener((observable, oldValue, newValue) -> vPosEstimate.setValue(newValue));
+        vPosEstimate.addListener((observable, oldValue, newValue) -> vbarValue.setValue(newValue));
 
         // scrollbar visibility
         hbarPolicy = Var.newSimpleVar(hPolicy);
