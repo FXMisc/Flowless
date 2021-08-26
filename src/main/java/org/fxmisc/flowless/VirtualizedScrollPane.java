@@ -29,9 +29,15 @@ public class VirtualizedScrollPane<V extends Node & Virtualized> extends Region 
     private final ScrollBar vbar;
     private final V content;
     private final ChangeListener<Boolean> contentFocusedListener;
+    private final ChangeListener<Double> hbarValueListener;
+    private final ChangeListener<Double> hPosEstimateListener;
+    private final ChangeListener<Double> vbarValueListener;
+    private final ChangeListener<Double> vPosEstimateListener;
 
     private Var<Double> hbarValue;
     private Var<Double> vbarValue;
+    private Var<Double> hPosEstimate;
+    private Var<Double> vPosEstimate;
 
     /** The Policy for the Horizontal ScrollBar */
     private final Var<ScrollPane.ScrollBarPolicy> hbarPolicy;
@@ -75,15 +81,13 @@ public class VirtualizedScrollPane<V extends Node & Virtualized> extends Region 
         vbar.blockIncrementProperty().bind(vbar.visibleAmountProperty());
 
         // scrollbar positions
-        Var<Double> hPosEstimate = Val
-                .combine(
+        hPosEstimate = Val.combine(
                     content.estimatedScrollXProperty(),
                     Val.map(content.layoutBoundsProperty(), Bounds::getWidth),
                     content.totalWidthEstimateProperty(),
                     VirtualizedScrollPane::offsetToScrollbarPosition)
                 .asVar(this::setHPosition);
-        Var<Double> vPosEstimate = Val
-                .combine(
+       vPosEstimate = Val.combine(
                     content.estimatedScrollYProperty(),
                     Val.map(content.layoutBoundsProperty(), Bounds::getHeight),
                     content.totalHeightEstimateProperty(),
@@ -92,10 +96,18 @@ public class VirtualizedScrollPane<V extends Node & Virtualized> extends Region 
                 .asVar(this::setVPosition);
         hbarValue = Var.doubleVar(hbar.valueProperty());
         vbarValue = Var.doubleVar(vbar.valueProperty());
-        hbarValue.addListener((observable, oldValue, newValue) -> hPosEstimate.setValue(newValue));
-        hPosEstimate.addListener((observable, oldValue, newValue) -> hbarValue.setValue(newValue));
-        vbarValue.addListener((observable, oldValue, newValue) -> vPosEstimate.setValue(newValue));
-        vPosEstimate.addListener((observable, oldValue, newValue) -> vbarValue.setValue(newValue));
+        // The use of a pair of mirrored ChangeListener instead of a more natural bidirectional binding
+        // here is a workaround following a change in JavaFX [1] which broke the behaviour of the scroll bar [2].
+        // [1] https://bugs.openjdk.java.net/browse/JDK-8264770
+        // [2] https://github.com/FXMisc/Flowless/issues/97
+        hbarValueListener = (observable, oldValue, newValue) -> hPosEstimate.setValue(newValue);
+        hbarValue.addListener(hbarValueListener);
+        hPosEstimateListener = (observable, oldValue, newValue) -> hbarValue.setValue(newValue);
+        hPosEstimate.addListener(hPosEstimateListener);
+        vbarValueListener = (observable, oldValue, newValue) -> vPosEstimate.setValue(newValue);
+        vbarValue.addListener(vbarValueListener);
+        vPosEstimateListener = (observable, oldValue, newValue) -> vbarValue.setValue(newValue);
+        vPosEstimate.addListener(vPosEstimateListener);
 
         // scrollbar visibility
         hbarPolicy = Var.newSimpleVar(hPolicy);
@@ -186,8 +198,10 @@ public class VirtualizedScrollPane<V extends Node & Virtualized> extends Region 
 
     private void dispose() {
         content.focusedProperty().removeListener(contentFocusedListener);
-        hbarValue.unbindBidirectional(content.estimatedScrollXProperty());
-        vbarValue.unbindBidirectional(content.estimatedScrollYProperty());
+        hbarValue.removeListener(hbarValueListener);
+        hPosEstimate.removeListener(hPosEstimateListener);
+        vbarValue.removeListener(vbarValueListener);
+        vPosEstimate.removeListener(vPosEstimateListener);
         unbindScrollBar(hbar);
         unbindScrollBar(vbar);
     }
