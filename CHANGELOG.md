@@ -1,5 +1,17 @@
 # Change Log
 
+## [v0.6.6](https://github.com/FXMisc/Flowless/tree/v0.6.6) (2021-09-10)
+[Full Changelog](https://github.com/FXMisc/Flowless/compare/v0.6.5...v0.6.6)
+
+**Fixed issues:**
+
+- JavaFX 17 breaks scrollbar behaviours in VirtualizedScrollPane [\#97](https://github.com/FXMisc/Flowless/issues/97)
+
+**Merged pull requests:**
+
+- Replaced bindBidirectional calls by a pair of ChangeListener to bind scrollbar coordinates and content position [\#98](https://github.com/FXMisc/Flowless/pull/98) ([FredericThevenet](https://github.com/fthevenet))
+- Clean-up scrollbar position listeners on dispose [\#99](https://github.com/FXMisc/Flowless/pull/99) ([FredericThevenet](https://github.com/fthevenet))
+
 ## [v0.6.5](https://github.com/FXMisc/Flowless/tree/v0.6.5) (2021-07-28)
 [Full Changelog](https://github.com/FXMisc/Flowless/compare/v0.6.4...v0.6.5)
 
