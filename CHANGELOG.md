@@ -1,5 +1,12 @@
 # Change Log
 
+## [v0.6.7](https://github.com/FXMisc/Flowless/tree/v0.6.7) (2021-10-19)
+[Full Changelog](https://github.com/FXMisc/Flowless/compare/v0.6.6...v0.6.7)
+
+**Fixed issues:**
+
+- Horizontal Scroll Bar does not work correctly [\#1030](https://github.com/FXMisc/RichtextFX/issues/1030)  ([appsofteng](https://github.com/appsofteng))
+
 ## [v0.6.6](https://github.com/FXMisc/Flowless/tree/v0.6.6) (2021-09-10)
 [Full Changelog](https://github.com/FXMisc/Flowless/compare/v0.6.5...v0.6.6)
 
