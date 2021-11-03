@@ -13,7 +13,7 @@ plugins {
     id 'signing'
 }
 
-version = '0.6.5-SNAPSHOT'
+version = '0.6.8-SNAPSHOT'
 
 repositories {
     mavenCentral()
@@ -35,6 +35,14 @@ dependencies {
     testImplementation "org.testfx:openjfx-monocle:8u76-b04"
 }
 
+jar {
+    manifest {
+        attributes(
+            'Automatic-Module-Name': 'org.fxmisc.flowless'
+        )
+    }
+}
+
 javadoc {
     // ignore missing Javadoc comments or tags
     options.addStringOption('Xdoclint:all,-missing', '-quiet')
@@ -54,6 +62,7 @@ javadoc {
 
 task fatJar(type: Jar, dependsOn: classes) {
     archiveAppendix = 'fat'
+    manifest.attributes( 'Automatic-Module-Name': 'org.fxmisc.flowless' )
     from sourceSets.main.output
     from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
 }
