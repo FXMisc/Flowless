@@ -1,6 +1,8 @@
 Flowless
 ========
 
+Please note that as from version **0.6.5** Flowless requires Java **9**.
+
 Efficient VirtualFlow for JavaFX. VirtualFlow is a layout container that lays out _cells_ in a vertical or horizontal _flow_. The main feature of a _virtual_ flow is that only the currently visible cells are rendered in the scene. You may have a list of thousands of items, but only, say, 30 cells are rendered at any given time.
 
 JavaFX has its own VirtualFlow, which is not part of the public API, but is used, for example, in the implementation of [ListView](https://api.javafx.dev/javafx.controls/javafx/scene/control/ListView.html). It is, however, [not very efficient](https://bugs.openjdk.java.net/browse/JDK-8091726) when updating the viewport on items changed or scroll.
