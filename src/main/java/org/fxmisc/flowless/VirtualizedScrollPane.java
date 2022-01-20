@@ -299,8 +299,8 @@ public class VirtualizedScrollPane<V extends Node & Virtualized> extends Region 
         double layoutHeight = snapSizeY(getLayoutBounds().getHeight());
         boolean vbarVisible = vbar.isVisible();
         boolean hbarVisible = hbar.isVisible();
-        double vbarWidth = snapSizeY(vbarVisible ? vbar.prefWidth(-1) : 0);
-        double hbarHeight = snapSizeX(hbarVisible ? hbar.prefHeight(-1) : 0);
+        double vbarWidth = snapSizeX(vbarVisible ? vbar.prefWidth(-1) : 0);
+        double hbarHeight = snapSizeY(hbarVisible ? hbar.prefHeight(-1) : 0);
 
         double w = layoutWidth - vbarWidth;
         double h = layoutHeight - hbarHeight;
