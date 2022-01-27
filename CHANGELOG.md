@@ -1,5 +1,11 @@
 # Change Log
 
+## [v0.6.8](https://github.com/FXMisc/Flowless/tree/v0.6.8) (2022-01-27)
+[Full Changelog](https://github.com/FXMisc/Flowless/compare/v0.6.7...v0.6.8)
+
+- Corrected swapped X & Y snapsize methods [\#103](https://github.com/FXMisc/Flowless/issues/103)
+- Added auto module to jar manifest
+
 ## [v0.6.7](https://github.com/FXMisc/Flowless/tree/v0.6.7) (2021-10-19)
 [Full Changelog](https://github.com/FXMisc/Flowless/compare/v0.6.6...v0.6.7)
 
