@@ -324,7 +324,7 @@ public class VirtualizedScrollPane<V extends Node & Virtualized> extends Region 
                 pos,
                 content.getLayoutBounds().getWidth(),
                 content.totalWidthEstimateProperty().getValue());
-        content.estimatedScrollXProperty().setValue(offset);
+        content.estimatedScrollXProperty().setValue((double) Math.round(offset));
     }
 
     private void setVPosition(double pos) {
@@ -332,7 +332,9 @@ public class VirtualizedScrollPane<V extends Node & Virtualized> extends Region 
                 pos,
                 content.getLayoutBounds().getHeight(),
                 content.totalHeightEstimateProperty().getValue());
-        content.estimatedScrollYProperty().setValue(offset);
+        // offset needs rounding otherwise thin lines appear between cells,
+        // usually only visible when cells have dark backgrounds/borders.
+        content.estimatedScrollYProperty().setValue((double) Math.round(offset));
     }
 
     private static void setupUnitIncrement(ScrollBar bar) {
