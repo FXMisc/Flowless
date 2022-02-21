@@ -96,7 +96,10 @@ extends Region implements TargetPositionVisitor {
      * and re-lays out the viewport
      */
     public void scrollCurrentPositionBy(double delta) {
-        targetPosition = currentPosition.scrollBy(delta);
+        // delta needs rounding otherwise thin lines appear between cells,
+        // notably when scrolling with a mouse or using a scroll bar and
+        // usually only visible when cells have dark backgrounds/borders.
+        targetPosition = currentPosition.scrollBy(Math.round(delta));
         requestLayout();
     }
 
