@@ -13,14 +13,14 @@ plugins {
     id 'signing'
 }
 
-version = '0.6.8-SNAPSHOT'
+version = '0.6.9-SNAPSHOT'
 
 repositories {
     mavenCentral()
 }
 
-sourceCompatibility = '1.8'
-targetCompatibility = '1.8'
+sourceCompatibility = '1.9'
+targetCompatibility = '1.9'
 
 group = 'org.fxmisc.flowless'
 project.archivesBaseName = 'flowless'

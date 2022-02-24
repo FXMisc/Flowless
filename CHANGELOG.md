@@ -1,5 +1,11 @@
 # Change Log
 
+## [v0.6.9](https://github.com/FXMisc/Flowless/tree/v0.6.9) (2022-02-24)
+[Full Changelog](https://github.com/FXMisc/Flowless/compare/v0.6.8...v0.6.9)
+
+- Fix thin lines between cells [\#105](https://github.com/FXMisc/Flowless/pull/105)
+- Fix thin lines between cells 2 [\#105](https://github.com/FXMisc/Flowless/pull/106)
+
 ## [v0.6.8](https://github.com/FXMisc/Flowless/tree/v0.6.8) (2022-01-27)
 [Full Changelog](https://github.com/FXMisc/Flowless/compare/v0.6.7...v0.6.8)
 
