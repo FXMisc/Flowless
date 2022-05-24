@@ -11,10 +11,10 @@ import org.reactfx.value.Var;
 public interface Virtualized {
 
     Val<Double> totalWidthEstimateProperty();
-    default double getTotalWidthEstimate() { return totalHeightEstimateProperty().getValue(); }
+    default double getTotalWidthEstimate() { return totalHeightEstimateProperty().getOrElse( 0.0 ); }
 
     Val<Double> totalHeightEstimateProperty();
-    default double getTotalHeightEstimate() { return totalHeightEstimateProperty().getValue(); }
+    default double getTotalHeightEstimate() { return totalHeightEstimateProperty().getOrElse( 0.0 ); }
 
     Var<Double> estimatedScrollXProperty();
     default double getEstimatedScrollX() { return estimatedScrollXProperty().getValue(); }
