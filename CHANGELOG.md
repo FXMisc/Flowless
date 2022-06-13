@@ -1,5 +1,11 @@
 # Change Log
 
+## [v0.6.10](https://github.com/FXMisc/Flowless/tree/v0.6.9) (2022-06-13)
+[Full Changelog](https://github.com/FXMisc/Flowless/compare/v0.6.9...v0.6.10)
+
+- Fix Virtualized height NPE [\#107](https://github.com/FXMisc/Flowless/pull/107)
+- Fix first cell rendering [\#109](https://github.com/FXMisc/Flowless/pull/109)
+
 ## [v0.6.9](https://github.com/FXMisc/Flowless/tree/v0.6.9) (2022-02-24)
 [Full Changelog](https://github.com/FXMisc/Flowless/compare/v0.6.8...v0.6.9)
 
