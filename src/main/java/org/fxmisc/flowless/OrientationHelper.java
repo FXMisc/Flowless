@@ -1,9 +1,11 @@
 package org.fxmisc.flowless;
 
+import javafx.application.Platform;
 import javafx.beans.property.DoubleProperty;
 import javafx.geometry.Bounds;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
@@ -259,6 +261,10 @@ final class VerticalHelper implements OrientationHelper {
 
     @Override
     public double prefLength(Node node, double breadth) {
+        if ( node.getScene() == null && node instanceof Parent ) {
+            Platform.runLater( () -> ((Parent) node).requestLayout() );
+            // Need to redo this as prefHeight maybe incorrect
+        }
         return node.prefHeight(breadth);
     }
 
