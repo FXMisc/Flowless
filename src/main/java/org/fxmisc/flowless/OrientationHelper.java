@@ -259,6 +259,10 @@ final class VerticalHelper implements OrientationHelper {
 
     @Override
     public double prefLength(Node node, double breadth) {
+        if ( node.getScene() == null && node instanceof Parent ) {
+            Platform.runLater( () -> ((Parent) node).requestLayout() );
+            // Need to redo this as prefHeight maybe incorrect
+        }
         return node.prefHeight(breadth);
     }
 
