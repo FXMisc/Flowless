@@ -146,6 +146,8 @@ extends Region implements TargetPositionVisitor {
         int begin = Math.max( 0, getFirstVisibleIndex() );
         int end = Math.max( itemIndex, getLastVisibleIndex() );
         positioner.cropTo( Math.min( begin, itemIndex ), end+1 );
+        // Needed for correct layout in some situations
+        sizeTracker.getAverageLengthEstimate();
     }
 
     @Override
