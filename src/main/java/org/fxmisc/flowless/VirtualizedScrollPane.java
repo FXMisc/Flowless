@@ -6,13 +6,12 @@ import javafx.application.Platform;
 import javafx.beans.DefaultProperty;
 import javafx.beans.NamedArg;
 import javafx.beans.Observable;
-import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.value.ChangeListener;
 import javafx.css.PseudoClass;
 import javafx.geometry.Bounds;
+import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
-import javafx.scene.Node;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.Region;
@@ -21,7 +20,7 @@ import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
 @DefaultProperty("content")
-public class VirtualizedScrollPane<V extends Node & Virtualized> extends Region implements Virtualized {
+public class VirtualizedScrollPane<V extends Region & Virtualized> extends Region implements Virtualized {
 
     private static final PseudoClass CONTENT_FOCUSED = PseudoClass.getPseudoClass("content-focused");
 
@@ -84,12 +83,14 @@ public class VirtualizedScrollPane<V extends Node & Virtualized> extends Region 
         hPosEstimate = Val.combine(
                     content.estimatedScrollXProperty(),
                     Val.map(content.layoutBoundsProperty(), Bounds::getWidth),
+                    Val.map(content.paddingProperty(), p -> p.getLeft() + p.getRight()),
                     content.totalWidthEstimateProperty(),
                     VirtualizedScrollPane::offsetToScrollbarPosition)
                 .asVar(this::setHPosition);
        vPosEstimate = Val.combine(
                     content.estimatedScrollYProperty(),
                     Val.map(content.layoutBoundsProperty(), Bounds::getHeight),
+                    Val.map(content.paddingProperty(), p -> p.getTop() + p.getBottom()),
                     content.totalHeightEstimateProperty(),
                     VirtualizedScrollPane::offsetToScrollbarPosition)
                 .orElseConst(0.0)
@@ -320,17 +321,21 @@ public class VirtualizedScrollPane<V extends Node & Virtualized> extends Region 
     }
 
     private void setHPosition(double pos) {
+        Insets padding = content.getPadding();
         double offset = scrollbarPositionToOffset(
                 pos,
                 content.getLayoutBounds().getWidth(),
+                padding.getLeft() + padding.getRight(),
                 content.totalWidthEstimateProperty().getValue());
         content.estimatedScrollXProperty().setValue((double) Math.round(offset));
     }
 
     private void setVPosition(double pos) {
+        Insets padding = content.getPadding();
         double offset = scrollbarPositionToOffset(
                 pos,
                 content.getLayoutBounds().getHeight(),
+                padding.getTop() + padding.getBottom(),
                 content.totalHeightEstimateProperty().getValue());
         // offset needs rounding otherwise thin lines appear between cells,
         // usually only visible when cells have dark backgrounds/borders.
@@ -353,16 +358,16 @@ public class VirtualizedScrollPane<V extends Node & Virtualized> extends Region 
     }
 
     private static double offsetToScrollbarPosition(
-            double contentOffset, double viewportSize, double contentSize) {
+            double contentOffset, double viewportSize, double padding, double contentSize) {
         return contentSize > viewportSize
-                ? contentOffset / (contentSize - viewportSize) * contentSize
+                ? contentOffset / (contentSize - viewportSize + padding) * contentSize
                 : 0;
     }
 
     private static double scrollbarPositionToOffset(
-            double scrollbarPos, double viewportSize, double contentSize) {
+            double scrollbarPos, double viewportSize, double padding, double contentSize) {
         return contentSize > viewportSize
-                ? scrollbarPos / contentSize * (contentSize - viewportSize)
+                ? scrollbarPos / contentSize * (contentSize - viewportSize + padding)
                 : 0;
     }
 }
