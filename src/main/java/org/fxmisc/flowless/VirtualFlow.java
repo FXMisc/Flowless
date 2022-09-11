@@ -523,7 +523,7 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
         double total = totalLengthEstimateProperty().getOrElse(0.0);
         double length = sizeTracker.getViewportLength();
         double max = Math.max(total - length, 0);
-        double current = lengthOffsetEstimate.getValue();
+        double current = Math.round(lengthOffsetEstimate.getValue());
 
         if(pixels > max) pixels = max;
         if(pixels < 0) pixels = 0;
