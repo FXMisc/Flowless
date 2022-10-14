@@ -327,7 +327,9 @@ public class VirtualizedScrollPane<V extends Region & Virtualized> extends Regio
                 content.getLayoutBounds().getWidth(),
                 padding.getLeft() + padding.getRight(),
                 content.totalWidthEstimateProperty().getValue());
-        content.estimatedScrollXProperty().setValue((double) Math.round(offset));
+        if ( content.estimatedScrollXProperty().getValue() != offset ) {
+            content.estimatedScrollXProperty().setValue(offset);
+        }
     }
 
     private void setVPosition(double pos) {
@@ -337,9 +339,9 @@ public class VirtualizedScrollPane<V extends Region & Virtualized> extends Regio
                 content.getLayoutBounds().getHeight(),
                 padding.getTop() + padding.getBottom(),
                 content.totalHeightEstimateProperty().getValue());
-        // offset needs rounding otherwise thin lines appear between cells,
-        // usually only visible when cells have dark backgrounds/borders.
-        content.estimatedScrollYProperty().setValue((double) Math.round(offset));
+        if ( content.estimatedScrollYProperty().getValue() != offset ) {
+            content.estimatedScrollYProperty().setValue(offset);
+        }
     }
 
     private static void setupUnitIncrement(ScrollBar bar) {
@@ -360,14 +362,16 @@ public class VirtualizedScrollPane<V extends Region & Virtualized> extends Regio
     private static double offsetToScrollbarPosition(
             double contentOffset, double viewportSize, double padding, double contentSize) {
         return contentSize > viewportSize
-                ? contentOffset / (contentSize - viewportSize + padding) * contentSize
+                // rounding otherwise thin lines appear between cells, only visible with dark backgrounds/borders
+                ? (double) Math.round( contentOffset / (contentSize - viewportSize + padding) * contentSize )
                 : 0;
     }
 
     private static double scrollbarPositionToOffset(
             double scrollbarPos, double viewportSize, double padding, double contentSize) {
         return contentSize > viewportSize
-                ? scrollbarPos / contentSize * (contentSize - viewportSize + padding)
+                // rounding otherwise thin lines appear between cells, only visible with dark backgrounds/borders
+                ? (double) Math.round( scrollbarPos / contentSize * (contentSize - viewportSize + padding) )
                 : 0;
     }
 }

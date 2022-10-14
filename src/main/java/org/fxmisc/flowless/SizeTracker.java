@@ -3,15 +3,19 @@ package org.fxmisc.flowless;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableObjectValue;
 import javafx.geometry.Bounds;
 import javafx.scene.control.IndexRange;
 
+import org.reactfx.EventStream;
 import org.reactfx.EventStreams;
 import org.reactfx.Subscription;
 import org.reactfx.collection.LiveList;
 import org.reactfx.collection.MemoizationList;
+import org.reactfx.util.Tuple3;
 import org.reactfx.value.Val;
 import org.reactfx.value.ValBase;
 
@@ -56,9 +60,14 @@ final class SizeTracker {
         this.viewportBounds = viewportBounds;
         this.cells = lazyCells;
         this.breadths = lazyCells.map(orientation::minBreadth).memoize();
-        this.maxKnownMinBreadth = breadths.memoizedItems()
-                .reduce(Math::max)
-                .orElseConst(0.0);
+        LiveList<Double> knownBreadths = this.breadths.memoizedItems();
+
+        this.maxKnownMinBreadth = Val.create(
+                () -> knownBreadths.stream().mapToDouble( Double::doubleValue ).max().orElse(0.0),
+                // skips spurious events resulting from cell replacement (delete then add again)
+                knownBreadths.changes().successionEnds( Duration.ofMillis( 15 ) )
+        );
+
         this.breadthForCells = Val.combine(
                 maxKnownMinBreadth,
                 viewportBounds,
@@ -69,37 +78,52 @@ final class SizeTracker {
                 .map(breadth -> cell -> orientation.prefLength(cell, breadth));
 
         this.lengths = cells.mapDynamic(lengthFn).memoize();
-
         LiveList<Double> knownLengths = this.lengths.memoizedItems();
-        Val<Double> sumOfKnownLengths = knownLengths.reduce((a, b) -> a + b).orElseConst(0.0);
-        Val<Integer> knownLengthCount = knownLengths.sizeProperty();
 
-        this.averageLengthEstimate = Val.create(
-                () -> {
-                    // make sure to use pref lengths of all present cells
-                    for(int i = 0; i < cells.getMemoizedCount(); ++i) {
-                        int j = cells.indexOfMemoizedItem(i);
-                        lengths.force(j, j + 1);
-                    }
+        Supplier<Double> averageKnownLengths = () -> {
+            // make sure to use pref lengths of all present cells
+            for(int i = 0; i < cells.getMemoizedCount(); ++i) {
+                int j = cells.indexOfMemoizedItem(i);
+                lengths.force(j, j + 1);
+            }
 
-                    int count = knownLengthCount.getValue();
-                    return count == 0
-                            ? null
-                            : sumOfKnownLengths.getValue() / count;
-                },
-                sumOfKnownLengths, knownLengthCount);
+            return knownLengths.stream()
+                .mapToDouble( Double::doubleValue )
+                .sorted().average()
+                .orElse( 0.0 );
+        };
 
-        this.totalLengthEstimate = Val.combine(
-                averageLengthEstimate, cells.sizeProperty(),
-                (avg, n) -> n * avg);
+        final int AVERAGE_LENGTH = 0, TOTAL_LENGTH = 1;
+        Val<double[/*average,total*/]> lengthStats = Val.wrap(
+                knownLengths.changes().or( cells.sizeProperty().values() )
+                .successionEnds( Duration.ofMillis( 15 ) ) // reduce noise
+                .map( e -> {
+                    double averageLength = averageKnownLengths.get();
+                    int cellCount = e.isRight() ? e.getRight() : cells.size();
+                    return new double[] { averageLength, cellCount * averageLength };
+                } ).toBinding( new double[] { 0.0, 0.0 } )
+        );
+
+        EventStream<double[/*average,total*/]> filteredLengthStats;
+        // briefly hold back changes that may be from spurious events coming from cell refreshes, these
+        // are identified as those where the estimated total length is less than the previous event.
+        filteredLengthStats = new PausableSuccessionStream<>( lengthStats.changes(), Duration.ofMillis(1000), chg -> {
+                double[/*average,total*/] oldStats = chg.getOldValue();
+                double[/*average,total*/] newStats = chg.getNewValue();
+                if ( newStats[TOTAL_LENGTH] < oldStats[TOTAL_LENGTH] ) {
+                    return false; // don't emit yet, first wait & prefer newer values
+                }
+                return true;
+        } )
+        .map( chg -> chg.getNewValue() );
+
+        this.averageLengthEstimate = Val.wrap( filteredLengthStats.map( stats -> stats[AVERAGE_LENGTH] ).toBinding( 0.0 ) );
+        this.totalLengthEstimate = Val.wrap( filteredLengthStats.map( stats -> stats[TOTAL_LENGTH] ).toBinding( 0.0 ) );
 
         Val<Integer> firstVisibleIndex = Val.create(
                 () -> cells.getMemoizedCount() == 0 ? null : cells.indexOfMemoizedItem(0),
                 cells, cells.memoizedItems()); // need to observe cells.memoizedItems()
                 // as well, because they may change without a change in cells.
-
-        Val<? extends Cell<?, ?>> firstVisibleCell = cells.memoizedItems()
-                .collapse(visCells -> visCells.isEmpty() ? null : visCells.get(0));
 
         Val<Integer> knownLengthCountBeforeFirstVisibleCell = Val.create(() -> {
             return firstVisibleIndex.getOpt()
@@ -117,17 +141,23 @@ final class SizeTracker {
                 averageLengthEstimate,
                 (firstIdx, knownCnt, avgLen) -> (firstIdx - knownCnt) * avgLen);
 
-        Val<Double> firstCellMinY = firstVisibleCell.flatMap(orientation::minYProperty);
+        Val<Double> firstCellMinY = cells.memoizedItems()
+                .collapse(visCells -> visCells.isEmpty() ? null : visCells.get(0))
+                .flatMap(orientation::minYProperty);
 
-        lengthOffsetEstimate = Val.wrap( EventStreams.combine(
+        EventStream<Tuple3<Double, Double, Double>> lengthOffsetStream = EventStreams.combine(
             totalKnownLengthBeforeFirstVisibleCell.values(),
             unknownLengthEstimateBeforeFirstVisibleCell.values(),
             firstCellMinY.values()
-         )
-        .filter( t3 -> t3.test( (a,b,minY) -> a != null && b != null && minY != null ) )
-        .thenRetainLatestFor( Duration.ofMillis( 1 ) )
-        .map( t3 -> t3.map( (a,b,minY) -> Double.valueOf( a + b - minY ) ) )
-        .toBinding( 0.0 ) );
+        );
+
+        lengthOffsetEstimate = Val.wrap(
+           // skip spurious events resulting from cell replacement (delete then add again), except
+           // when immediateUpdate is true: activated via updateNextLengthOffsetEstimateImmediately()
+           new PausableSuccessionStream<>( lengthOffsetStream, Duration.ofMillis(15), immediateUpdate )
+            .filter( t3 -> t3.test( (a,b,minY) -> a != null && b != null && minY != null ) )
+            .map( t3 -> t3.map( (a,b,minY) -> Double.valueOf( Math.round( a + b - minY ) ) ) )
+            .toBinding( 0.0 ) );
 
         // pinning totalLengthEstimate and lengthOffsetEstimate
         // binds it all together and enables memoization
@@ -135,6 +165,9 @@ final class SizeTracker {
                 totalLengthEstimate.pin(),
                 lengthOffsetEstimate.pin());
     }
+
+    private SimpleBooleanProperty immediateUpdate = new SimpleBooleanProperty();
+    void updateNextLengthOffsetEstimateImmediately() { immediateUpdate.set( true ); }
 
     private static <T> Val<T> avoidFalseInvalidations(Val<T> src) {
         return new ValBase<T>() {

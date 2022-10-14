@@ -17,8 +17,8 @@ import org.reactfx.value.Var;
  *     VirtualizedScrollPane<ScaledVirtualized> vsPane = new VirtualizedScrollPane(wrapper);
  *
  *     // To scale actualContent without also scaling vsPane's scrollbars:
- *     wrapper.scaleProperty().setY(3);
- *     wrapper.scaleProperty().setX(2);
+ *     wrapper.getZoom().setY(3);
+ *     wrapper.getZoom().setX(2);
  *     }
  * </pre>
  *
@@ -51,13 +51,13 @@ public class ScaledVirtualized<V extends Node & Virtualized> extends Region impl
         );
         estScrollX = Var.mapBidirectional(
                 content.estimatedScrollXProperty(),
-                scrollX -> scrollX * zoom.getX(),
-                scrollX -> scrollX / zoom.getX()
+                scrollX -> (double) Math.round( scrollX * zoom.getX() ),
+                scrollX -> (double) Math.round( scrollX / zoom.getX() )
         );
         estScrollY = Var.mapBidirectional(
                 content.estimatedScrollYProperty(),
-                scrollY -> scrollY * zoom.getY(),
-                scrollY -> scrollY / zoom.getY()
+                scrollY -> (double) Math.round( scrollY * zoom.getY() ),
+                scrollY -> (double) Math.round( scrollY / zoom.getY() )
         );
 
         zoom.xProperty()     .addListener((obs, ov, nv) -> requestLayout());
