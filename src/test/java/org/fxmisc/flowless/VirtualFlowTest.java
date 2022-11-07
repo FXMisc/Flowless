@@ -5,6 +5,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
+import org.testfx.util.WaitForAsyncUtils;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -22,8 +23,8 @@ public class VirtualFlowTest extends FlowlessTestBase {
         vf.layout();
 
         vf.show(110.0);
-        vf.show(110.0);
         vf.layout();
+
         assertEquals(-10.0, rect.getBoundsInParent().getMinY(), 0.01);
     }
 
@@ -36,9 +37,10 @@ public class VirtualFlowTest extends FlowlessTestBase {
         vf.resize(100, 100); // size of VirtualFlow less than that of the cell
         vf.layout();
 
-        vf.setLengthOffset(10.0);
-        vf.setLengthOffset(10.0);
+        WaitForAsyncUtils.waitForFxEvents();
+        vf.setLengthOffset( 10 );
         vf.layout();
+
         assertEquals(-10.0, rect.getBoundsInParent().getMinY(), 0.01);
     }
 
@@ -65,12 +67,14 @@ public class VirtualFlowTest extends FlowlessTestBase {
         vf.layout();
         assertSame(visibleCells.get(0), vf.getCell(vf.getFirstVisibleIndex()));
         assertSame(visibleCells.get(visibleCells.size() - 1), vf.getCell(vf.getLastVisibleIndex()));
-        assertTrue(vf.getFirstVisibleIndex() <= 50 && 50 <= vf.getLastVisibleIndex());
+        assertTrue(vf.getFirstVisibleIndex() > 40 && vf.getFirstVisibleIndex() <= 50);
+        assertTrue(vf.getLastVisibleIndex() >= 50);
 
         vf.show(99);
         vf.layout();
         assertSame(visibleCells.get(0), vf.getCell(vf.getFirstVisibleIndex()));
         assertSame(visibleCells.get(visibleCells.size() - 1), vf.getCell(vf.getLastVisibleIndex()));
-        assertTrue(vf.getFirstVisibleIndex() <= 99 && 99 <= vf.getLastVisibleIndex());
+        assertTrue(vf.getFirstVisibleIndex() > 50 && vf.getFirstVisibleIndex() <= 99);
+        assertTrue(vf.getLastVisibleIndex() >= 99);
     }
 }

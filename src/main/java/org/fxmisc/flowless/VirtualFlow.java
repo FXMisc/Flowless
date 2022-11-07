@@ -180,7 +180,7 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
                 layoutBoundsProperty(),
                 b -> new Rectangle(b.getWidth(), b.getHeight())));
 
-        lengthOffsetEstimate = new StableBidirectionalVar<>( sizeTracker.lengthOffsetEstimateProperty(), this::setLengthOffset );
+        lengthOffsetEstimate = sizeTracker.lengthOffsetEstimateProperty().asVar(this::setLengthOffset);
 
         // scroll content by mouse scroll
         this.addEventHandler(ScrollEvent.ANY, se -> {
@@ -532,6 +532,7 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
         if(diff == 0) {
             // do nothing
         } else if(Math.abs(diff) <= length) { // distance less than one screen
+            sizeTracker.updateNextLengthOffsetEstimateImmediately();
             navigator.scrollCurrentPositionBy(diff);
         } else {
             jumpToAbsolutePosition(pixels);
