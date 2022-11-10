@@ -13,7 +13,7 @@ plugins {
     id 'signing'
 }
 
-version = '0.6.9-SNAPSHOT'
+version = '0.7.1-SNAPSHOT'
 
 repositories {
     mavenCentral()
@@ -52,8 +52,8 @@ javadoc {
 
     options.links = [
             // resolve links to Java and JavaFX Javadocs
-            'http://docs.oracle.com/javase/8/docs/api/',
-            'http://docs.oracle.com/javase/8/javafx/api/',
+            'http://docs.oracle.com/javase/9/docs/api/',
+            'http://docs.oracle.com/javase/9/javafx/api/',
 
             // resolve links to ReactFX
             'https://www.javadoc.io/doc/org.reactfx/reactfx/2.0-M5/'

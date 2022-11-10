@@ -1,6 +1,15 @@
 # Change Log
 
-## [v0.6.10](https://github.com/FXMisc/Flowless/tree/v0.6.9) (2022-06-13)
+## [v0.7.0](https://github.com/FXMisc/Flowless/tree/v0.7.0) (2022-11-10)
+[Full Changelog](https://github.com/FXMisc/Flowless/compare/v0.6.10...v0.7.0)
+
+- Fix first cell not showing sometimes [\#110](https://github.com/FXMisc/Flowless/pull/110)
+- Take padding into account when scrolling [\#111](https://github.com/FXMisc/Flowless/pull/111)
+- Fix for scrolling [\#112](https://github.com/FXMisc/Flowless/pull/112)
+- Fix wrapped text scrollbar flicker [\#113](https://github.com/FXMisc/Flowless/pull/113)
+- Removed scroll noise and improved bidirectional binding behavior [\#113](https://github.com/FXMisc/Flowless/pull/113)
+
+## [v0.6.10](https://github.com/FXMisc/Flowless/tree/v0.6.10) (2022-06-13)
 [Full Changelog](https://github.com/FXMisc/Flowless/compare/v0.6.9...v0.6.10)
 
 - Fix Virtualized height NPE [\#107](https://github.com/FXMisc/Flowless/pull/107)
