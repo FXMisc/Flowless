@@ -1,5 +1,10 @@
 # Change Log
 
+## [v0.7.1](https://github.com/FXMisc/Flowless/tree/v0.7.1) (2023-07-03)
+[Full Changelog](https://github.com/FXMisc/Flowless/compare/v0.7.0...v0.7.1)
+
+- SizeTracker catch IOOB & NoSuchElement exceptions
+
 ## [v0.7.0](https://github.com/FXMisc/Flowless/tree/v0.7.0) (2022-11-10)
 [Full Changelog](https://github.com/FXMisc/Flowless/compare/v0.6.10...v0.7.0)
 
