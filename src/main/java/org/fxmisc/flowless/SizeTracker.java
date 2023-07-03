@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.NoSuchElementException;
 
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableObjectValue;
@@ -82,10 +83,12 @@ final class SizeTracker {
 
         Supplier<Double> averageKnownLengths = () -> {
             // make sure to use pref lengths of all present cells
-            for(int i = 0; i < cells.getMemoizedCount(); ++i) {
+            for(int i = 0; i < cells.getMemoizedCount(); ++i) try {
                 int j = cells.indexOfMemoizedItem(i);
                 lengths.force(j, j + 1);
             }
+            catch ( IndexOutOfBoundsException IX ) {}
+            catch ( NoSuchElementException EX ) {}
 
             return knownLengths.stream()
                 .mapToDouble( Double::doubleValue )
