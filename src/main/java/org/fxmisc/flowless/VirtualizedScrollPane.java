@@ -128,12 +128,14 @@ public class VirtualizedScrollPane<V extends Region & Virtualized> extends Regio
         Val<Double> layoutHeight = Val.map(layoutBoundsProperty(), Bounds::getHeight);
         Val<Boolean> needsHBar0 = Val.combine(
                 content.totalWidthEstimateProperty(),
+                content.paddingProperty(),
                 layoutWidth,
-                (cw, lw) -> cw > lw);
+                (cw, cp, lw) -> cw + cp.getLeft() + cp.getRight() > lw);
         Val<Boolean> needsVBar0 = Val.combine(
                 content.totalHeightEstimateProperty(),
+                content.paddingProperty(),
                 layoutHeight,
-                (ch, lh) -> ch > lh);
+                (ch, cp, lh) -> ch + cp.getTop() + cp.getBottom() > lh);
         Val<Boolean> needsHBar = Val.combine(
                 needsHBar0,
                 needsVBar0,
