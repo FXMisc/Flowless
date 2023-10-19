@@ -79,18 +79,21 @@ public class VirtualizedScrollPane<V extends Region & Virtualized> extends Regio
         hbar.blockIncrementProperty().bind(hbar.visibleAmountProperty());
         vbar.blockIncrementProperty().bind(vbar.visibleAmountProperty());
 
+        Val<Double> hContentPadding = Val.map(content.paddingProperty(), p -> p.getLeft() + p.getRight());
+        Val<Double> vContentPadding = Val.map(content.paddingProperty(), p -> p.getTop() + p.getBottom());
+
         // scrollbar positions
         hPosEstimate = Val.combine(
                     content.estimatedScrollXProperty(),
                     Val.map(content.layoutBoundsProperty(), Bounds::getWidth),
-                    Val.map(content.paddingProperty(), p -> p.getLeft() + p.getRight()),
+                    hContentPadding,
                     content.totalWidthEstimateProperty(),
                     VirtualizedScrollPane::offsetToScrollbarPosition)
                 .asVar(this::setHPosition);
        vPosEstimate = Val.combine(
                     content.estimatedScrollYProperty(),
                     Val.map(content.layoutBoundsProperty(), Bounds::getHeight),
-                    Val.map(content.paddingProperty(), p -> p.getTop() + p.getBottom()),
+                    vContentPadding,
                     content.totalHeightEstimateProperty(),
                     VirtualizedScrollPane::offsetToScrollbarPosition)
                 .orElseConst(0.0)
@@ -128,28 +131,30 @@ public class VirtualizedScrollPane<V extends Region & Virtualized> extends Regio
         Val<Double> layoutHeight = Val.map(layoutBoundsProperty(), Bounds::getHeight);
         Val<Boolean> needsHBar0 = Val.combine(
                 content.totalWidthEstimateProperty(),
-                content.paddingProperty(),
+                hContentPadding,
                 layoutWidth,
-                (cw, cp, lw) -> cw + cp.getLeft() + cp.getRight() > lw);
+                (cw, hcp, lw) -> cw + hcp > lw);
         Val<Boolean> needsVBar0 = Val.combine(
                 content.totalHeightEstimateProperty(),
-                content.paddingProperty(),
+                vContentPadding,
                 layoutHeight,
-                (ch, cp, lh) -> ch + cp.getTop() + cp.getBottom() > lh);
+                (ch, vcp, lh) -> ch + vcp > lh);
         Val<Boolean> needsHBar = Val.combine(
                 needsHBar0,
                 needsVBar0,
                 content.totalWidthEstimateProperty(),
+                hContentPadding,
                 vbar.widthProperty(),
                 layoutWidth,
-                (needsH, needsV, cw, vbw, lw) -> needsH || needsV && cw + vbw.doubleValue() > lw);
+                (needsH, needsV, cw, hcp, vbw, lw) -> needsH || needsV && cw + hcp + vbw.doubleValue() > lw);
         Val<Boolean> needsVBar = Val.combine(
                 needsVBar0,
                 needsHBar0,
                 content.totalHeightEstimateProperty(),
+                vContentPadding,
                 hbar.heightProperty(),
                 layoutHeight,
-                (needsV, needsH, ch, hbh, lh) -> needsV || needsH && ch + hbh.doubleValue() > lh);
+                (needsV, needsH, ch, vcp, hbh, lh) -> needsV || needsH && ch + vcp + hbh.doubleValue() > lh);
 
         Val<Boolean> shouldDisplayHorizontal = Val.flatMap(hbarPolicy, policy -> {
             switch (policy) {
