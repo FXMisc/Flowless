@@ -77,6 +77,8 @@ Include Flowless in your project
 | :---------:         | :---------: | :-----: |
 | org.fxmisc.flowless | flowless    | 0.7.2   |
 
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.fxmisc.flowless/flowless/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.fxmisc.flowless/flowless)
+
 #### Gradle example
 
 ```groovy
