@@ -101,8 +101,11 @@ final class SizeTracker {
                 knownLengths.changes().or( cells.sizeProperty().values() )
                 .successionEnds( Duration.ofMillis( 15 ) ) // reduce noise
                 .map( e -> {
+                	if ( e != null && e.isRight() && e.getRight() != null ) return e.getRight();
+                	return cells.size();
+                } )
+                .map( cellCount -> {
                     double averageLength = averageKnownLengths.get();
-                    int cellCount = e.isRight() ? e.getRight() : cells.size();
                     return new double[] { averageLength, cellCount * averageLength };
                 } ).toBinding( new double[] { 0.0, 0.0 } )
         );
@@ -158,7 +161,7 @@ final class SizeTracker {
            // skip spurious events resulting from cell replacement (delete then add again), except
            // when immediateUpdate is true: activated via updateNextLengthOffsetEstimateImmediately()
            new PausableSuccessionStream<>( lengthOffsetStream, Duration.ofMillis(15), immediateUpdate )
-            .filter( t3 -> t3.test( (a,b,minY) -> a != null && b != null && minY != null ) )
+            .filter( t3 -> t3 != null && t3.test( (a,b,minY) -> a != null && b != null && minY != null ) )
             .map( t3 -> t3.map( (a,b,minY) -> Double.valueOf( Math.round( a + b - minY ) ) ) )
             .toBinding( 0.0 ) );
 
