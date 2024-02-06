@@ -142,7 +142,7 @@ final class SizeTracker {
                 (a, b) -> a + b).orElseConst(0.0);
 
         Val<Double> unknownLengthEstimateBeforeFirstVisibleCell = Val.combine(
-                firstVisibleIndex,
+                firstVisibleIndex.orElseConst(0),
                 knownLengthCountBeforeFirstVisibleCell,
                 averageLengthEstimate,
                 (firstIdx, knownCnt, avgLen) -> (firstIdx - knownCnt) * avgLen);
