@@ -1,5 +1,10 @@
 # Change Log
 
+## [v0.7.3](https://github.com/FXMisc/Flowless/tree/v0.7.3) (2024-05-14)
+[Full Changelog](https://github.com/FXMisc/Flowless/compare/v0.7.2...v0.7.3)
+
+- Fixed NPE in SizeTracker (x3)
+
 ## [v0.7.2](https://github.com/FXMisc/Flowless/tree/v0.7.2) (2023-10-20)
 [Full Changelog](https://github.com/FXMisc/Flowless/compare/v0.7.1...v0.7.2)
 
