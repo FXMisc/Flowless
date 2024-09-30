@@ -5,7 +5,7 @@ Please note that as from version **0.6.5** Flowless requires Java 9 or newer.
 
 Efficient VirtualFlow for JavaFX. VirtualFlow is a layout container that lays out _cells_ in a vertical or horizontal _flow_. The main feature of a _virtual_ flow is that only the currently visible cells are rendered in the scene. You may have a list of thousands of items, but only, say, 30 cells are rendered at any given time.
 
-JavaFX has its own VirtualFlow, which is not part of the public API, but is used, for example, in the implementation of [ListView](https://api.javafx.dev/javafx.controls/javafx/scene/control/ListView.html). It is, however, [not very efficient](https://bugs.openjdk.java.net/browse/JDK-8091726) when updating the viewport on items changed or scroll.
+JavaFX has its own VirtualFlow, which is not part of the public API, but is used, for example, in the implementation of [ListView](https://openjfx.io/javadoc/23/javafx.controls/javafx/scene/control/ListView.html). It is, however, [not very efficient](https://bugs.openjdk.java.net/browse/JDK-8091726) when updating the viewport on items changed or scroll.
 
 Here is a comparison of JavaFX's ListView vs. Flowless on a list of 80 items, 25 of which fit into the viewport.
 
@@ -24,7 +24,7 @@ Here is the [source code](https://gist.github.com/Jugen/2d392fd72ebec9db3c5d2aca
 Use case for Flowless
 ---------------------
 
-You will benefit from Flowless (compared to ListView) the most if you have many add/delete items occuring in the viewport and an expensive [updateItem](https://api.javafx.dev/javafx.controls/javafx/scene/control/Cell.html#updateItem(T,boolean)) method.
+You will benefit from Flowless (compared to ListView) the most if you have many add/delete items occuring in the viewport and an expensive [updateItem](https://openjfx.io/javadoc/23/javafx.controls/javafx/scene/control/Cell.html#updateItem(T,boolean)) method.
 
 Note, however, that Flowless is a low-level layout component and does not provide higher-level features like selection model or inline editing. One can, of course, implement those on top of Flowless.
 
@@ -48,7 +48,7 @@ VirtualFlow in Flowless provides additional public API compared to ListView or V
 Conceptual differences from ListView
 ------------------------------------
 
-**Dumb cells.** This is the most important difference. For Flowless, cells are just [Node](https://api.javafx.dev/javafx.graphics/javafx/scene/Node.html)s and don't encapsulate any logic regarding virtual flow. A cell does not even necessarily store the index of the item it is displaying. This allows VirtualFlow to have complete control over when the cells are created and/or updated.
+**Dumb cells.** This is the most important difference. For Flowless, cells are just [Node](https://openjfx.io/javadoc/23/javafx.graphics/javafx/scene/Node.html)s and don't encapsulate any logic regarding virtual flow. A cell does not even necessarily store the index of the item it is displaying. This allows VirtualFlow to have complete control over when the cells are created and/or updated.
 
 **Cell reuse is opt-in,** not forced. Cells are not reused by default. A new cell is created for each item. This simplifies cell implementation and does not impair performance if reusing a cell would be about as expensive as creating a new one (i.e. `updateItem` would be expensive).
 
