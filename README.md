@@ -33,15 +33,15 @@ Additional API
 
 VirtualFlow in Flowless provides additional public API compared to ListView or VirtualFlow from JavaFX.
 
-**Direct cell access** with [getCell(itemIndex)](http://www.fxmisc.org/flowless/javadoc/org/fxmisc/flowless/VirtualFlow.html#getCell-int-) and [getCellIfVisible(itemIndex)](http://www.fxmisc.org/flowless/javadoc/org/fxmisc/flowless/VirtualFlow.html#getCellIfVisible-int-) methods. This is useful for measurement purposes.
+**Direct cell access** with [getCell(itemIndex)](https://fxmisc.github.io/flowless/javadoc/0.7.0/org/fxmisc/flowless/VirtualFlow.html#getCell-int-) and [getCellIfVisible(itemIndex)](https://fxmisc.github.io/flowless/javadoc/0.7.0/org/fxmisc/flowless/VirtualFlow.html#getCellIfVisible-int-) methods. This is useful for measurement purposes.
 
-**List of currently visible cells** via [visibleCells()](http://www.fxmisc.org/flowless/javadoc/org/fxmisc/flowless/VirtualFlow.html#visibleCells--).
+**List of currently visible cells** via [visibleCells()](https://fxmisc.github.io/flowless/javadoc/0.7.0/org/fxmisc/flowless/VirtualFlow.html#visibleCells--).
 
-**Hit test** with the [hit(double x, double y)](http://www.fxmisc.org/flowless/javadoc/org/fxmisc/flowless/VirtualFlow.html#hit-double-double-) method that converts viewport coordinates into a cell index and coordinates relative to the cell, or indicates that the hit is before or beyond the cells.
+**Hit test** with the [hit(double x, double y)](https://fxmisc.github.io/flowless/javadoc/0.7.0/org/fxmisc/flowless/VirtualFlow.html#hit-double-double-) method that converts viewport coordinates into a cell index and coordinates relative to the cell, or indicates that the hit is before or beyond the cells.
 
-**Navigate to a subregion of a cell** using the [show(itemIndex, region)](http://www.fxmisc.org/flowless/javadoc/org/fxmisc/flowless/VirtualFlow.html#show-int-javafx.geometry.Bounds-) method. This is a finer grained navigation than just the [show(itemIndex)](http://www.fxmisc.org/flowless/javadoc/org/fxmisc/flowless/VirtualFlow.html#show-int-) method.
+**Navigate to a subregion of a cell** using the [show(itemIndex, region)](https://fxmisc.github.io/flowless/javadoc/0.7.0/org/fxmisc/flowless/VirtualFlow.html#show-int-javafx.geometry.Bounds-) method. This is a finer grained navigation than just the [show(itemIndex)](https://fxmisc.github.io/flowless/javadoc/0.7.0/org/fxmisc/flowless/VirtualFlow.html#show-int-) method.
 
-**Scroll:** [scrollX(deltaX)](http://www.fxmisc.org/flowless/javadoc/org/fxmisc/flowless/VirtualFlow.html#scrollX-double-) and [scrollY(deltaY)](http://www.fxmisc.org/flowless/javadoc/org/fxmisc/flowless/VirtualFlow.html#scrollY-double-) methods.
+**Scroll:** [scrollXBy(deltaX)](https://fxmisc.github.io/flowless/javadoc/0.7.0/org/fxmisc/flowless/VirtualFlow.html#scrollXBy-double-) and [scrollYBy(deltaY)](https://fxmisc.github.io/flowless/javadoc/0.7.0/org/fxmisc/flowless/VirtualFlow.html#scrollYBy-double-) methods.
 
 **Gravity:** You can create VirtualFlow where cells stick to the bottom (vertical flow) or right (horizontal flow) when there are not enough items to fill the viewport.
 
@@ -100,4 +100,4 @@ Download the [0.7.3 jar](https://github.com/FXMisc/Flowless/releases/tag/v0.7.3)
 Documentation
 -------------
 
-[Javadoc](http://fxmisc.github.io/flowless/javadoc/0.7.0/org/fxmisc/flowless/package-summary.html)
+[Javadoc](https://fxmisc.github.io/flowless/javadoc/0.7.0/org/fxmisc/flowless/package-summary.html)
