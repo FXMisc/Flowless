@@ -121,10 +121,10 @@ final class SizeTracker {
                 .flatMap(orientation::minYProperty);
 
         lengthOffsetEstimate = Val.combine(
-            totalKnownLengthBeforeFirstVisibleCell,
-            unknownLengthEstimateBeforeFirstVisibleCell,
-            firstCellMinY,
-            (a, b, minY) -> Double.valueOf(Math.round(a + b - minY))
+                totalKnownLengthBeforeFirstVisibleCell,
+                unknownLengthEstimateBeforeFirstVisibleCell,
+                firstCellMinY,
+                (a, b, minY) -> Double.valueOf(Math.round(a + b - minY))
         )
         .orElseConst(0.0);
 
