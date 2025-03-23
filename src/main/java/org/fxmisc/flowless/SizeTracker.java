@@ -4,7 +4,6 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.NoSuchElementException;
 
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableObjectValue;
 import javafx.geometry.Bounds;
 import javafx.scene.control.IndexRange;
@@ -135,9 +134,6 @@ final class SizeTracker {
                 totalLengthEstimate.pin(),
                 lengthOffsetEstimate.pin());
     }
-
-    private SimpleBooleanProperty immediateUpdate = new SimpleBooleanProperty();
-    void updateNextLengthOffsetEstimateImmediately() { immediateUpdate.set( true ); }
 
     private static <T> Val<T> avoidFalseInvalidations(Val<T> src) {
         return new ValBase<T>() {

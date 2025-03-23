@@ -532,7 +532,6 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
         if(diff == 0) {
             // do nothing
         } else if(Math.abs(diff) <= length) { // distance less than one screen
-            sizeTracker.updateNextLengthOffsetEstimateImmediately();
             navigator.scrollCurrentPositionBy(diff);
         } else {
             jumpToAbsolutePosition(pixels);
