@@ -1,5 +1,11 @@
 # Change Log
 
+## [v0.7.4](https://github.com/FXMisc/Flowless/tree/v0.7.4) (2025-03-25)
+[Full Changelog](https://github.com/FXMisc/Flowless/compare/v0.7.3...v0.7.4)
+
+- Fix scroll thumb jumps ahead and returns back [\#124](https://github.com/FXMisc/Flowless/pull/127)
+  (Note that this reverts changes made in an effort to make scroll listeners less noisy.)
+
 ## [v0.7.3](https://github.com/FXMisc/Flowless/tree/v0.7.3) (2024-05-14)
 [Full Changelog](https://github.com/FXMisc/Flowless/compare/v0.7.2...v0.7.3)
 
