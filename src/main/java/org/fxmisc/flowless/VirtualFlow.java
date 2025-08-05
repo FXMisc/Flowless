@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import javafx.beans.property.ObjectProperty;
@@ -94,7 +95,7 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
             ObservableList<T> items,
             Function<? super T, ? extends C> cellFactory,
             Gravity gravity) {
-        return new VirtualFlow<>(items, cellFactory, new HorizontalHelper(), gravity);
+        return new VirtualFlow<>(items, (ndx,item) -> cellFactory.apply(item), new HorizontalHelper(), gravity);
     }
 
     /**
@@ -113,7 +114,17 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
             ObservableList<T> items,
             Function<? super T, ? extends C> cellFactory,
             Gravity gravity) {
-        return new VirtualFlow<>(items, cellFactory, new VerticalHelper(), gravity);
+        return new VirtualFlow<>(items, (ndx,item) -> cellFactory.apply(item), new VerticalHelper(), gravity);
+    }
+
+    /**
+     * Creates a viewport that lays out content vertically from top to bottom
+     * but with a cellFactory that also receives the item index. 
+     */
+    public static <T, C extends Cell<T, ?>> VirtualFlow<T, C> createVertical(
+            ObservableList<T> items,
+            BiFunction<Integer, ? super T, ? extends C> cellFactory) {
+        return new VirtualFlow<>(items, cellFactory, new VerticalHelper(), Gravity.FRONT);
     }
 
     private final ObservableList<T> items;
@@ -162,13 +173,13 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
 
     private VirtualFlow(
             ObservableList<T> items,
-            Function<? super T, ? extends C> cellFactory,
+            BiFunction<Integer, ? super T, ? extends C> cellFactory,
             OrientationHelper orientation,
             Gravity gravity) {
         this.getStyleClass().add("virtual-flow");
         this.items = items;
         this.orientation = orientation;
-        this.cellListManager = new CellListManager<>(this, items, cellFactory);
+        this.cellListManager = new CellListManager<T,C>(this, items, cellFactory);
         this.gravity.set(gravity);
         MemoizationList<C> cells = cellListManager.getLazyCellList();
         this.sizeTracker = new SizeTracker(orientation, layoutBoundsProperty(), cells);

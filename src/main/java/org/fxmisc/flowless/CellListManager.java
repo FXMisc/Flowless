@@ -1,7 +1,7 @@
 package org.fxmisc.flowless;
 
 import java.util.Optional;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -31,10 +31,10 @@ final class CellListManager<T, C extends Cell<T, ? extends Node>> {
     public CellListManager(
             Node owner,
             ObservableList<T> items,
-            Function<? super T, ? extends C> cellFactory) {
+            BiFunction<Integer, ? super T, ? extends C> cellFactory) {
         this.owner = owner;
         this.cellPool = new CellPool<>(cellFactory);
-        this.cells = LiveList.map(items, this::cellForItem).memoize();
+        this.cells = new IndexedMappedList<>(items, this::cellForItem).memoize();
         this.presentCells = cells.memoizedItems();
         this.cellNodes = presentCells.map(Cell::getNode);
         this.presentCellsSubscription = presentCells.observeQuasiModifications(this::presentCellsChanged);
@@ -95,8 +95,8 @@ final class CellListManager<T, C extends Cell<T, ? extends Node>> {
         }
     }
 
-    private C cellForItem(T item) {
-        C cell = cellPool.getCell(item);
+    private C cellForItem(Integer index, T item) {
+        C cell = cellPool.getCell(index, item);
 
         // apply CSS when the cell is first added to the scene
         Node node = cell.getNode();
@@ -132,7 +132,7 @@ final class CellListManager<T, C extends Cell<T, ? extends Node>> {
      * has moved out of the viewport and is thus removed from
      * the Navigator's children list. This breaks expected trackpad
      * scrolling behaviour, at least on macOS.
-     * 
+     *
      * So here we take over event-bubbling duties for ScrollEvent
      * and push them ourselves directly to the given owner.
      */

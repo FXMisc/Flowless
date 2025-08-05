@@ -2,17 +2,17 @@ package org.fxmisc.flowless;
 
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 /**
  * Helper class that stores a pool of reusable cells that can be updated via {@link Cell#updateItem(Object)} or
  * creates new ones via its {@link #cellFactory} if the pool is empty.
  */
 final class CellPool<T, C extends Cell<T, ?>> {
-    private final Function<? super T, ? extends C> cellFactory;
+    private final BiFunction<Integer, ? super T, ? extends C> cellFactory;
     private final Queue<C> pool = new LinkedList<>();
 
-    public CellPool(Function<? super T, ? extends C> cellFactory) {
+    public CellPool(BiFunction<Integer, ? super T, ? extends C> cellFactory) {
         this.cellFactory = cellFactory;
     }
 
@@ -20,12 +20,12 @@ final class CellPool<T, C extends Cell<T, ?>> {
      * Returns a reusable cell that has been updated with the current item if the pool has one, or returns a
      * newly-created one via its {@link #cellFactory}.
      */
-    public C getCell(T item) {
+    public C getCell(Integer index, T item) {
         C cell = pool.poll();
         if(cell != null) {
-            cell.updateItem(item);
+            cell.updateItem(index, item);
         } else {
-            cell = cellFactory.apply(item);
+            cell = cellFactory.apply(index, item);
         }
         return cell;
     }

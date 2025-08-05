@@ -48,6 +48,19 @@ public interface Cell<T, N extends Node> {
     }
 
     /**
+     * If this cell is reusable (as indicated by {@link #isReusable()}),
+     * this method is called to display a different item. {@link #reset()}
+     * will have been called before a call to this method.
+     *
+     * <p>The default implementation calls {@link #updateItem(Object)}
+     *
+     * @param item the new item to display
+     */
+    default void updateItem(Integer index, T item) {
+        updateItem(item);
+    }
+
+    /**
      * Called to update index of a visible cell.
      *
      * <p>Default implementation does nothing.
