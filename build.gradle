@@ -9,8 +9,8 @@ plugins {
     id 'eclipse'
     id 'biz.aQute.bnd.builder' version '5.3.0' // OSGi
     // OSGi bundle is configured through the bnd.bnd file
-    id 'maven-publish'
-    id 'signing'
+    id 'com.vanniktech.maven.publish' version '0.34.0'
+    id 'org.openjfx.javafxplugin' version '0.0.13'
 }
 
 version = '0.7.5-SNAPSHOT'
@@ -19,8 +19,9 @@ repositories {
     mavenCentral()
 }
 
-sourceCompatibility = '1.9'
-targetCompatibility = '1.9'
+compileJava {
+    options.release = 9
+}
 
 group = 'org.fxmisc.flowless'
 project.archivesBaseName = 'flowless'
@@ -60,86 +61,69 @@ javadoc {
     ]
 }
 
+javafx {
+    version = '11'
+    modules = ['javafx.controls']
+    def taskNames = gradle.getStartParameter().getTaskNames()
+    // Prevent pom & module.json from containing JavaFX runtime dependencies
+    if ( taskNames.stream().anyMatch( t -> t.startsWith('pub') ) ) {
+        configuration = 'compileOnly'
+    }
+}
+
 task fatJar(type: Jar, dependsOn: classes) {
     archiveAppendix = 'fat'
     manifest.attributes( 'Automatic-Module-Name': 'org.fxmisc.flowless' )
     from sourceSets.main.output
     from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+    excludes = [ 'module-info.class',  // block module-info files from other jars
+        '*.dll','javafx*','javafx/',   // block inclusion of javafx files
+        'com/'                         // block com/sun/* files
+    ]
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
+    archiveClassifier = 'javadoc'
     from 'build/docs/javadoc'
 }
 
 task sourcesJar(type: Jar) {
     from sourceSets.main.allSource
-    classifier = 'sources'
+    archiveClassifier = 'sources'
 }
 
-artifacts {
-    archives jar
-
-    archives javadocJar
-    archives sourcesJar
-}
-
-def doUploadArchives = project.hasProperty('sonatypeUsername') && project.hasProperty('sonatypePassword')
-publish.onlyIf { doUploadArchives }
-
-if(doUploadArchives) {
-    publishing {
-        repositories {
-            maven {
-               def releasesRepoUrl = "https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/"
-               def snapshotsRepoUrl = "https://central.sonatype.com/repository/maven-snapshots/"
-               url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
-                credentials {
-                    username = "${sonatypeUsername}"
-                    password = "${sonatypePassword}"
-                }
+mavenPublishing {
+    pom {
+        name = 'flowless'
+        packaging = 'jar'
+        description = 'Efficient VirtualFlow for JavaFX.'
+        url = 'https://github.com/FXMisc/Flowless/#flowless'
+   
+        scm {
+            url = 'scm:git@github.com:FXMisc/flowless.git'
+            connection = 'scm:git@github.com:FXMisc/Flowless.git'
+            developerConnection = 'scm:git@github.com:FXMisc/Flowless.git'
+        }
+   
+        licenses {
+            license {
+                name = 'The BSD 2-Clause License'
+                url = 'http://opensource.org/licenses/BSD-2-Clause'
+                distribution = 'repo'
             }
         }
-        publications {
-            flowless(MavenPublication) {
-                from components.java
-                artifact sourcesJar
-                artifact javadocJar
-                pom {
-                    name = 'flowless'
-                    packaging = 'jar'
-                    description = 'Efficient VirtualFlow for JavaFX.'
-                    url = 'https://github.com/FXMisc/Flowless/#flowless'
-               
-                    scm {
-                        url = 'scm:git@github.com:FXMisc/flowless.git'
-                        connection = 'scm:git@github.com:FXMisc/Flowless.git'
-                        developerConnection = 'scm:git@github.com:FXMisc/Flowless.git'
-                    }
-               
-                    licenses {
-                        license {
-                            name = 'The BSD 2-Clause License'
-                            url = 'http://opensource.org/licenses/BSD-2-Clause'
-                            distribution = 'repo'
-                        }
-                    }
-               
-                    developers {
-                        developer {
-                            name = 'Tomas Mikula'
-                        }
-                        developer {
-                            name = 'Jordan Martinez'
-                        }
-                   }
-                }
+   
+        developers {
+            developer {
+                name = 'Tomas Mikula'
             }
-        }
-    }
-    
-    signing {
-        sign publishing.publications.flowless
+            developer {
+                name = 'Jordan Martinez'
+            }
+            developer {
+                name = 'Jurgen Doll'
+            }
+       }
     }
 }
 
