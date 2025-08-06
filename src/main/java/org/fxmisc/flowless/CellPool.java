@@ -24,7 +24,7 @@ final class CellPool<T, C extends Cell<T, ?>> {
         C cell = pool.poll();
         if(cell != null) {
             // Note that update(index,item) invokes
-        	// cell.updateItem(item) by default
+            // cell.updateItem(item) by default
             cell.update(index, item);
         } else {
             // Note that cellFactory may just be a wrapper:
