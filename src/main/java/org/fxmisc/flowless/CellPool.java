@@ -23,8 +23,13 @@ final class CellPool<T, C extends Cell<T, ?>> {
     public C getCell(Integer index, T item) {
         C cell = pool.poll();
         if(cell != null) {
-            cell.updateItem(index, item);
+            // Note that update(index,item) invokes
+        	// cell.updateItem(item) by default
+            cell.update(index, item);
         } else {
+            // Note that cellFactory may just be a wrapper:
+            // (index, item) -> wrappedFactory.apply(item)
+            // See the various VirtualFlow creation methods
             cell = cellFactory.apply(index, item);
         }
         return cell;

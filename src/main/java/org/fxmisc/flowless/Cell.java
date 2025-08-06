@@ -38,13 +38,13 @@ public interface Cell<T, N extends Node> {
      * this method is called to display a different item. {@link #reset()}
      * will have been called before a call to this method.
      *
-     * <p>The default implementation throws
-     * {@link UnsupportedOperationException}.
+     * <p>The default implementation calls {@link #updateItem(Object)}
      *
+     * @param index the item's position in the VirtualFlow list
      * @param item the new item to display
      */
-    default void updateItem(T item) {
-        throw new UnsupportedOperationException();
+    default void update(Integer index, T item) {
+        updateItem(item);
     }
 
     /**
@@ -52,12 +52,13 @@ public interface Cell<T, N extends Node> {
      * this method is called to display a different item. {@link #reset()}
      * will have been called before a call to this method.
      *
-     * <p>The default implementation calls {@link #updateItem(Object)}
+     * <p>The default implementation throws
+     * {@link UnsupportedOperationException}.
      *
      * @param item the new item to display
      */
-    default void updateItem(Integer index, T item) {
-        updateItem(item);
+    default void updateItem(T item) {
+        throw new UnsupportedOperationException();
     }
 
     /**
