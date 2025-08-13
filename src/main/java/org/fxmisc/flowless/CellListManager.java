@@ -78,6 +78,17 @@ final class CellListManager<T, C extends Cell<T, ? extends Node>> {
     }
 
     /**
+     * This is a noop on non visible items. For reusable Cells this will cause
+     * updateItem to be invoked on the next available pooled Cell. If a Cell is
+     * not available or reusable, a new Cell is created via the cell factory.
+     */
+    public void refreshCell(int itemIndex) {
+        if (itemIndex >= 0 && itemIndex < cells.size() && cells.isMemoized(itemIndex)) {
+            cells.forget(itemIndex, itemIndex+1);
+        }
+    }
+
+    /**
      * Updates the list of cells to display
      *
      * @param fromItem the index of the first item to display

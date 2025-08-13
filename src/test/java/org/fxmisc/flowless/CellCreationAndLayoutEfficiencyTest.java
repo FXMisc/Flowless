@@ -72,6 +72,14 @@ public class CellCreationAndLayoutEfficiencyTest extends FlowlessTestBase {
     }
 
     @Test
+    public void refreshing_a_cell_in_viewport_creates_and_lays_out_once() {
+        // refresh a cell in the viewport
+        interact(() -> flow.refreshCell(10));
+        assertEquals(1, cellCreations.getAndReset());
+        assertEquals(1, cellLayouts.getAndReset());
+    }
+
+    @Test
     public void deleting_an_item_in_viewport_only_creates_and_lays_out_cell_once() {
         // delete an item in the middle of the viewport
         interact(() -> items.remove(12));

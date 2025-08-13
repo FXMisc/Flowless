@@ -222,6 +222,15 @@ public class VirtualFlow<T, C extends Cell<T, ?>> extends Region implements Virt
     }
 
     /**
+     * This is a noop on non visible items. For reusable Cells this will cause
+     * updateItem to be invoked on the next available pooled Cell. If a Cell is
+     * not available or reusable, a new Cell is created via the cell factory.
+     */
+    public void refreshCell(int itemIndex) {
+    	cellListManager.refreshCell(itemIndex);
+    }
+
+    /**
      * This method calls {@link #layout()} as a side-effect to insure
      * that the VirtualFlow is up-to-date in light of any changes
      */
