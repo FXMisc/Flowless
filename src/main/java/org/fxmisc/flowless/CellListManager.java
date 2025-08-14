@@ -82,10 +82,20 @@ final class CellListManager<T, C extends Cell<T, ? extends Node>> {
      * updateItem to be invoked on the next available pooled Cell. If a Cell is
      * not available or reusable, a new Cell is created via the cell factory.
      */
-    public void refreshCell(int itemIndex) {
-        if (itemIndex >= 0 && itemIndex < cells.size() && cells.isMemoized(itemIndex)) {
-            cells.forget(itemIndex, itemIndex+1);
-        }
+    public void refreshCells(int fromItem, int toItem) {
+    	int start = Math.min( fromItem, toItem );
+    	int end = Math.max( fromItem, toItem );
+
+    	IndexRange memorizedRange = cells.getMemoizedItemsRange();
+    	int min = memorizedRange.getStart();
+    	int max = memorizedRange.getEnd();
+
+    	start = Math.max( start, min );
+    	end = Math.min( end, max );
+
+    	if ( start < max && end > min ) {
+    		cells.forget(start, end);
+    	}
     }
 
     /**
