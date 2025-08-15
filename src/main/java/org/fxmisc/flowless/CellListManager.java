@@ -81,21 +81,21 @@ final class CellListManager<T, C extends Cell<T, ? extends Node>> {
      * This is a noop on non visible items. For reusable Cells this will cause
      * updateItem to be invoked on the next available pooled Cell. If a Cell is
      * not available or reusable, a new Cell is created via the cell factory.
+     * @param fromItem - the start index, inclusive.
+     * @param toItem - the end index, exclusive.
      */
     public void refreshCells(int fromItem, int toItem) {
-    	int start = Math.min( fromItem, toItem );
-    	int end = Math.max( fromItem, toItem );
+        if (fromItem >= toItem) throw new IllegalArgumentException(
+            String.format("To must be greater than from. from=%s to=%s", fromItem, toItem)
+        );
 
-    	IndexRange memorizedRange = cells.getMemoizedItemsRange();
-    	int min = memorizedRange.getStart();
-    	int max = memorizedRange.getEnd();
+        IndexRange memorizedRange = cells.getMemoizedItemsRange();
+        fromItem = Math.max( fromItem, memorizedRange.getStart() );
+        toItem = Math.min( toItem, memorizedRange.getEnd() );
 
-    	start = Math.max( start, min );
-    	end = Math.min( end, max );
-
-    	if ( start < max && end > min ) {
-    		cells.forget(start, end);
-    	}
+        if (fromItem < toItem) {
+            cells.forget(fromItem, toItem);
+        }
     }
 
     /**
